@@ -122,15 +122,12 @@ public partial class MyGame : Sandbox.Game
 		await Task.DelaySeconds(0.1f);
 		foreach (Client pl in Client.All)
 		{
-			pl.Pawn.Delete();
+			if (pl.Pawn != null)
+			{
+				pl.Pawn.Delete();
+			}
 			var pawn = new Pawn();
 			pl.Pawn = pawn;
-		}
-		foreach (Bot pl in Bot.All)
-		{
-			pl.Client.Pawn.Delete();
-			var pawn = new Pawn();
-			pl.Client.Pawn = pawn;
 		}
 	}
 
@@ -171,23 +168,19 @@ public partial class MyGame : Sandbox.Game
 			DestroyCurrentSMBStage();
 			stwfp.CreateStage();
 			SkyGenerator.CreateBackground(CurrentSky);
-			NextGameState = Time.Now + 3;
+			NextGameState = Time.Now + 6;
+			SpawnAllBallsDelayed(0.1f);
 		}else
 		if (inState == 1)
 		{
-			foreach (Client pl in Client.All)
-			{
-				pl.Pawn.Delete();
-				var pawn = new Pawn();
-				pl.Pawn = pawn;
-			}
-			NextGameState = Time.Now + 60;
+			SpawnAllSpectators();
+			NextGameState = Time.Now + 2;
 		}else
 		if (inState == 2)
 		{
 			DestroyCurrentSMBStage();
 			PlayNextStageInCourse(CurrentCourse);
-			NextGameState = Time.Now + StageMaxTime;
+			NextGameState = Time.Now + (StageMaxTime * 100);
 			SkyGenerator.CreateBackground(CurrentSky);
 			SpawnAllBallsDelayed(0.1f);
 		}else
@@ -296,12 +289,12 @@ public partial class MyGame : Sandbox.Game
 	{
 		base.ClientJoined( client );
 
-		if (CurrentGameState == 0 | CurrentGameState == 3)
+		if (CurrentGameState == 1 | CurrentGameState == 3)
 		{
 			var pawn = new SpectatorPawn();
 			client.Pawn = pawn;
 		}else
-		if (CurrentGameState == 1 | CurrentGameState == 2)
+		if (CurrentGameState == 0 | CurrentGameState == 2)
 		{
 			var pawn = new Pawn();
 			client.Pawn = pawn;

@@ -18,7 +18,7 @@ public static partial class SkyGenerator
 		Log.Info("Want to generate " + inName);
 		foreach (Entity element in Entity.All)
 		{
-			if (element.Tags.Has("BGObject"))
+			if (element.Tags.Has("BGObject") && element.IsClientOnly)
 			{
 				Log.Info("Deleting old BG Object...");
 				element.Delete();
@@ -33,7 +33,7 @@ public static partial class SkyGenerator
 		MyGame GameEnt = Game.Current as MyGame;
 		foreach (Entity element in Entity.All)
 		{
-			if (element.Tags.Has("BGObject"))
+			if (element.Tags.Has("BGObject") && element.IsClientOnly)
 			{
 				Log.Info(GameEnt.BGScale);
 				element.Scale = GameEnt.BGScale;

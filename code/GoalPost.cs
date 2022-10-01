@@ -3,6 +3,7 @@ using SandboxEditor;
 using Sandbox.Component;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Sandbox;
 
@@ -20,6 +21,8 @@ partial class GoalPost : SMBObject
 	public PartyBall PartyBall {get;set;}
 
 	public Rotation PartyBallRotation {get;set;}
+
+	public GoalTapeEntity GoalTape {get;set;}
 
 	[Net]
 	public int WarpDist {get;set;}
@@ -63,13 +66,27 @@ partial class GoalPost : SMBObject
 		PartyBall.EnableTraceAndQueries = true;
 		PartyBall.EnableSolidCollisions = true;
 		PartyBall.EnableAllCollisions = true;
+
+		GoalTape = new GoalTapeEntity();
+		GoalTape.Owner = this;
+		List<TapePoint> GoalTapePoints = new List<TapePoint>{};
+		Vector3 TapeStart = Position + (Rotation.Up * 14) + (Rotation.Right * -18);
+		Vector3 TapeEnd = Position + (Rotation.Up * 14) + (Rotation.Right * 18);
+		float TapeSegments = 10;
+		for (int i = 0; i < TapeSegments; i++)
+		{
+			Vector3 PointPos = Vector3.Lerp(TapeStart, TapeEnd, i / (TapeSegments - 1));
+			TapePoint TempPoint = new TapePoint(PointPos, (i == 0 | i == TapeSegments - 1));
+			GoalTapePoints.Add(TempPoint);
+		}
+		GoalTape.CreateRope(GoalTapePoints);
 	}
 
 	public override void SimulateSMBObject()
 	{
 		base.SimulateSMBObject();
-		//Position = new Vector3(Position.x, Position.y, -30);
-		//Rotation = Rotation.FromRoll((float)Math.Sin(Time.Now * 12) * 80);
+		//Position = new Vector3(Position.x, Position.y, Position.z + ((float)Math.Sin(Time.Now * 6) * 2));
+		//Rotation = Rotation.FromYaw((float)Math.Sin(Time.Now * 4) * 80);
 		//Rotation = Rotation.Normal;
 		//Position += new Vector3((float)Math.Sin(Time.Now * 8) * Time.Delta * 800, (float)Math.Cos(Time.Now * 8) * Time.Delta * 800, 0);
 		//Position += new Vector3(Time.Delta * 1500, 0, 0);
@@ -82,6 +99,15 @@ partial class GoalPost : SMBObject
 		//}
 
 		//PartyBallRotation = Rotation.FromPitch(90);
+	}
+
+	[Event.Frame]
+	public void AnchorTapeEnds()
+	{
+		Vector3 TapeStart = Position + (Rotation.Up * 14) + (Rotation.Right * -18);
+		Vector3 TapeEnd = Position + (Rotation.Up * 14) + (Rotation.Right * 18);
+		GoalTape.Points[0].Position = TapeStart;
+		GoalTape.Points[GoalTape.Points.Count - 1].Position = TapeEnd;
 	}
 
 	[Event.Frame]
@@ -123,6 +149,10 @@ partial class GoalPost : SMBObject
 		if (PartyBall != null)
 		{
 			PartyBall.Delete();
+		}
+		if (GoalTape != null)
+		{
+			GoalTape.Delete();
 		}
 	}
 }

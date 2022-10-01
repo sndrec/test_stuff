@@ -42,6 +42,12 @@ public class course_w1
 				st006.CreateStage();
 				break;
 			case 7:
+				st007.CreateStage();
+				break;
+			case 8:
+				st008.CreateStage();
+				break;
+			case 9:
 				MyGame GameEnt = Game.Current as MyGame;
 				GameEnt.EndCourse();
 				CurrentStage = 0;

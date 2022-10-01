@@ -17,12 +17,14 @@ public struct SMBStage
 	public Angles SpawnRotation {get;set;}
 	public string StageSky {get;set;}
 	public List<SMBObject> StageObjects {get;set;}
+	public List<ModelEntity> BGObjects {get;set;}
 
 	public SMBStage(string InName, float InMaxTime, Vector3 InSpawnPos, Angles InSpawnRot, string InSkyName, string InGameMusic, float InBGScale)
 	{
 		Name = InName;
 		MaxTime = InMaxTime;
 		StageObjects = new List<SMBObject>();
+		BGObjects = new List<ModelEntity>();
 		SpawnPosition = InSpawnPos;
 		SpawnRotation = InSpawnRot;
 		StageSky = InSkyName;
@@ -46,6 +48,20 @@ public struct SMBStage
 		NewObject.EnableAllCollisions = true;
 		NewObject.EnableDrawing = true;
 		StageObjects.Add(NewObject);
+		return NewObject;
+	}
+
+	public ModelEntity AddBGObject(string InModel, Vector3 InPosition, Rotation InRotation)
+	{
+		ModelEntity NewObject = new ModelEntity();
+		NewObject.SetModel(InModel);
+		NewObject.SetupPhysicsFromModel(PhysicsMotionType.Keyframed);
+		NewObject.Position = InPosition;
+		NewObject.Rotation = InRotation;
+		NewObject.EnableAllCollisions = true;
+		NewObject.EnableDrawing = true;
+		BGObjects.Add(NewObject);
+		NewObject.Tags.Add("BGObject");
 		return NewObject;
 	}
 
@@ -90,6 +106,11 @@ public struct SMBStage
 			if (CheckEnt != null)
 			{
 				CheckEnt.Delete();
+			}
+			ModelEntity CheckEnt2 = element as ModelEntity;
+			if (CheckEnt2 != null)
+			{
+				CheckEnt2.Delete();
 			}
 		}
 	}

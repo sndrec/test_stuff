@@ -136,7 +136,6 @@ partial class Pawn : ModelEntity
 			ImpactParticle.SetPosition(2, new Vector3(RelativeComponent / 64, 0, 0));
 			ImpactParticle.SetPosition(1, HitPosition);
 			ImpactParticle.SetPosition(0, (HitNormal * RelativeComponent * -0.125f) + (FinalVel * 0.75f));
-			Log.Info(HitNormal * RelativeComponent);
 			ImpactParticle.Simulating = true;
 			ImpactParticle.EnableDrawing = true;
 		}
@@ -271,7 +270,6 @@ partial class Pawn : ModelEntity
 			ImpactParticle.SetPosition(2, new Vector3(RelativeComponent / 64, 0, 0));
 			ImpactParticle.SetPosition(1, HitPosition);
 			ImpactParticle.SetPosition(0, (HitNormal * RelativeComponent * -0.125f) + (FinalVel * 0.75f));
-			Log.Info(HitNormal * RelativeComponent);
 			ImpactParticle.Simulating = true;
 			ImpactParticle.EnableDrawing = true;
 		}
@@ -306,7 +304,7 @@ partial class Pawn : ModelEntity
 		SpectatorPawn NewPawn = new SpectatorPawn();
 		pl.Pawn = NewPawn;
 	}
-	public bool TryBallCollisionDiscrete(float RealDelta)
+	public bool TryBallCollisionDiscrete(float RealDelta, bool DoCollisionResponse)
 	{
 		bool CollisionHappened = false;
 		for (int i = 0; i < 4; i++)
@@ -345,7 +343,10 @@ partial class Pawn : ModelEntity
 				//DebugOverlay.Sphere(FinalTrace.HitPosition, 4, new Color(0,0,255), Time.Delta, false);
 
 				//DebugOverlay.Line(MoveTrace.HitPosition, MoveTrace.HitPosition + (FinalTrace.Normal * 32), new Color(255,255,255), 0.25f, false);
-				ClientVelocity = ApplyCollisionResponse(ClientVelocity, FinalTrace.Normal, MoveTrace.Entity, MoveTrace.HitPosition, RealDelta);
+				if (DoCollisionResponse)
+				{
+					ClientVelocity = ApplyCollisionResponse(ClientVelocity, FinalTrace.Normal, MoveTrace.Entity, MoveTrace.HitPosition, RealDelta);
+				}
 			}else
 			{
 				break;
@@ -366,26 +367,6 @@ partial class Pawn : ModelEntity
 		Vector3 ModifiedVelocity = ClientVelocity;
 		foreach (Entity element in Entity.All)
 		{
-			if (BallState == 0 && element != null)
-			{
-				if (element.Tags.Has("goaltrigger"))
-				{
-					SMBObject TriggerOwner = element.Owner as SMBObject;
-					Vector3 TriggerTestStart = SMBObject.TransformPosition(TriggerOwner.UninterpolatedTransform, SMBObject.InverseTransformPosition(TriggerOwner.OldTransform, OldPosition));
-					Trace GoalTrace = Trace.Ray(TriggerTestStart, ClientPosition);
-					GoalTrace.WithTag("goaltrigger");
-					TraceResult GoalTraceResult = GoalTrace.Run();
-					//DebugOverlay.Line(TriggerTestStart, ClientPosition);
-					if (GoalTraceResult.Hit)
-					{
-						DebugOverlay.Sphere(GoalTraceResult.HitPosition, 3, new Color(255, 0, 0), 1, false);
-						Log.Info("trigger hit");
-						ChangeBallState(2);
-					}
-					//Log.Info(element);
-					continue;
-				}
-			}
 
 			SMBObject CheckEnt = element as SMBObject;
 			if (CheckEnt == null | !CheckEnt.IsValid())
@@ -401,6 +382,12 @@ partial class Pawn : ModelEntity
 			TraceResult MoveTrace = Trace.Ray(RealStartPosition, TemporaryPosition + (TemporaryVelocity * RealDelta)).WithTag(CheckEnt.CollisionTag).IncludeClientside(true).Run();
 			if (MoveTrace.Hit)
 			{
+				//DebugOverlay.Sphere( RealStartPosition, 1, new Color(255,0,0), 30, false );
+				//DebugOverlay.Sphere( MoveTrace.HitPosition, 1, new Color(0,0,255), 30, false );
+				//DebugOverlay.Sphere( TemporaryPosition + (TemporaryVelocity * RealDelta), 1, new Color(255,255,255), 30, false );
+				//DebugOverlay.Line( RealStartPosition, MoveTrace.HitPosition, new Color(0,255,0), 30, false );
+				//DebugOverlay.Line( MoveTrace.HitPosition, TemporaryPosition + (TemporaryVelocity * RealDelta), new Color(0,255,255), 30, false );
+
 				if (ControlEnabled == false)
 				{
 					FirstHit = Time.Now;
@@ -408,6 +395,7 @@ partial class Pawn : ModelEntity
 				ControlEnabled = true;
 				TemporaryPosition = MoveTrace.HitPosition + (MoveTrace.Normal * 10);
 				TemporaryVelocity = ApplyCollisionResponse(TemporaryVelocity, MoveTrace.Normal, MoveTrace.Entity, MoveTrace.HitPosition, RealDelta);
+				//DebugOverlay.Line( MoveTrace.HitPosition, MoveTrace.HitPosition + (MoveTrace.Normal * 100), new Color(255,255,0), 30, false );
 				if (MoveTrace.Fraction < MinFrac)
 				{
 					MinFrac = MoveTrace.Fraction;
@@ -576,7 +564,10 @@ partial class Pawn : ModelEntity
 				bool DidContinuous = TryBallCollisionContinuous(RealDelta);
 				if (!DidContinuous)
 				{
-					TryBallCollisionDiscrete(RealDelta);
+					TryBallCollisionDiscrete(RealDelta, true);
+				}else
+				{
+					TryBallCollisionDiscrete(RealDelta, false);
 				}
 				if (LastHit + 0.1f < Time.Now)
 				{
@@ -600,12 +591,43 @@ partial class Pawn : ModelEntity
 					//Log.Info(RelativeVel.Length);
 					RollingWoop.SetVolume(MathX.Clamp(MathX.Remap(RelativeVel.Length, 50, 400, 0, 0.5f), 0, 1));
 					RollingWoop.SetPitch(MathX.Clamp(MathX.Remap(RelativeVel.Length, 50, 600, 0.3f, 2.25f), 0.25f, 2));
-					RollingGrind.SetVolume(MathX.Clamp(MathX.Remap(RelativeVel.Length, 300, 600, 0, 0.65f), 0, 0.65f));
-					RollingGrind.SetPitch(MathX.Clamp(MathX.Remap(RelativeVel.Length, 300, 700, 1f, 1.5f), 1f, 1.5f));
+					RollingGrind.SetVolume(MathX.Clamp(MathX.Remap(RelativeVel.Length, 300, 600, 0, 1f), 0, 1f));
+					RollingGrind.SetPitch(MathX.Clamp(MathX.Remap(RelativeVel.Length, 300, 700, 1f, 2f), 1f, 2f));
 				}else
 				{
 					RollingWoop.SetVolume(0);
 					RollingGrind.SetVolume(0);
+				}
+				foreach (Entity element in Entity.All)
+				{
+					if (element != null && element.Tags.Has("goaltrigger"))
+					{
+						SMBObject TriggerOwner = element.Owner as SMBObject;
+						Vector3 TriggerTestStart = SMBObject.TransformPosition(TriggerOwner.UninterpolatedTransform, SMBObject.InverseTransformPosition(TriggerOwner.OldTransform, OldPosition));
+						Trace GoalTrace = Trace.Ray(TriggerTestStart, ClientPosition);
+						GoalTrace.WithTag("goaltrigger");
+						TraceResult GoalTraceResult = GoalTrace.Run();
+						if (GoalTraceResult.Hit && BallState != 2)
+						{
+							GoalPost GoalEnt = GoalTraceResult.Entity.Owner as GoalPost;
+							ChangeBallState(2);
+							TapeStick ClosestStick = GoalEnt.GoalTape.Sticks[0];
+							float ClosestDist = 1000;
+							foreach (TapeStick Stick in GoalEnt.GoalTape.Sticks)
+							{
+								Vector3 StickCentre = (Stick.PointA.Position + Stick.PointB.Position) / 2;
+								float Dist = (StickCentre - ClientPosition).Length;
+								if (Dist < ClosestDist)
+								{
+									ClosestDist = Dist;
+									ClosestStick = Stick;
+								}
+							}
+							GoalEnt.GoalTape.Sticks.Remove(ClosestStick);
+							GoalEnt.GoalTape.UpdateRopeMesh(true);
+						}
+						continue;
+					}
 				}
 			}
 		}else
@@ -614,7 +636,7 @@ partial class Pawn : ModelEntity
 			Vector3 AddVelocity = new Vector3(0, 0, -1) * 588 * RealDelta;
 			ClientVelocity += AddVelocity;
 			ClientPosition = ClientPosition + (ClientVelocity * RealDelta);
-			TryBallCollisionDiscrete(RealDelta);
+			TryBallCollisionDiscrete(RealDelta, true);
 			TryBallCollisionContinuous(RealDelta);
 			if (Time.Now > LastStateChange + 2)
 			{
@@ -635,7 +657,7 @@ partial class Pawn : ModelEntity
 				ClientVelocity += -ClientVelocity * RealDelta * 3;
 			}
 			ClientPosition = ClientPosition + (ClientVelocity * RealDelta);
-			TryBallCollisionDiscrete(RealDelta);
+			TryBallCollisionDiscrete(RealDelta, true);
 			TryBallCollisionContinuous(RealDelta);
 			RollingWoop.SetVolume(0);
 			RollingGrind.SetVolume(0);
@@ -717,6 +739,10 @@ partial class Pawn : ModelEntity
 		}else
 		{
 			ServerRenderBall.EnableDrawing = false;
+		}
+		if ( Local.Client == null && Input.Pressed( InputButton.Run ))
+		{
+			GameEnt.NextGameState = Time.Now;
 		}
 
 		//MoveHelper helper = new MoveHelper( Position, Velocity );
