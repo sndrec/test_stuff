@@ -62,6 +62,10 @@ public partial class MyGame : Sandbox.Game
 		NextGameState = Time.Now + 30;
 		CurrentCourse = 1;
 		FirstFrame = false;
+		if ( IsClient )
+    {
+			_ = new UI_Base();
+    }
 	}
 
 	//states:
