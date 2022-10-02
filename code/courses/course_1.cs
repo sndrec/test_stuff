@@ -21,6 +21,8 @@ public class course_w1
 	public static void PlayNextStage()
 	{
 		CurrentStage++;
+		MyGame GameEnt = Game.Current as MyGame;
+		GameEnt.StageInCourse = CurrentStage;
 		switch (CurrentStage)
 		{
 			case 1:
@@ -48,7 +50,6 @@ public class course_w1
 				st008.CreateStage();
 				break;
 			case 9:
-				MyGame GameEnt = Game.Current as MyGame;
 				GameEnt.EndCourse();
 				CurrentStage = 0;
 				break;

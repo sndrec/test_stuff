@@ -9,6 +9,12 @@ partial class Pawn : ModelEntity
 	/// <summary>
 	/// Called when the entity is first created 
 	/// </summary>
+	[Net]
+	public ModelEntity ServerRenderBall {get;set;}
+	
+	[Net]
+	public float LatestNow {get;set;}
+
 	public Vector3 LastGroundNormal {get;set;}
 
 	public Vector3 LastGroundVel {get;set;}
@@ -34,9 +40,6 @@ partial class Pawn : ModelEntity
 	public float SpawnTime {get;set;}
 
 	public ModelEntity RenderBall {get;set;}
-
-	[Net]
-	public ModelEntity ServerRenderBall {get;set;}
 
 	public Rotation RenderBallAng {get;set;}
 
@@ -77,9 +80,6 @@ partial class Pawn : ModelEntity
 	public MyGame GameEnt {get;set;}
 
 	public bool AboutToGainControl {get;set;}
-
-	[Net]
-	public float LatestNow {get;set;}
 
 	public static float InOutQuad(float t, float b, float c, float d)
 	{
@@ -322,6 +322,11 @@ partial class Pawn : ModelEntity
 				if (ControlEnabled == false)
 				{
 					FirstHit = Time.Now;
+					if (GameEnt.HasFirstHit == false)
+					{
+						GameEnt.FirstHitTime = Time.Now;
+						GameEnt.HasFirstHit = true;
+					}
 					GameEnt.PlayGlobalSound("an_go");
 				}
 				ControlEnabled = true;
@@ -391,6 +396,11 @@ partial class Pawn : ModelEntity
 				if (ControlEnabled == false)
 				{
 					FirstHit = Time.Now;
+					if (GameEnt.HasFirstHit == false)
+					{
+						GameEnt.FirstHitTime = Time.Now;
+						GameEnt.HasFirstHit = true;
+					}
 				}
 				ControlEnabled = true;
 				TemporaryPosition = MoveTrace.HitPosition + (MoveTrace.Normal * 10);
@@ -611,6 +621,8 @@ partial class Pawn : ModelEntity
 						{
 							GoalPost GoalEnt = GoalTraceResult.Entity.Owner as GoalPost;
 							ChangeBallState(2);
+							float TimeRemaining = GameEnt.StageMaxTime - (Time.Now - GameEnt.FirstHitTime);
+							GameEnt.Score += (int)(TimeRemaining * 100);
 							TapeStick ClosestStick = GoalEnt.GoalTape.Sticks[0];
 							float ClosestDist = 1000;
 							foreach (TapeStick Stick in GoalEnt.GoalTape.Sticks)

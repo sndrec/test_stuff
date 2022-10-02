@@ -30,23 +30,32 @@ public partial class MyGame : Sandbox.Game
 	public string CurrentSky{get;set;}
 
 	[Net]
-	public Entity SkyRoot {get;set;}
-
-	[Net]
 	public float BGScale {get;set;}
 
 	[Net]
 	public string DesiredSong {get;set;}
 
-	public string PlayingSong {get;set;}
+	[Net]
+	public float NextGameState {get;set;}
 
-	public Sound GameMusic {get;set;}
+	[Net]
+	public float StageMaxTime {get;set;}
+
+	[Net]
+	public string StageName {get;set;}
+
+	[Net]
+	public int StageInCourse {get;set;}
+
+	public bool HasFirstHit {get;set;}
+
+	public float FirstHitTime {get;set;}
 
 	public SMBStage CurrentStage {get;set;}
 
-	public float NextGameState {get;set;}
+	public string PlayingSong {get;set;}
 
-	public float StageMaxTime {get;set;}
+	public Sound GameMusic {get;set;}
 
 	public int CurrentCourse {get;set;}
 
@@ -56,6 +65,8 @@ public partial class MyGame : Sandbox.Game
 
 	public bool FirstFrame {get;set;}
 
+	public int Score{get;set;}
+
 	public MyGame()
 	{
 		Global.TickRate = 60;
@@ -63,9 +74,9 @@ public partial class MyGame : Sandbox.Game
 		CurrentCourse = 1;
 		FirstFrame = false;
 		if ( IsClient )
-    {
+    	{
 			_ = new UI_Base();
-    }
+    	}
 	}
 
 	//states:
@@ -184,7 +195,7 @@ public partial class MyGame : Sandbox.Game
 		{
 			DestroyCurrentSMBStage();
 			PlayNextStageInCourse(CurrentCourse);
-			NextGameState = Time.Now + (StageMaxTime * 100);
+			NextGameState = Time.Now + (StageMaxTime + 5.6f);
 			SkyGenerator.CreateBackground(CurrentSky);
 			SpawnAllBallsDelayed(0.1f);
 		}else
@@ -265,13 +276,13 @@ public partial class MyGame : Sandbox.Game
 				ChangeGameState(3);
 			}
 		}
-		//Log.Info(CurrentGameState);
 		//Log.Info(NextGameState - Time.Now);
 	}
 
 	[Event.Tick.Client]
 	public void ManageGameMusic()
 	{
+		Log.Info(CurrentGameState);
 		if (PlayingSong != DesiredSong)
 		{
 			Log.Info("Changing song!");

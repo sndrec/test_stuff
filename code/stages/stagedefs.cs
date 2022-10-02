@@ -61,7 +61,7 @@ public class st001
 		NewStage.AddStageObject("models/bg/jungle1/bg_jun1_pot_large.vmdl", GameEnt.BlenderPos(-26, 2, 0), Rotation.FromYaw(135));
 		NewStage.AddStageObject("models/bg/jungle1/bg_jun1_pot_large.vmdl", GameEnt.BlenderPos(-26, -10, 0), Rotation.FromYaw(180));
 		SMBObject SpinnerPlat = NewStage.AddStageObject("models/stages/test_world/st001_spinner.vmdl", new Vector3(2080,0,-50), Rotation.Identity);
-		NewStage.AddGoal(new Vector3(2080, 0, -90), Rotation.FromYaw(0));
+		NewStage.AddGoal(new Vector3(2080, 0, -90), Rotation.FromYaw(180));
 		SpinnerPlat.SimulateSMBObjectCustom = RotatePlatform;
 	}
 }
@@ -85,7 +85,7 @@ public class st002
 		NewStage.AddBGObject("models/bg/jungle1/bg_jun1_beanstalk.vmdl", GameEnt.BlenderPos(0, 44, 0f), Rotation.Identity);
 		NewStage.AddBGObject("models/bg/jungle1/bg_jun1_beanstalk.vmdl", GameEnt.BlenderPos(0, 0, 0f), Rotation.Identity);
 		NewStage.AddBGObject("models/bg/jungle1/bg_jun1_beanstalk.vmdl", GameEnt.BlenderPos(0, -52, 0f), Rotation.Identity);
-		NewStage.AddGoal(GameEnt.BlenderPos(0, -86, 0), Rotation.Identity);
+		NewStage.AddGoal(GameEnt.BlenderPos(0, -86, 0), Rotation.FromYaw(180));
 	}
 }
 
@@ -124,7 +124,7 @@ public class st004
 	{
 		SMBStage NewStage = new SMBStage("Downhill", 60, new Vector3(0, 0, 1210), new Angles(0, 0, 0), "sky_jun", "w1_jungle", 2);
 		NewStage.AddStageObject("models/stages/test_world/st004.vmdl", new Vector3(0,0,1200), Rotation.Identity);
-		NewStage.AddGoal(new Vector3(1400,-1600,-1200), Rotation.FromYaw(0));
+		NewStage.AddGoal(new Vector3(1400,-1600,-1200), Rotation.FromYaw(180));
 	}
 }
 

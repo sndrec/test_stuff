@@ -144,13 +144,14 @@ public partial class GoalTapeEntity : Entity
 			if (!p.Anchored && Local.Client.Pawn is Pawn)
 			{
 				Pawn Ball = Local.Client.Pawn as Pawn;
-				if ((p.Position - Ball.ClientPosition).Length < 11)
+				if ((p.Position - Ball.ClientPosition).Length < 10)
 				{
 					Vector3 NewNormal = (p.Position - Ball.ClientPosition).Normal;
 					NewNormal = (NewNormal * new Vector3(1, 1, 0.95f)).Normal;
-					Vector3 DesiredPosition = Ball.ClientPosition + (NewNormal * 11);
-					p.Velocity += (DesiredPosition - p.Position) / Time.Delta;
-					Ball.ClientVelocity -= (NewNormal * 8f * Time.Delta);
+					Vector3 DesiredPosition = Ball.ClientPosition + (NewNormal * 10);
+					p.Velocity += (DesiredPosition - p.Position) * (Time.Delta * 1000);
+					p.Position = DesiredPosition;
+					Ball.ClientVelocity -= (NewNormal * 10f * Time.Delta);
 				}
 			}
 			//DebugOverlay.Sphere(p.Position, 0.5f, new Color(255, 0, 0), Time.Delta, false);

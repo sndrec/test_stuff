@@ -36,6 +36,7 @@ public struct SMBStage
 		GameEnt.CurrentSky = InSkyName;
 		GameEnt.DesiredSong = InGameMusic;
 		GameEnt.BGScale = InBGScale;
+		GameEnt.StageName = InName;
 	}
 
 	public SMBObject AddStageObject(string InModel, Vector3 InPosition, Rotation InRotation)
