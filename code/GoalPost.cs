@@ -138,6 +138,14 @@ partial class GoalPost : SMBObject
         glow.Color = new Color(0.25f, 0.25f, 1);
         glow.ObscuredColor = new Color(0.25f, 0.25f, 1);
         glow.Width = 150;
+        if (Local.Client.Pawn is Pawn)
+        {
+        	Pawn Ball = Local.Client.Pawn as Pawn;
+      		if (Ball.BallState == 2)
+      		{
+				PartyBall.PlaybackRate = 1;
+      		}
+        }
 	}
 
 	protected override void OnDestroy()

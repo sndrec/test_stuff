@@ -557,13 +557,13 @@ partial class Pawn : ModelEntity
 				Rotation GravDir = new Rotation(0f, 0f, -1f, 0f);
 				if (ControlEnabled == true)
 				{
-					YawTilt = MathX.Lerp(YawTilt, AnalogInput.y * 15, RealDelta * 10);
-					PitchTilt = MathX.Lerp(PitchTilt, AnalogInput.x * 15, RealDelta * 10);
+					YawTilt = MathX.Lerp(YawTilt, AnalogInput.y, RealDelta * 15);
+					PitchTilt = MathX.Lerp(PitchTilt, AnalogInput.x, RealDelta * 15);
 					float InX = (float)Math.Pow(Math.Abs(AnalogInput.x), 2) * Math.Sign(AnalogInput.x);
 					float InY = (float)Math.Pow(Math.Abs(AnalogInput.y), 2) * Math.Sign(AnalogInput.y);
 					//Log.Info(AnalogInput);
-					GravDir = GravDir.RotateAroundAxis(FixedEyeRot.Right, InX * -23);
-					GravDir = GravDir.RotateAroundAxis(FixedEyeRot.Forward, InY * -23);
+					GravDir = GravDir.RotateAroundAxis(FixedEyeRot.Right, PitchTilt * -23);
+					GravDir = GravDir.RotateAroundAxis(FixedEyeRot.Forward, YawTilt * -23);
 					GravDir = GravDir.Normal;
 				}
 				Vector3 AddVelocity = GravDir.Down * 588 * RealDelta;
@@ -621,6 +621,11 @@ partial class Pawn : ModelEntity
 						{
 							GoalPost GoalEnt = GoalTraceResult.Entity.Owner as GoalPost;
 							ChangeBallState(2);
+							Particles ImpactParticle = Particles.Create("particles/goalconfetti.vpcf");
+							ImpactParticle.SetPosition(0, GoalEnt.PartyBall.Position - (GoalEnt.PartyBall.Rotation.Up * 15));
+							ImpactParticle.SetPosition(1, ClientVelocity * 1);
+							ImpactParticle.Simulating = true;
+							ImpactParticle.EnableDrawing = true;
 							float TimeRemaining = GameEnt.StageMaxTime - (Time.Now - GameEnt.FirstHitTime);
 							GameEnt.Score += (int)(TimeRemaining * 100);
 							TapeStick ClosestStick = GoalEnt.GoalTape.Sticks[0];
@@ -673,6 +678,7 @@ partial class Pawn : ModelEntity
 			TryBallCollisionContinuous(RealDelta);
 			RollingWoop.SetVolume(0);
 			RollingGrind.SetVolume(0);
+			LastGroundVel += -LastGroundVel * Time.Delta * 2;
 		}
 
 		BBox StageBounds = new BBox(new Vector3(0, 0, 0), new Vector3(0, 0, 0));
@@ -832,7 +838,7 @@ partial class Pawn : ModelEntity
 				Vector3 VelNoZ = ClientVelocity;
 				VelNoZ.z = 0;
 				float VelNoZMag = VelNoZ.Length;
-				float CamMoveFracVelVert = (Math.Abs(ClientVelocity.z) + 100);
+				float CamMoveFracVelVert = Math.Min(Math.Abs(ClientVelocity.z) + 100, 500);
 				float CamMoveFracVelHoriz;
 				float SlowStart = 0.1f;
 				float FastStart = 1;
@@ -873,8 +879,8 @@ partial class Pawn : ModelEntity
 				//PitchTilt = MathX.Lerp(PitchTilt, AnalogInput.x * 12, RealDelta * 10);
 				Rotation NewCamRotation = new Angles(NewPitch + 15f, NewYaw, 0f).ToRotation();
 				Rotation FixedEyeRot = Rotation.From(0f, NewYaw, 0f);
-				Rotation HelperRotPitch = Rotation.FromAxis(FixedEyeRot.Right, PitchTilt);
-				Rotation HelperRotYaw = Rotation.FromAxis(FixedEyeRot.Forward, YawTilt);
+				Rotation HelperRotPitch = Rotation.FromAxis(FixedEyeRot.Right, PitchTilt * 15);
+				Rotation HelperRotYaw = Rotation.FromAxis(FixedEyeRot.Forward, YawTilt * 15);
 				MyGame GameEnt = Game.Current as MyGame;
 				GameEnt.StageTilt = (HelperRotPitch * HelperRotYaw);
 				EyeRotation = GameEnt.StageTilt * NewCamRotation;
@@ -933,8 +939,6 @@ partial class Pawn : ModelEntity
 		}else
 		if (BallState == 2)
 		{
-			LastGroundVel += -LastGroundVel * Time.Delta * 2;
-			Vector3 UsePosition = ClientPosition + new Vector3(0, 0, 15);
 			if (Time.Now > LastStateChange + 2)
 			{
 				if (!BlastingUp)
@@ -943,13 +947,40 @@ partial class Pawn : ModelEntity
 					BlastUpZLock = ClientPosition;
 					BlastingUp = true;
 				}
-				UsePosition = BlastUpZLock;
 			}
-			CameraGoalDesiredPosition = UsePosition + (Rotation.FromYaw(90 * Time.Delta) * (Rotation.LookAt(CameraGoalDesiredPosition - UsePosition)).Normal.Forward * 60);
-			CameraVelocity += (CameraGoalDesiredPosition - CameraPosition) * 16f * Time.Delta;
-			CameraVelocity += -CameraVelocity * Time.Delta * 4;
+			Vector3 DeltaPosition = (ClientPosition - CameraPosition);
+			float OurDot = Vector3.Dot(DeltaPosition, CameraVelocity);
+			DeltaPosition = DeltaPosition.Normal;
+			float AdjustedDelta = Time.Delta * 60;
+			float AdjustedDot = OurDot * -0.01f * AdjustedDelta;
+			if (!BlastingUp)
+			{
+				CameraVelocity += new Vector3(AdjustedDot * DeltaPosition.x * 0.05f, AdjustedDot * DeltaPosition.y * 0.05f, -CameraVelocity.z * Time.Delta);
+				CameraVelocity += -CameraVelocity * Time.Delta;
+			}
+			else
+			{
+				CameraVelocity += -CameraVelocity * Time.Delta * 2;
+			}
+			if (AdjustedDot < 0)
+			{
+				Log.Info(AdjustedDot);
+				CameraVelocity += new Vector3(AdjustedDot * 0.1f * DeltaPosition.y, AdjustedDot * 0.1f * DeltaPosition.x, 0);
+			}
 			CameraPosition = CameraPosition + (CameraVelocity * Time.Delta);
-			CameraRotation = Rotation.Slerp(CameraRotation, Rotation.LookAt(-(CameraPosition - ClientPosition), new Vector3(0, 0, 1)), Time.Delta * 30, true);
+			Vector3 CameraPivot = (ClientPosition + new Vector3(0, 0, 15));
+			Vector3 DeltaPivot = (CameraPosition - CameraPivot);
+			float PivotDist = DeltaPivot.Length;
+			if (PivotDist > 0.00001f && !BlastingUp)
+			{
+				Vector3 Dir = DeltaPivot.Normal;
+				CameraPosition = CameraPivot + (DeltaPivot.Normal * MathX.Lerp(PivotDist, 40, Time.Delta * 2));
+			}
+			if (!BlastingUp)
+			{
+				CameraPosition += new Vector3(0, 0, CameraPivot.z - CameraPosition.z) * 0.1f;
+			}
+			CameraRotation = Rotation.Slerp(CameraRotation, Rotation.LookAt(-(CameraPosition - ClientPosition), new Vector3(0, 0, 1)), Time.Delta * 15, true);
 			EyeRotation = CameraRotation;
 			EyePosition = CameraPosition;
 		}

@@ -202,7 +202,7 @@ public partial class MyGame : Sandbox.Game
 		if (inState == 3)
 		{
 			SpawnAllSpectators();
-			NextGameState = Time.Now + 5;
+			NextGameState = Time.Now + 0.5f;
 		}else
 		if (inState == 4)
 		{
@@ -282,10 +282,8 @@ public partial class MyGame : Sandbox.Game
 	[Event.Tick.Client]
 	public void ManageGameMusic()
 	{
-		Log.Info(CurrentGameState);
 		if (PlayingSong != DesiredSong)
 		{
-			Log.Info("Changing song!");
 			PlayingSong = DesiredSong;
 			GameMusic.Stop();
 			GameMusic = Sound.FromWorld(PlayingSong, new Vector3(0,0,0));
@@ -294,7 +292,7 @@ public partial class MyGame : Sandbox.Game
 		{
 			if (GameMusic.Finished)
 			{
-				Log.Info("Song loop began!");
+				GameMusic.Stop();
 				GameMusic = Sound.FromWorld(PlayingSong, new Vector3(0,0,0));
 			}
 		}

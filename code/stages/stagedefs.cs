@@ -52,7 +52,7 @@ public class st001
 			new AnimKeyframe(10, 3, new Vector3(-240, 480, 0), Rotation.Identity)
 		};
 		MyGame GameEnt = Game.Current as MyGame;
-		SMBStage NewStage = new SMBStage("Simple", 90, new Vector3(-1640, 0, 10), new Angles(0, 0, 0), "sky_jun", "w1_jungle", 2);
+		SMBStage NewStage = new SMBStage("Simple", 90, new Vector3(-1640, 0, 10), new Angles(0, 0, 0), "sky_jun", "mus_jungle", 2);
 		NewStage.AddStageObject("models/stages/test_world/st001.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		NewStage.AddStageObject("models/stages/test_world/st001_moveplat1.vmdl", new Vector3(0,0,0), Rotation.Identity, Plat1Keyframes);
 		NewStage.AddStageObject("models/stages/test_world/st001_moveplat1.vmdl", new Vector3(-240,480,0), Rotation.Identity, Plat2Keyframes);
@@ -80,7 +80,7 @@ public class st002
 	public static void CreateStage()
 	{
 		MyGame GameEnt = Game.Current as MyGame;
-		SMBStage NewStage = new SMBStage("Hollow", 60, GameEnt.BlenderPos(0, 70, 0.5f), new Angles(0, 0, 0), "sky_jun", "w1_jungle", 1);
+		SMBStage NewStage = new SMBStage("Hollow", 60, GameEnt.BlenderPos(0, 70, 0.5f), new Angles(0, 0, 0), "sky_jun", "mus_jungle", 1);
 		NewStage.AddStageObject("models/stages/test_world/st002.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		NewStage.AddBGObject("models/bg/jungle1/bg_jun1_beanstalk.vmdl", GameEnt.BlenderPos(0, 44, 0f), Rotation.Identity);
 		NewStage.AddBGObject("models/bg/jungle1/bg_jun1_beanstalk.vmdl", GameEnt.BlenderPos(0, 0, 0f), Rotation.Identity);
@@ -110,7 +110,7 @@ public class st003
 			new AnimKeyframe(14, 3, new Vector3(0, 0, 0), Rotation.Identity),
 			new AnimKeyframe(15, 3, new Vector3(0, 0, 0), Rotation.Identity)
 		};
-		SMBStage NewStage = new SMBStage("Repulse", 60, new Vector3(0, 0, 10), new Angles(0, 0, 0), "sky_jun", "w1_jungle", 1);
+		SMBStage NewStage = new SMBStage("Repulse", 60, new Vector3(0, 0, 10), new Angles(0, 0, 0), "sky_jun", "mus_jungle", 1);
 		NewStage.AddStageObject("models/stages/test_world/st003_mainplat.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		NewStage.AddStageObject("models/stages/test_world/st003_movingplat1.vmdl", new Vector3(0,0,0), Rotation.Identity, Plat1Keyframes);
 		NewStage.AddStageObject("models/stages/test_world/st003_movingplat2.vmdl", new Vector3(0,0,0), Rotation.Identity, Plat2Keyframes);
@@ -122,7 +122,7 @@ public class st004
 {
 	public static void CreateStage()
 	{
-		SMBStage NewStage = new SMBStage("Downhill", 60, new Vector3(0, 0, 1210), new Angles(0, 0, 0), "sky_jun", "w1_jungle", 2);
+		SMBStage NewStage = new SMBStage("Downhill", 60, new Vector3(0, 0, 1210), new Angles(0, 0, 0), "sky_jun", "mus_jungle", 2);
 		NewStage.AddStageObject("models/stages/test_world/st004.vmdl", new Vector3(0,0,1200), Rotation.Identity);
 		NewStage.AddGoal(new Vector3(1400,-1600,-1200), Rotation.FromYaw(180));
 	}
@@ -132,7 +132,7 @@ public class st005
 {
 	public static void CreateStage()
 	{
-		SMBStage NewStage = new SMBStage("Jump", 60, new Vector3(0, 0, 10), new Angles(0, 90, 0), "sky_jun", "w1_jungle", 1);
+		SMBStage NewStage = new SMBStage("Jump", 60, new Vector3(0, 0, 10), new Angles(0, 90, 0), "sky_jun", "mus_jungle", 1);
 		NewStage.AddStageObject("models/stages/test_world/st005.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		NewStage.AddGoal(new Vector3(-270,1290,-350), Rotation.FromYaw(-90));
 	}
@@ -143,7 +143,7 @@ public class st006
 	public static void CreateStage()
 	{
 		MyGame GameEnt = Game.Current as MyGame;
-		SMBStage NewStage = new SMBStage("Concentric", 60, new Vector3(0, 0, 10), new Angles(0, -90, 0), "sky_jun", "w1_jungle", 1);
+		SMBStage NewStage = new SMBStage("Concentric", 60, new Vector3(0, 0, 10), new Angles(0, -90, 0), "sky_jun", "mus_jungle", 1);
 		NewStage.AddStageObject("models/stages/test_world/st006.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		NewStage.AddGoal(GameEnt.BlenderPos(72, 0, -3.12992f), Rotation.FromYaw(-90));
 	}
@@ -154,7 +154,7 @@ public class st007
 	public static void CreateStage()
 	{
 		MyGame GameEnt = Game.Current as MyGame;
-		SMBStage NewStage = new SMBStage("Cut Corners", 60, GameEnt.BlenderPos(40, -4, 224.5f), new Angles(0, 180, 0), "sky_jun", "w1_jungle", 2);
+		SMBStage NewStage = new SMBStage("Cut Corners", 60, GameEnt.BlenderPos(40, -4, 224.5f), new Angles(0, 180, 0), "sky_jun", "mus_jungle", 2);
 		NewStage.AddStageObject("models/stages/test_world/st007.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		NewStage.AddGoal(GameEnt.BlenderPos(70.8796f, -36.0482f, -15.2052f), Rotation.From(new Angles(-29.5f, -70, 0)));
 	}
@@ -165,7 +165,7 @@ public class st008
 	public static void CreateStage()
 	{
 		MyGame GameEnt = Game.Current as MyGame;
-		SMBStage NewStage = new SMBStage("Loops for Days", 60, GameEnt.BlenderPos(-152, -24, 48.5f), new Angles(0, 90, 0), "sky_jun", "w1_jungle", 2);
+		SMBStage NewStage = new SMBStage("Loops for Days", 60, GameEnt.BlenderPos(-152, -24, 48.5f), new Angles(0, 90, 0), "sky_jun", "mus_jungle", 2);
 		NewStage.AddStageObject("models/stages/test_world/st008.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		NewStage.AddGoal(GameEnt.BlenderPos(104f, 86f, -39.0237f), Rotation.From(new Angles(0, 0, 0)));
 	}
