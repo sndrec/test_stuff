@@ -6,15 +6,15 @@
         <panel class="hud-score-layout">
           <panel class="hud-score-justbox">
             <label class="hud-score-toptext">Score:</label>
-            <label class="hud-score-displaytext">0</label>
+            <label @text="UI_ScoreDigits" class="hud-score-displaytext">0</label>
           </panel>
         </panel>
         <panel class="hud-time-layout">
 
           <panel class="hud-time-base">
             <label class="hud-time-toptext">Time</label>
-            <label class="hud-time-bigtime">60</label>
-            <label class="hud-time-smalltime">.000</label>
+            <label @text="UI_TimeSecond" class="hud-time-bigtime">60</label>
+            <label @text="UI_TimeMili" class="hud-time-smalltime">.000</label>
           </panel>
         </panel>
         <panel class="hud-right-layout"/>
@@ -22,9 +22,9 @@
       <panel class="hud-half">
         <panel class="hud-level-layout">
           <panel class="hud-level-numbox">
-            <label class="hud-level-numtext">0</label>
+            <label @text="UI_LevelNumber" class="hud-level-numtext">0</label>
           </panel>
-          <label class="hud-level-leveltext">Level Goes Here</label>
+          <label @text="UI_LevelName" class="hud-level-leveltext">Level Goes Here</label>
         </panel>
         <panel class="hud-middle-layout"/>
         <panel class="hud-radar-layout"/>
