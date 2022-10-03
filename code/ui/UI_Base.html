@@ -2,32 +2,65 @@
 <link rel="stylesheet" href="UI_Base.scss" />
 <div>
     <panel class="hud-base">
-      <panel class="hud-half">
-        <panel class="hud-score-layout">
-          <panel class="hud-score-justbox">
-            <label class="hud-score-toptext">Score:</label>
-            <label @text="UI_ScoreDigits" class="hud-score-displaytext">0</label>
-          </panel>
-        </panel>
-        <panel class="hud-time-layout">
 
-          <panel class="hud-time-base">
-            <label class="hud-time-toptext">Time</label>
-            <label @text="UI_TimeSecond" class="hud-time-bigtime">60</label>
-            <label @text="UI_TimeMili" class="hud-time-smalltime">.000</label>
-          </panel>
-        </panel>
-        <panel class="hud-right-layout"/>
-      </panel>
       <panel class="hud-half">
-        <panel class="hud-level-layout">
-          <panel class="hud-level-numbox">
-            <label @text="UI_LevelNumber" class="hud-level-numtext">0</label>
+        <panel class="hud-third left">
+
+          <panel class="hud-score-buffer"/>
+          <panel @ref="UIE_HudScalableOne" class="hud-score-layout">
+
+            <panel class="hud-score-justbox">
+              <label class="hud-score-toptext">Score:</label>
+              <label @text="UI_ScoreDigits" class="hud-score-displaytext">0</label>
+            </panel>
+
           </panel>
-          <label @text="UI_LevelName" class="hud-level-leveltext">Level Goes Here</label>
         </panel>
-        <panel class="hud-middle-layout"/>
-        <panel class="hud-radar-layout"/>
+
+        <panel class="hud-third center">
+          <panel @ref="UIE_HudScalableTwo" class="hud-time-layout-container">
+            <panel class="hud-time-layout">
+
+              <panel class="hud-time-buffer"/>
+              <panel class="hud-time-base">
+                <label class="hud-time-toptext">Time</label>
+                <label @text="UI_TimeSecond" class="hud-time-bigtime">60</label>
+                <label @text="UI_TimeMili" class="hud-time-smalltime">.000</label>
+              </panel>
+
+            </panel>
+          </panel>
+        </panel>
+
+        <panel class="hud-third">
+          <panel @ref="UIE_HudScalableThr" class="hud-right-layout"/>
+        </panel>
       </panel>
+
+      <panel class="hud-half">
+        <panel class="hud-third">
+
+          <panel @ref="UIE_HudScalableFou" class="hud-level-layout">
+            <panel class="hud-level-justbox">
+              <panel class="hud-level-numbox">
+                <label @text="UI_LevelNumber" class="hud-level-numtext">0</label>
+              </panel>
+              <label @text="UI_LevelName" class="hud-level-leveltext">Level Goes Here</label>
+            </panel>
+          </panel>
+
+        </panel>
+        <panel class="hud-third">
+
+          <panel @ref="UIE_HudScalableFiv" class="hud-middle-layout"/>
+
+        </panel>
+        <panel class="hud-third">
+
+          <panel @ref="UIE_HudScalableSix" class="hud-radar-layout"/>
+
+        </panel>
+      </panel>
+
     </panel>
 </div>

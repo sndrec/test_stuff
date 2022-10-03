@@ -1,4 +1,5 @@
 UI_Base {
+
   .hud-base {
     width: 100%;
     height: 100%;
@@ -6,18 +7,51 @@ UI_Base {
     flex-direction: column;
   }
 
+  .center {
+    justify-content: center;
+    //background-color: #ff0000;
+  }
+  .left {
+    //background-color: #ff0000;
+    align-items: flex-start;
+  }
+  .bottom {
+    background-color: #ff0000;
+  }
+
   //top and bottom half containers
   .hud-half {
     width: 100%;
     height: 50%;
+    justify-content: center;
+  }
+
+  //containers within containers
+  .hud-third {
+    width: 100%;
+    height: 100%;
   }
 
   //timer elements
-  .hud-time-layout {
-    width: 20%;
-    height: 34%;
-    justify-content: center;
+  .hud-time-layout-container {
+    width: 300px;
+    height: 0px;
+    //background-color: #ff0000;
+    position: relative;
     transform: scale(0.6);
+  }
+  .hud-time-layout {
+    width: 300px;
+    height: 315px;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    //background-color: #000000;
+    //align-self: start;
+
+  }
+  .hud-time-buffer {
+    height: 60px;
   }
   .hud-time-toptext {
     width: 100%;
@@ -36,7 +70,7 @@ UI_Base {
     height: 255px;
     background-color: #009af2;
     border-radius: 30px;
-    margin-top: 60px;
+    //margin-top: 60px;
     display: flex;
     flex-direction: column;
   }
@@ -67,18 +101,18 @@ UI_Base {
 
   //score elements
   .hud-score-layout {
-    width: 40%;
-    height: 33%;
-    justify-content: flex-start;
+    width: 0px;
+    height: 0px;
+    //justify-content: flex-start;
     //display: flex;
     //flex-direction: column;
     transform: scale(0.6);
   }
   .hud-score-justbox {
-    height: 100%;
+    height: 200px;
     width: 442px;
-    display: flex;
-    flex-direction: column;
+    position: absolute;
+    //background-color: #000000;
   }
   .hud-score-toptext {
     width: 100%;
@@ -86,12 +120,14 @@ UI_Base {
     color: white;
     text-stroke: 0.5px black;
     text-align: left;
-    left: 60px;
-    top: 20px;
+    //left: 60px;
+    //top: 20px;
     font-family: Poppins;
     font-weight: semibold;
     letter-spacing: -3px;
     text-shadow: 8px 8px #000000;
+    position: absolute;
+    left: 40px;
   }
   .hud-score-displaytext {
     width: 100%;
@@ -99,11 +135,14 @@ UI_Base {
     color: white;
     text-stroke: 0.5px black;
     text-align: right;
-    bottom: -15px;
+    //bottom: -15px;
     font-family: Poppins;
     font-weight: semibold;
     letter-spacing: -3px;
     text-shadow: 8px 8px #000000;
+    position: absolute;
+    top: 80px;
+    left: -20px;
   }
 
   //space
@@ -125,10 +164,20 @@ UI_Base {
 
   //level display elements
   .hud-level-layout {
-    width: 100%;
-    height: 100%;
-    justify-content: flex-start;
+    width: 0px;
+    height: 0px;
     transform: scale(0.6);
+    background-color: #0000ff;
+    position: absolute;
+    bottom: 20;
+    left: 20;
+  }
+  .hud-level-justbox {
+    height: 200px;
+    width: 1200px;
+    position: absolute;
+    //background-color: #000000;
+    bottom: 0;
   }
   .hud-level-numbox {
     position: absolute;
@@ -137,10 +186,8 @@ UI_Base {
     align-content: center;
     background-color: #009af2;
     border-radius: 10px;
-    display: inline-block;
+    //display: inline-block;
     align-self: flex-end;
-    bottom: 20px;
-    left: 20px;
   }
   .hud-level-numtext {
     width: 100%;
@@ -160,22 +207,22 @@ UI_Base {
     color: white;
     text-stroke: 0.5px black;
     text-align: left;
-    left: 220px;
+    left: 200px;
     top: 20px;
     font-family: Poppins;
     font-weight: semibold;
     letter-spacing: -3px;
     text-shadow: 8px 8px #000000;
-    display: inline-block;
+    //display: inline-block;
     align-self: flex-end;
-    padding-bottom: 50px;
+    padding-bottom: 30px;
   }
 
   //radar elements
   .hud-radar-layout {
     width: 100%;
     height: 100%;
-    justify-content: right;
+    //justify-content: right;
     transform: scale(0.6);
   }
 }
