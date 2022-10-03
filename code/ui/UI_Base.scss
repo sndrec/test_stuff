@@ -17,6 +17,7 @@ UI_Base {
     width: 20%;
     height: 34%;
     justify-content: center;
+    transform: scale(0.6);
   }
   .hud-time-toptext {
     width: 100%;
@@ -68,8 +69,10 @@ UI_Base {
   .hud-score-layout {
     width: 40%;
     height: 33%;
+    justify-content: flex-start;
     //display: flex;
     //flex-direction: column;
+    transform: scale(0.6);
   }
   .hud-score-justbox {
     height: 100%;
@@ -107,23 +110,28 @@ UI_Base {
   .hud-right-layout {
     width: 40%;
     height: 33%;
-    justify-content: center;
+    justify-content: flex-end;
     //background-color: #000000;
+    transform: scale(0.6);
   }
 
   //space
   .hud-middle-layout {
     width: 20%;
     height: 100%;
+    justify-content: center;
+    transform: scale(0.6);
   }
 
   //level display elements
   .hud-level-layout {
-    width: 40%;
+    width: 100%;
     height: 100%;
-    display: flex;
+    justify-content: flex-start;
+    transform: scale(0.6);
   }
   .hud-level-numbox {
+    position: absolute;
     width: 150px;
     height: 150px;
     align-content: center;
@@ -152,7 +160,7 @@ UI_Base {
     color: white;
     text-stroke: 0.5px black;
     text-align: left;
-    left: 60px;
+    left: 220px;
     top: 20px;
     font-family: Poppins;
     font-weight: semibold;
@@ -165,8 +173,9 @@ UI_Base {
 
   //radar elements
   .hud-radar-layout {
-    width: 40%;
+    width: 100%;
     height: 100%;
     justify-content: right;
+    transform: scale(0.6);
   }
 }
