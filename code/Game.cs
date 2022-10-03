@@ -337,6 +337,7 @@ public partial class MyGame : Sandbox.Game
 			StageTilt = Rotation.Identity;
 			FirstFrame = true;
 		}
+		Map.Camera.ZFar = 100000;
 		foreach (Entity element in Entity.All)
 		{
 			if (!element.Tags.Has("BGObject"))

@@ -8,13 +8,12 @@ namespace Sandbox;
 [SceneCamera.AutomaticRenderHook]
 internal class MyRenderHook : RenderHook 
 {
-	public Color MyColor { get; set; }
 
 	public override void OnStage( SceneCamera target, Stage renderStage )
 	{
 		if ( renderStage == Stage.AfterOpaque )
 		{
-			Graphics.Clear(false, false);
+			Map.Camera.ZFar = 100000;
 			foreach (Entity element in Entity.All)
 			{
 				if (element.Tags.Has("BGObject") && element is ModelEntity)

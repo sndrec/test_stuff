@@ -515,7 +515,6 @@ partial class Pawn : ModelEntity
 		ConsoleSystem.SetValue("snd_occlusion", 0);
 		ConsoleSystem.SetValue("snd_doppler", 0);
 		ConsoleSystem.SetValue("steamaudio_enable", 0);
-		Map.Camera.ZFar = 100000;
 	}
 
 	public void ChangeBallState(int InState)
@@ -557,8 +556,8 @@ partial class Pawn : ModelEntity
 				Rotation GravDir = new Rotation(0f, 0f, -1f, 0f);
 				if (ControlEnabled == true)
 				{
-					YawTilt = MathX.Lerp(YawTilt, AnalogInput.y, RealDelta * 15);
-					PitchTilt = MathX.Lerp(PitchTilt, AnalogInput.x, RealDelta * 15);
+					YawTilt = MathX.Lerp(YawTilt, AnalogInput.y, RealDelta * 24);
+					PitchTilt = MathX.Lerp(PitchTilt, AnalogInput.x, RealDelta * 24);
 					float InX = (float)Math.Pow(Math.Abs(AnalogInput.x), 2) * Math.Sign(AnalogInput.x);
 					float InY = (float)Math.Pow(Math.Abs(AnalogInput.y), 2) * Math.Sign(AnalogInput.y);
 					//Log.Info(AnalogInput);
@@ -623,7 +622,7 @@ partial class Pawn : ModelEntity
 							ChangeBallState(2);
 							Particles ImpactParticle = Particles.Create("particles/goalconfetti.vpcf");
 							ImpactParticle.SetPosition(0, GoalEnt.PartyBall.Position - (GoalEnt.PartyBall.Rotation.Up * 15));
-							ImpactParticle.SetPosition(1, ClientVelocity * 1);
+							ImpactParticle.SetPosition(1, ClientVelocity * 0.75f);
 							ImpactParticle.Simulating = true;
 							ImpactParticle.EnableDrawing = true;
 							float TimeRemaining = GameEnt.StageMaxTime - (Time.Now - GameEnt.FirstHitTime);
@@ -842,7 +841,7 @@ partial class Pawn : ModelEntity
 				float CamMoveFracVelHoriz;
 				float SlowStart = 0.1f;
 				float FastStart = 1;
-				float MaxSpeed = 50;
+				float MaxSpeed = 100;
 				if (VelNoZMag > FastStart)
 				{
 					float Ratio = Math.Min((VelNoZMag - FastStart) / MaxSpeed, 1);
@@ -877,17 +876,17 @@ partial class Pawn : ModelEntity
 				BallCamAng = new Angles(NewPitch, NewYaw, 0f);
 				//YawTilt = MathX.Lerp(YawTilt, AnalogInput.y * 12, RealDelta * 10);
 				//PitchTilt = MathX.Lerp(PitchTilt, AnalogInput.x * 12, RealDelta * 10);
-				Rotation NewCamRotation = new Angles(NewPitch + 15f, NewYaw, 0f).ToRotation();
+				Rotation NewCamRotation = new Angles(NewPitch + 20f, NewYaw, 0f).ToRotation();
 				Rotation FixedEyeRot = Rotation.From(0f, NewYaw, 0f);
-				Rotation HelperRotPitch = Rotation.FromAxis(FixedEyeRot.Right, PitchTilt * 15);
-				Rotation HelperRotYaw = Rotation.FromAxis(FixedEyeRot.Forward, YawTilt * 15);
+				Rotation HelperRotPitch = Rotation.FromAxis(FixedEyeRot.Right, PitchTilt * 13.2f);
+				Rotation HelperRotYaw = Rotation.FromAxis(FixedEyeRot.Forward, YawTilt * 13.2f);
 				MyGame GameEnt = Game.Current as MyGame;
-				GameEnt.StageTilt = (HelperRotPitch * HelperRotYaw);
+				GameEnt.StageTilt = Rotation.Slerp(GameEnt.StageTilt, HelperRotPitch * HelperRotYaw, Time.Delta * 15f);
 				EyeRotation = GameEnt.StageTilt * NewCamRotation;
 				//EyeRotation = NewCamRotation;
 				//EyeRotation = EyeRotation.Normal;
-				float FakeRotOffsetUpDown = (NewPitch * -0.15f) + 15;
-				float FakeRotOffsetDist = (NewPitch * 0.15f) + 45;
+				float FakeRotOffsetUpDown = (NewPitch * -0.15f) + 10;
+				float FakeRotOffsetDist = (NewPitch * 0.15f) + 55;
 				//EyePosition = CameraOrigin - (EyeRotation.Forward * FakeRotOffsetDist) + (EyeRotation.Up * FakeRotOffsetUpDown);
 				EyePosition = CameraOrigin - (EyeRotation.Forward * FakeRotOffsetDist) + (EyeRotation.Up * FakeRotOffsetUpDown);
 				CameraVelocity = (EyePosition - CameraPosition) / RealDelta;
@@ -901,8 +900,8 @@ partial class Pawn : ModelEntity
 				CameraOrigin = StageStartTrace.HitPosition + (StageStartTrace.Normal * 10);
 				YawTilt = 0;
 				PitchTilt = 0;
-				Rotation NewCamRotation = BallCamAng.ToRotation() * Rotation.FromPitch(15);
-				Vector3 DesiredEyePosition = CameraOrigin - (NewCamRotation.Forward * 45) + (NewCamRotation.Up * 15);
+				Rotation NewCamRotation = BallCamAng.ToRotation() * Rotation.FromPitch(20);
+				Vector3 DesiredEyePosition = CameraOrigin - (NewCamRotation.Forward * 55) + (NewCamRotation.Up * 10);
 				Rotation DesiredEyeRotation = NewCamRotation.Normal;
 				BBox StageBounds = new BBox(new Vector3(0, 0, 0), new Vector3(0, 0, 0));
 				foreach (Entity element in Entity.All)
