@@ -15,15 +15,36 @@ public class UI_Base : RootPanel
     public string UI_TimeMili { get; set; }
     public string UI_LevelNumber { get; set; }
     public string UI_LevelName { get; set; }
+    public double UI_ScaleFactor {get;set;}
     public float ScoreInterp {get;set;}
     public float TimeInSeconds {get;set;}
     public float Milliseconds {get;set;}
+
+    public Panel UIE_HudScalableOne {get;set;}
+    public Panel UIE_HudScalableTwo {get;set;}
+    public Panel UIE_HudScalableThr {get;set;}
+    public Panel UIE_HudScalableFou {get;set;}
+    public Panel UIE_HudScalableFiv {get;set;}
+    public Panel UIE_HudScalableSix {get;set;}
+    public string ScaleString {get;set;}
 
 	[Event.Frame]
 	public void GetVars()
 	{
 		MyGame GameEnt = Game.Current as MyGame;
 		Pawn Ball = Local.Client.Pawn as Pawn;
+
+    UI_ScaleFactor = 2.0/3; //REPLACE 2.0 WITH CONSOLE VARIABLE
+    ScaleString = "scale(" + UI_ScaleFactor.ToString() + ")";
+
+    UIE_HudScalableOne.Style.Set("transform",ScaleString);
+    UIE_HudScalableTwo.Style.Set("transform",ScaleString);
+    UIE_HudScalableThr.Style.Set("transform",ScaleString);
+    UIE_HudScalableFou.Style.Set("transform",ScaleString);
+    UIE_HudScalableFiv.Style.Set("transform",ScaleString);
+    UIE_HudScalableSix.Style.Set("transform",ScaleString);
+    //Log.Info(ScaleString);
+
 		if (GameEnt.CurrentGameState != 2)
 		{
 			GameEnt.HasFirstHit = false;
