@@ -264,6 +264,8 @@ public partial class MyGame : Sandbox.Game
 				pl.Pawn.Delete();
 			}
 			Pawn pawn = new Pawn();
+			pawn.Owner = pl as Entity;
+			pawn.GetPlayerStateManager();
 			pawn.UpdateCitizenClothing(pl);
 			pl.Pawn = pawn;
 		}
@@ -436,7 +438,8 @@ public partial class MyGame : Sandbox.Game
 		if (CurrentGameState == 0 | CurrentGameState == 2)
 		{
 			var pawn = new Pawn();
-			pawn.OurManager = NewManager;
+			pawn.Owner = client as Entity;
+			pawn.GetPlayerStateManager();
 			client.Pawn = pawn;
 		}
 

@@ -494,6 +494,7 @@ public partial class Pawn : ModelEntity
 		ServerRenderBall = new ModelEntity();
 		ServerRenderBall.SetModel( "models/ballbase.vmdl" );
 		ServerRenderBall.EnableDrawing = true;
+		ServerRenderBall.Predictable = true;
 		ServerRenderBall.Owner = this;
 		RenderBallAng = Rotation.Identity;
 		BallCitizen = new AnimatedEntity();
@@ -507,12 +508,19 @@ public partial class Pawn : ModelEntity
 		BallGravity = 588f;
 		BallMaxTilt = 23f;
 		BallMaxVisualTilt = 13.2f;
+	}
+
+	public void GetPlayerStateManager()
+	{
 		foreach (Entity element in Entity.All)
 		{
 			if (element is PlayerStateManager)
 			{
-				OurManager = element as PlayerStateManager;
-				break;
+				if (element.Owner == Owner)
+				{
+					OurManager = element as PlayerStateManager;
+					break;
+				}
 			}
 		}
 	}
@@ -619,7 +627,7 @@ public partial class Pawn : ModelEntity
 	public virtual Vector3 TickBallMovement(Vector3 AnalogInput)
 	{
 		float RealDelta = Math.Min(Global.TickInterval, Time.Delta);
-		AnalogInput = new Vector3(MathX.Clamp(AnalogInput.x, -1, 1), MathX.Clamp(AnalogInput.y, -1, 1), 0);
+		AnalogInput = new Vector3(MathX.Clamp(AnalogInput.x * (float)Math.Abs(AnalogInput.x), -1, 1), MathX.Clamp(AnalogInput.y * (float)Math.Abs(AnalogInput.y), -1, 1), 0);
 		if (BallState == 0)
 		{
 			if (Time.Now > SpawnTime + 5)
@@ -632,8 +640,8 @@ public partial class Pawn : ModelEntity
 				Rotation GravDir = new Rotation(0f, 0f, -1f, 0f);
 				if (ControlEnabled == true)
 				{
-					YawTilt = MathX.Lerp(YawTilt, AnalogInput.y, RealDelta * 24);
-					PitchTilt = MathX.Lerp(PitchTilt, AnalogInput.x, RealDelta * 24);
+					YawTilt = MathX.Lerp(YawTilt, AnalogInput.y, RealDelta * 21);
+					PitchTilt = MathX.Lerp(PitchTilt, AnalogInput.x, RealDelta * 21);
 					float InX = (float)Math.Pow(Math.Abs(AnalogInput.x), 2) * Math.Sign(AnalogInput.x);
 					float InY = (float)Math.Pow(Math.Abs(AnalogInput.y), 2) * Math.Sign(AnalogInput.y);
 					GravDir = GravDir.RotateAroundAxis(FixedEyeRot.Right, PitchTilt * -BallMaxTilt);
@@ -833,7 +841,9 @@ public partial class Pawn : ModelEntity
 			RenderBallAng = HelperRot * RenderBallAng;
 			ServerRenderBall.Rotation = RenderBallAng.Normal;
 			ServerRenderBall.Position = Position;
+			ServerRenderBall.ResetInterpolation();
 			BallCitizen.Position = Position + (CitizenRotation.Up * -9);
+			BallCitizen.ResetInterpolation();
 		}else
 		{
 			ServerRenderBall.EnableDrawing = false;
@@ -864,8 +874,10 @@ public partial class Pawn : ModelEntity
 		Rotation HelperRot2 = Rotation.FromAxis(SpinAxis, LastGroundVel.Length * Time.Delta * AmountToSpin);
 		CitizenRotation = (HelperRot2 * CitizenRotation).Normal;
 		ServerRenderBall.Position = ClientPosition;
+		ServerRenderBall.ResetInterpolation();
 		BallCitizen.Position = ClientPosition + (CitizenRotation.Up * -9);
 		BallCitizen.Rotation = CitizenRotation;
+		BallCitizen.ResetInterpolation();
 //
 		//camera stuff
 		if (BallState == 0)

@@ -168,11 +168,11 @@ public partial class AwardCopter : SMBObject
 			}
 			if (Placement == 2)
 			{
-				TargetPosition = GameEnt.BlenderPos(5.5f, -13.0f, 4f);
+				TargetPosition = GameEnt.BlenderPos(2.5f, -13.0f, 4f);
 			}
 			if (Placement == 3)
 			{
-				TargetPosition = GameEnt.BlenderPos(-5.5f, -13.0f, 3f);
+				TargetPosition = GameEnt.BlenderPos(-2.5f, -13.0f, 3f);
 			}
 		}else
 		if (TimeElapsed > 10f)
@@ -186,11 +186,11 @@ public partial class AwardCopter : SMBObject
 			}
 			if (Placement == 2)
 			{
-				TargetPosition = GameEnt.BlenderPos(5.5f, -20.0f, 5f);
+				TargetPosition = GameEnt.BlenderPos(2.5f, -20.0f, 5f);
 			}
 			if (Placement == 3)
 			{
-				TargetPosition = GameEnt.BlenderPos(-5.5f, -20.0f, 4f);
+				TargetPosition = GameEnt.BlenderPos(-2.5f, -20.0f, 4f);
 			}
 		}else
 		if (TimeElapsed > 8f)
@@ -204,29 +204,33 @@ public partial class AwardCopter : SMBObject
 			}
 			if (Placement == 2)
 			{
-				TargetPosition = GameEnt.BlenderPos(8f, 0f, 8f);
+				TargetPosition = GameEnt.BlenderPos(4f, 0f, 8f);
 			}
 			if (Placement == 3)
 			{
-				TargetPosition = GameEnt.BlenderPos(-8f, 0f, 4f);
+				TargetPosition = GameEnt.BlenderPos(-4f, 0f, 4f);
 			}
+			TargetPawn.BallFriction = 0.54f;
+			TargetPawn.BallMaxTilt = 23f;
 		}else
 		if (TimeElapsed > 7f)
 		{
 			//snag!
 			MovementFactor = 512f;
-			MovementDrag = 16f;
-			TargetPosition = TargetPawn.Position + new Vector3(0, 0, 11);
-			TargetPawn.ServerSetVelocity(TargetPawn.Velocity + (-TargetPawn.Velocity * Time.Delta * 12));
+			MovementDrag = 24f;
+			TargetPosition = TargetPawn.Position + new Vector3(0, 0, 12);
+			TargetPawn.BallFriction = 16f;
+			TargetPawn.BallMaxTilt = 0f;
 			BallOpen = false;
 		}else
 		if (TimeElapsed > 6f)
 		{
-			//start moving down
+			//even faster!
 			MovementFactor = 2048f;
 			MovementDrag = 48f;
-			TargetPosition = (TargetPawn.Position + (TargetPawn.Velocity * Time.Delta * 12)) + new Vector3(0, 0, 16);
-			TargetPawn.ServerSetVelocity(TargetPawn.Velocity + (-TargetPawn.Velocity * Time.Delta * 4));
+			TargetPosition = (TargetPawn.Position + (TargetPawn.Velocity * Time.Delta * 12)) + new Vector3(0, 0, 24);
+			TargetPawn.BallFriction = 8f;
+			TargetPawn.BallMaxTilt = 4f;
 			BallOpen = true;
 		}else
 		if (TimeElapsed > 4.5f)
@@ -234,7 +238,9 @@ public partial class AwardCopter : SMBObject
 			//chase faster!
 			MovementFactor = 96f;
 			MovementDrag = 12f;
-			TargetPosition = (TargetPawn.Position + (TargetPawn.Velocity * Time.Delta * 14)) + new Vector3(0, 0, 40);
+			TargetPosition = (TargetPawn.Position + (TargetPawn.Velocity * Time.Delta * 14)) + new Vector3(0, 0, 48);
+			TargetPawn.BallFriction = 4f;
+			TargetPawn.BallMaxTilt = 8f;
 			BallOpen = true;
 		}else
 		if (TimeElapsed > 3f)
@@ -242,7 +248,9 @@ public partial class AwardCopter : SMBObject
 			//start chasing
 			MovementFactor = 16f;
 			MovementDrag = 6f;
-			TargetPosition = (TargetPawn.Position + (TargetPawn.Velocity * Time.Delta * 32)) + new Vector3(0, 0, 40);
+			TargetPosition = (TargetPawn.Position + (TargetPawn.Velocity * Time.Delta * 32)) + new Vector3(0, 0, 48);
+			TargetPawn.BallFriction = 2f;
+			TargetPawn.BallMaxTilt = 15f;
 		}
 	}
 

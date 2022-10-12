@@ -50,7 +50,7 @@ public class UI_Base : RootPanel
 		{
 			GameEnt.HasFirstHit = false;
 		}
-		if (Ball != null)
+		if (Ball != null && Ball.OurManager != null)
 		{
 			ScoreInterp = MathX.Lerp(ScoreInterp, Ball.OurManager.Score, Time.Delta * 10, true);
 		}
