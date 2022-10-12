@@ -36,8 +36,11 @@ public partial class SMBObject : ModelEntity
 	public List<AnimKeyframe> Keyframes {get;set;}
 
 	public delegate void SimulateSMBObjectDelegate(SMBObject InObject);
-
 	public SimulateSMBObjectDelegate SimulateSMBObjectCustom;
+	public delegate void OnCollide(SMBObject InObject);
+	public OnCollide OnCollideMember;
+	public delegate Vector3 CustomVelocityAtPoint(SMBObject InObject, Vector3 InPoint, float DeltaTime);
+	public CustomVelocityAtPoint CustomVelocityAtPointMember;
 
 	[Net]
 	public string CollisionTag {get;set;}
@@ -110,8 +113,12 @@ public partial class SMBObject : ModelEntity
 	{
 		return UnrotateVector(InPoint - InTransform.Position, InTransform.Rotation) * (new Vector3(1, 1, 1) / InTransform.Scale);
 	}
-	public Vector3 GetVelocityAtPoint(Vector3 InPoint, float DeltaTime)
+	public virtual Vector3 GetVelocityAtPoint(Vector3 InPoint, float DeltaTime)
 	{
+		if (CustomVelocityAtPointMember != null)
+		{
+			return CustomVelocityAtPointMember(this, InPoint, DeltaTime);
+		}
 		Vector3 InvPoint = InverseTransformPosition(UninterpolatedTransform, InPoint);
 		Vector3 OldPoint = TransformPosition(OldTransform, InvPoint);
 		Vector3 VelAtPoint = (InPoint - OldPoint) / DeltaTime;

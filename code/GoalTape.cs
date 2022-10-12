@@ -147,7 +147,7 @@ public partial class GoalTapeEntity : Entity
 				if ((p.Position - Ball.ClientPosition).Length < 10)
 				{
 					Vector3 NewNormal = (p.Position - Ball.ClientPosition).Normal;
-					NewNormal = (NewNormal * new Vector3(1, 1, 0.95f)).Normal;
+					NewNormal = (NewNormal * new Vector3(1, 1, 0.8f)).Normal;
 					Vector3 DesiredPosition = Ball.ClientPosition + (NewNormal * 10);
 					p.Velocity += (DesiredPosition - p.Position) * (Time.Delta * 1000);
 					p.Position = DesiredPosition;

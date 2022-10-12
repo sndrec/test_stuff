@@ -15,15 +15,19 @@
 						[
 							{
 								from = "check.vmat"
-								to = "materials/stagemat/grass01.vmat"
+								to = "materials/stagemat/skyhigh/check1.vmat"
 							},
 							{
 								from = "check4.vmat"
-								to = "materials/stagemat/tw_detail6.vmat"
+								to = "materials/stagemat/skyhigh/trim2.vmat"
 							},
 							{
 								from = "fill.vmat"
-								to = "materials/stagemat/tw_fill.vmat"
+								to = "materials/stagemat/skyhigh/fill.vmat"
+							},
+							{
+								from = "check2.vmat"
+								to = "materials/stagemat/skyhigh/check2.vmat"
 							},
 						]
 						use_global_default = false

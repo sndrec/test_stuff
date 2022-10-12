@@ -36,7 +36,7 @@ partial class GoalPost : SMBObject
 		EnableDrawing = true;
 		EnableTouch = true;
 		PhysicsBody.EnableTouch = true;
-		GoalTrigger = new ModelEntity();
+		GoalTrigger = new SMBTrigger();
 		GoalTrigger.SetModel("models/goaltrigger.vmdl");
 		GoalTrigger.SetupPhysicsFromModel(PhysicsMotionType.Keyframed);
 		GoalTrigger.Tags.Add("goaltrigger");
@@ -119,11 +119,12 @@ partial class GoalPost : SMBObject
 		BasePartyBallRot = GameEnt.StageTilt * BasePartyBallRot;
 		PartyBall.AngVel = Rotation.Slerp(PartyBall.AngVel, (BasePartyBallRot * PartyBallRotation.Inverse).Normal, Time.Delta * 2);
 		//PartyBall.AngVel	= Rotation.Slerp(PartyBall.AngVel, Rotation.Identity, Time.Delta);
-		Rotation GoalRotInfluence = Rotation.Slerp(Rotation.Identity, OldTransform.Rotation.Inverse * Rotation, Time.Delta * 2);
-		float GoalPosInfluencePower = (Position - OldTransform.Position).Length * (1 - Vector3.Dot((Position - OldTransform.Position).Normal, -Rotation.Up)) * 0.06725f;
-		Rotation GoalPosInfluence = Rotation.FromAxis(Vector3.Cross((Position - OldTransform.Position).Normal, -PartyBallRotation.Up), GoalPosInfluencePower);
-		PartyBall.AngVel = GoalRotInfluence * PartyBall.AngVel;
-		PartyBall.AngVel = GoalPosInfluence * PartyBall.AngVel;
+		//Rotation GoalRotInfluence = Rotation.Slerp(Rotation.Identity, OldTransform.Rotation.Inverse * Rotation, Time.Delta * 2);
+		//float GoalPosInfluencePower = (Position - OldTransform.Position).Length * (1 - Vector3.Dot((Position - OldTransform.Position).Normal, -Rotation.Up)) * 0.06725f;
+		//Rotation GoalPosInfluence = Rotation.FromAxis(Vector3.Cross((Position - OldTransform.Position).Normal, -PartyBallRotation.Up), GoalPosInfluencePower);
+
+		//PartyBall.AngVel = (GoalRotInfluence * PartyBall.AngVel).Normal;
+		//PartyBall.AngVel = (GoalPosInfluence * PartyBall.AngVel).Normal;
 		Rotation TrueAngVel = Rotation.Slerp(Rotation.Identity, PartyBall.AngVel, Time.Delta * 30);
 		PartyBallRotation = (TrueAngVel * PartyBallRotation).Normal;
 		float DegreesOffset = Vector3.GetAngle(-PartyBallRotation.Up, -Rotation.Up);
@@ -131,7 +132,8 @@ partial class GoalPost : SMBObject
 		{
 			Vector3 Axis = Vector3.Cross(-PartyBallRotation.Up, -Rotation.Up).Normal;
 			PartyBallRotation = Rotation.FromAxis(Axis, DegreesOffset - 60) * PartyBallRotation;
-			PartyBall.AngVel = Rotation.FromAxis(Axis, DegreesOffset * Time.Delta * 1.5f);
+			PartyBall.AngVel = Rotation.FromAxis(Axis, DegreesOffset * Time.Delta * 1.5f).Normal;
+
 		}
 		PartyBall.Rotation = PartyBallRotation;
 		var glow = Components.GetOrCreate<Glow>();

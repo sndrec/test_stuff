@@ -65,8 +65,6 @@ public partial class MyGame : Sandbox.Game
 
 	public bool FirstFrame {get;set;}
 
-	public int Score{get;set;}
-
 	public MyGame()
 	{
 		Global.TickRate = 60;
@@ -77,6 +75,127 @@ public partial class MyGame : Sandbox.Game
     	{
 			_ = new UI_Base();
     	}
+	}
+
+	public Vector3 ApplyCollisionResponseGeneric(Vector3 InVelocity, Vector3 HitNormal, Entity HitEntity, Vector3 HitPosition, float RealDelta, bool DoParticlesAndSounds)
+	{
+		SMBObject HitEntitySMB = HitEntity as SMBObject;
+		Vector3 FinalVel = InVelocity;
+		Vector3 RelativeVel = InVelocity;
+		Vector3 VelAtPos = new Vector3(0,0,0);
+		if (HitEntitySMB != null)
+		{
+			VelAtPos = HitEntitySMB.GetVelocityAtPoint(HitPosition, Global.TickInterval);
+			RelativeVel = InVelocity - VelAtPos;
+		}
+		float RelativeComponent = Vector3.Dot(RelativeVel, HitNormal);
+		if (DoParticlesAndSounds)
+		{
+			if (RelativeComponent > 0)
+			{
+				return InVelocity;
+			}
+			if (RelativeComponent < -240)
+			{	
+				Sound BumpSound = Sound.FromEntity("ball_impact_hard", this);
+			}else
+			if (RelativeComponent < -150)
+			{	
+				Sound BumpSound = Sound.FromEntity("ball_impact_medium", this);
+			}else
+			if (RelativeComponent < -100)
+			{	
+				Sound BumpSound = Sound.FromEntity("ball_impact_soft", this);
+			}
+		}
+
+		RelativeComponent = Math.Abs(RelativeComponent);
+		float ResultSpeed = RelativeComponent * 1f;
+		float AddSpeed = RelativeComponent * 0.5f;
+		AddSpeed = Math.Max(0, AddSpeed - 10);
+		FinalVel += HitNormal * (ResultSpeed + AddSpeed);
+		if (DoParticlesAndSounds)
+		{
+			if (RelativeComponent > 150)
+			{
+				//2.x = amount of particles
+				//1 = position
+				//0 = direction/power
+				Particles ImpactParticle = Particles.Create("particles/collisionstars.vpcf");
+				ImpactParticle.SetPosition(2, new Vector3(RelativeComponent / 64, 0, 0));
+				ImpactParticle.SetPosition(1, HitPosition);
+				ImpactParticle.SetPosition(0, (HitNormal * RelativeComponent * -0.125f) + (FinalVel * 0.75f));
+				ImpactParticle.Simulating = true;
+				ImpactParticle.EnableDrawing = true;
+			}
+		}
+
+		return FinalVel;
+	}
+
+	public (Vector3, Vector3) TryBallCollisionDiscreteGenericServer(float BallRadius, Vector3 BallPosition, Vector3 BallVelocity, float RealDelta, bool DoCollisionResponse, bool DoEffects, string[] IgnoreTags)
+	{
+		DebugOverlay.Sphere(BallPosition, BallRadius, new Color(255,0,0), Time.Delta, false);
+		Vector3 ModifiedPosition = BallPosition;
+		Vector3 ModifiedVelocity = BallVelocity;
+		for (int i = 0; i < 4; i++)
+		{
+			TraceResult MoveTrace = Trace.Sphere(BallRadius, ModifiedPosition, ModifiedPosition).WithTag("solid").WithoutTags(IgnoreTags).Run();
+			if (MoveTrace.Hit)
+			{	
+				TraceResult DepenTrace;
+				Vector3 UseNormal = MoveTrace.Normal;
+				if (MoveTrace.StartedSolid)
+				{
+					DepenTrace = Trace.Ray(ModifiedPosition, MoveTrace.HitPosition).WithTag("solid").WithoutTags(IgnoreTags).Run();
+					if (DepenTrace.Hit)
+					{
+						ModifiedPosition = DepenTrace.HitPosition + (MoveTrace.Normal * 10.001f);
+						UseNormal = DepenTrace.Normal;
+					}
+				}
+				TraceResult FinalTrace = Trace.Sphere(9, ModifiedPosition, ModifiedPosition - (MoveTrace.Normal * 2)).WithTag("solid").WithoutTags(IgnoreTags).Run();
+				if (DoCollisionResponse)
+				{
+					ModifiedVelocity = ApplyCollisionResponseGeneric(ModifiedVelocity, FinalTrace.Normal, MoveTrace.Entity, MoveTrace.HitPosition, RealDelta, DoEffects);
+				}
+			}else
+			{
+				break;
+			}
+		}
+		return (ModifiedPosition, ModifiedVelocity);
+	}
+
+	public (Vector3, Vector3) TryBallCollisionDiscreteGenericClient(float BallRadius, Vector3 BallPosition, Vector3 BallVelocity, float RealDelta, bool DoCollisionResponse, bool DoEffects)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			TraceResult MoveTrace = Trace.Sphere(BallRadius, BallPosition, BallPosition).WithTag("solid").WithoutTags("smbtrigger").IncludeClientside(true).Run();
+			if (MoveTrace.Hit)
+			{	
+				TraceResult DepenTrace;
+				Vector3 UseNormal = MoveTrace.Normal;
+				if (MoveTrace.StartedSolid)
+				{
+					DepenTrace = Trace.Ray(BallPosition, MoveTrace.HitPosition).WithTag("solid").WithoutTags("smbtrigger").IncludeClientside(true).Run();
+					if (DepenTrace.Hit)
+					{
+						BallPosition = DepenTrace.HitPosition + (MoveTrace.Normal * 10.001f);
+						UseNormal = DepenTrace.Normal;
+					}
+				}
+				TraceResult FinalTrace = Trace.Sphere(9, BallPosition, BallPosition - (MoveTrace.Normal * 2)).WithTag("solid").WithoutTags("smbtrigger").IncludeClientside(true).Run();
+				if (DoCollisionResponse)
+				{
+					BallVelocity = ApplyCollisionResponseGeneric(BallVelocity, FinalTrace.Normal, MoveTrace.Entity, MoveTrace.HitPosition, RealDelta, DoEffects);
+				}
+			}else
+			{
+				break;
+			}
+		}
+		return (BallPosition, BallVelocity);
 	}
 
 	//states:
@@ -110,7 +229,10 @@ public partial class MyGame : Sandbox.Game
 
 	public void DestroyCurrentSMBStage()
 	{
-		CurrentStage.DestroyStage();
+		if (CurrentStage != null)
+		{
+			CurrentStage.DestroyStage();
+		}
 	}
 
 	public virtual void PlayNextStageInCourse(int InCourse)
@@ -121,7 +243,7 @@ public partial class MyGame : Sandbox.Game
 				course_w1.PlayNextStage();
 				break;
 			default:
-				course_w1.PlayNextStage();
+				course_test.PlayNextStage();
 				break;
 		}
 	}
@@ -134,14 +256,15 @@ public partial class MyGame : Sandbox.Game
 
 	public async void SpawnAllBallsDelayed(float InDelayTime)
 	{
-		await Task.DelaySeconds(0.1f);
+		await Task.DelaySeconds(0.01f);
 		foreach (Client pl in Client.All)
 		{
 			if (pl.Pawn != null)
 			{
 				pl.Pawn.Delete();
 			}
-			var pawn = new Pawn();
+			Pawn pawn = new Pawn();
+			pawn.UpdateCitizenClothing(pl);
 			pl.Pawn = pawn;
 		}
 	}
@@ -183,7 +306,7 @@ public partial class MyGame : Sandbox.Game
 			DestroyCurrentSMBStage();
 			stwfp.CreateStage();
 			SkyGenerator.CreateBackground(CurrentSky);
-			NextGameState = Time.Now + 6;
+			NextGameState = Time.Now + 6000;
 			SpawnAllBallsDelayed(0.1f);
 		}else
 		if (inState == 1)
@@ -194,7 +317,7 @@ public partial class MyGame : Sandbox.Game
 		if (inState == 2)
 		{
 			DestroyCurrentSMBStage();
-			PlayNextStageInCourse(CurrentCourse);
+			PlayNextStageInCourse(1);
 			NextGameState = Time.Now + (StageMaxTime + 5.6f);
 			SkyGenerator.CreateBackground(CurrentSky);
 			SpawnAllBallsDelayed(0.1f);
@@ -302,6 +425,9 @@ public partial class MyGame : Sandbox.Game
 	{
 		base.ClientJoined( client );
 
+		PlayerStateManager NewManager = new PlayerStateManager();
+		NewManager.Owner = client as Entity;
+
 		if (CurrentGameState == 1 | CurrentGameState == 3)
 		{
 			var pawn = new SpectatorPawn();
@@ -310,8 +436,10 @@ public partial class MyGame : Sandbox.Game
 		if (CurrentGameState == 0 | CurrentGameState == 2)
 		{
 			var pawn = new Pawn();
+			pawn.OurManager = NewManager;
 			client.Pawn = pawn;
 		}
+
 	}
 
 	public Transform StageTiltTransform(Transform InTransform)
@@ -337,7 +465,6 @@ public partial class MyGame : Sandbox.Game
 			StageTilt = Rotation.Identity;
 			FirstFrame = true;
 		}
-		Map.Camera.ZFar = 100000;
 		foreach (Entity element in Entity.All)
 		{
 			if (!element.Tags.Has("BGObject"))

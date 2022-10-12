@@ -4,16 +4,41 @@ using System.Linq;
 
 namespace Sandbox;
 
-partial class Pawn : ModelEntity
+public partial class Pawn : ModelEntity
 {
 	/// <summary>
 	/// Called when the entity is first created 
 	/// </summary>
-	[Net]
+	[Net, Predicted]
 	public ModelEntity ServerRenderBall {get;set;}
 	
 	[Net]
 	public float LatestNow {get;set;}
+
+	[Net, Predicted]
+	public AnimatedEntity BallCitizen {get;set;}
+
+	[Net]
+	public PlayerStateManager OurManager {get;set;}
+
+	[Net]
+	public float BallRestitution {get;set;}
+
+	[Net]
+	public float BallFriction {get;set;}
+
+	[Net]
+	public float BallGravity {get;set;}
+
+	[Net]
+	public float BallMaxTilt {get;set;}
+
+	[Net]
+	public float BallMaxVisualTilt {get;set;}
+
+	public Rotation CitizenRotation {get;set;}
+
+	public ClothingContainer CitizenClothing {get;set;}
 
 	public Vector3 LastGroundNormal {get;set;}
 
@@ -125,6 +150,36 @@ partial class Pawn : ModelEntity
 		float diff = AngleDifference( target, cur );
 
 		return MathX.Approach( cur, cur + diff, inc );
+	}
+
+	[ClientRpc]
+	public void ServerSetPosition(Vector3 InVector)
+	{
+		ClientPosition = InVector;
+	}
+
+	[ClientRpc]
+	public void ServerSetVelocity(Vector3 InVector)
+	{
+		ClientVelocity = InVector;
+	}
+
+	[ClientRpc]
+	public void ServerSetRotation(Rotation InRotation)
+	{
+		BallCamAng = InRotation.Angles();
+	}
+
+	[ClientRpc]
+	public void ServerAddPosition(Vector3 InVector)
+	{
+		ClientPosition += InVector;
+	}
+
+	[ClientRpc]
+	public void ServerAddVelocity(Vector3 InVector)
+	{
+		ClientVelocity += InVector;
 	}
 
 	[ClientRpc]
@@ -257,7 +312,7 @@ partial class Pawn : ModelEntity
 
 		RelativeComponent = Math.Abs(RelativeComponent);
 		float ResultSpeed = RelativeComponent * 1f;
-		float AddSpeed = RelativeComponent * 0.5f;
+		float AddSpeed = RelativeComponent * BallRestitution;
 		AddSpeed = Math.Max(0, AddSpeed - 10);
 		FinalVel += HitNormal * (ResultSpeed + AddSpeed);
 		LastVelAtPos = VelAtPos;
@@ -278,18 +333,6 @@ partial class Pawn : ModelEntity
 			SendServerCollision(InVelocity, HitNormal, HitEntity.NetworkIdent, HitPosition, Time.Now);
 			LastServerMessage = Time.Now;
 		}
-		//point 0 = position
-		//point 1 = velocity
-		//point 2 = emit rate
-		//Vector3 SparkPowerAndDir = (LastGroundVel + (HitNormal * LastGroundVel.Length * 0.25f)) * 0.75f;
-		//float SparksPerSec = (LastGroundVel.Length / 4) - 50;
-		//if (SparksPerSec < 25)
-		//{
-		//	SparksPerSec = 0;
-		//}
-		//Log.Info(HitPosition);
-		//Log.Info(SparkPowerAndDir);
-		//Log.Info(SparksPerSec);
 
 		return FinalVel;
 	}
@@ -298,24 +341,33 @@ partial class Pawn : ModelEntity
 	public static void Spectate()
 	{
 		Client pl = ConsoleSystem.Caller;
-		//Log.Info(pl);
-		//Log.Info(pl.Pawn);
 		pl.Pawn.Delete();
 		SpectatorPawn NewPawn = new SpectatorPawn();
 		pl.Pawn = NewPawn;
 	}
+
+	public bool TryDiscreteSteps(float RealDelta, bool DoCollisionResponse, int numSteps)
+	{
+		bool DidCollisionOccur = false;
+		for (int i = 0; i < numSteps; i++)
+		{
+			ClientPosition += (ClientVelocity * RealDelta) / numSteps;
+			bool CollidedThisIteration = TryBallCollisionDiscrete(RealDelta, DoCollisionResponse);
+			if (CollidedThisIteration)
+			{
+				DidCollisionOccur = true;
+			}
+		}
+		return DidCollisionOccur;
+	}
+
 	public bool TryBallCollisionDiscrete(float RealDelta, bool DoCollisionResponse)
 	{
+		string[] IgnoreTags = {"smbtrigger", "nocol"};
 		bool CollisionHappened = false;
 		for (int i = 0; i < 4; i++)
 		{
-			//Log.Info(i);
-			//Vector3 RealStartPosition = Position
-			//if (i == 0)
-			//{
-			//	RealStartPosition = SMBObject.TransformPosition(CheckEnt.Transform, SMBObject.InverseTransformPosition(CheckEnt.OldTransform, Position));
-			//}
-			TraceResult MoveTrace = Trace.Sphere(10, ClientPosition, ClientPosition).WithTag("solid").IncludeClientside(true).Run();
+			TraceResult MoveTrace = Trace.Sphere(10, ClientPosition, ClientPosition).WithTag("solid").WithoutTags(IgnoreTags).IncludeClientside(true).Run();
 			if (MoveTrace.Hit)
 			{	
 				CollisionHappened = true;
@@ -334,15 +386,20 @@ partial class Pawn : ModelEntity
 				Vector3 UseNormal = MoveTrace.Normal;
 				if (MoveTrace.StartedSolid)
 				{
-					DepenTrace = Trace.Ray(ClientPosition, MoveTrace.HitPosition).WithTag("solid").IncludeClientside(true).Run();
+					DepenTrace = Trace.Ray(ClientPosition, MoveTrace.HitPosition).WithTag("solid").WithoutTags(IgnoreTags).IncludeClientside(true).Run();
 					if (DepenTrace.Hit)
 					{
+						//bool BehindFace = Vector3.Dot(ClientPosition - DepenTrace.HitPosition, DepenTrace.Normal) > 0;
+						//Log.Info(Vector3.Dot(ClientPosition - DepenTrace.HitPosition, DepenTrace.Normal));
 						ClientPosition = DepenTrace.HitPosition + (MoveTrace.Normal * 10.001f);
 						UseNormal = DepenTrace.Normal;
 						//DebugOverlay.Sphere(DepenTrace.HitPosition, 3, new Color(0,255,0), Time.Delta, false);
+					}else
+					{
+						continue;
 					}
 				}
-				TraceResult FinalTrace = Trace.Sphere(9, ClientPosition, ClientPosition - (MoveTrace.Normal * 2)).WithTag("solid").IncludeClientside(true).Run();
+				TraceResult FinalTrace = Trace.Sphere(9, ClientPosition, ClientPosition - (MoveTrace.Normal * 2)).WithTag("solid").WithoutTags(IgnoreTags).IncludeClientside(true).Run();
 
 				//DebugOverlay.Sphere(MoveTrace.HitPosition, 3, new Color(255,0,0), Time.Delta, false);
 				//DebugOverlay.Sphere(FinalTrace.HitPosition, 4, new Color(0,0,255), Time.Delta, false);
@@ -363,6 +420,7 @@ partial class Pawn : ModelEntity
 	public bool TryBallCollisionContinuous(float RealDelta)
 	{
 		string[] ColTags = new string[] {"solid", "testingcollision"};
+		string[] IgnoreTags = {"smbtrigger", "nocol"};
 		float MinFrac = 1;
 		Vector3 UsedCollisionNormal = new Vector3(0, 0, 1);
 		Vector3 UsedCollisionPosition = new Vector3(0,0,0);
@@ -378,21 +436,12 @@ partial class Pawn : ModelEntity
 			{
 				continue;
 			}
-			//Log.Info(element);
-			//Log.Info("Testing against object");
-			//Log.Info(CheckEnt);
 			Vector3 TemporaryPosition = OriginalPosition;
 			Vector3 TemporaryVelocity = OriginalVelocity;
 			Vector3 RealStartPosition = SMBObject.TransformPosition(CheckEnt.UninterpolatedTransform, SMBObject.InverseTransformPosition(CheckEnt.OldTransform, TemporaryPosition));
-			TraceResult MoveTrace = Trace.Ray(RealStartPosition, TemporaryPosition + (TemporaryVelocity * RealDelta)).WithTag(CheckEnt.CollisionTag).IncludeClientside(true).Run();
+			TraceResult MoveTrace = Trace.Ray(RealStartPosition, TemporaryPosition + (TemporaryVelocity * RealDelta)).WithTag(CheckEnt.CollisionTag).WithoutTags(IgnoreTags).IncludeClientside(true).Run();
 			if (MoveTrace.Hit)
 			{
-				//DebugOverlay.Sphere( RealStartPosition, 1, new Color(255,0,0), 30, false );
-				//DebugOverlay.Sphere( MoveTrace.HitPosition, 1, new Color(0,0,255), 30, false );
-				//DebugOverlay.Sphere( TemporaryPosition + (TemporaryVelocity * RealDelta), 1, new Color(255,255,255), 30, false );
-				//DebugOverlay.Line( RealStartPosition, MoveTrace.HitPosition, new Color(0,255,0), 30, false );
-				//DebugOverlay.Line( MoveTrace.HitPosition, TemporaryPosition + (TemporaryVelocity * RealDelta), new Color(0,255,255), 30, false );
-
 				if (ControlEnabled == false)
 				{
 					FirstHit = Time.Now;
@@ -421,7 +470,6 @@ partial class Pawn : ModelEntity
 		else
 		if (MinFrac < 1)
 		{
-			//Log.Info(MinFrac);
 			ClientVelocity = ModifiedVelocity;
 			ClientPosition = ModifiedPosition;
 			return true;
@@ -446,8 +494,34 @@ partial class Pawn : ModelEntity
 		ServerRenderBall = new ModelEntity();
 		ServerRenderBall.SetModel( "models/ballbase.vmdl" );
 		ServerRenderBall.EnableDrawing = true;
+		ServerRenderBall.Owner = this;
 		RenderBallAng = Rotation.Identity;
+		BallCitizen = new AnimatedEntity();
+		BallCitizen.SetModel("models/citizen/citizen.vmdl");
+		BallCitizen.EnableTouch = false;
+		BallCitizen.Predictable = true;
+		BallCitizen.Owner = this;
+		BallCitizen.Scale = 0.2f;
+		BallRestitution = 0.5f;
+		BallFriction = 0.54f;
+		BallGravity = 588f;
+		BallMaxTilt = 23f;
+		BallMaxVisualTilt = 13.2f;
+		foreach (Entity element in Entity.All)
+		{
+			if (element is PlayerStateManager)
+			{
+				OurManager = element as PlayerStateManager;
+				break;
+			}
+		}
+	}
 
+	public void UpdateCitizenClothing(Client cl)
+	{
+		CitizenClothing = new ClothingContainer();
+		CitizenClothing.LoadFromClient(cl);
+		CitizenClothing.DressEntity(BallCitizen);
 	}
 
 	public override void ClientSpawn()
@@ -464,6 +538,7 @@ partial class Pawn : ModelEntity
 		RespawnBall(true);
 		SpawnTime = Time.Now;
 		GameEnt = Game.Current as MyGame;
+		CitizenRotation = Rotation.Identity;
 
 	}
 
@@ -496,7 +571,6 @@ partial class Pawn : ModelEntity
 		ClientPosition = GameEnt.CurrentSpawnPos + new Vector3(0, 0, 60);
 		BallCamAng = GameEnt.CurrentSpawnRot;
 		OldPosition = ClientPosition;
-		//Log.Info(GameEnt);
 		ChangeBallState(0);
 		SpawnTime = Time.Now - 3.5f;
 		if (FirstRespawn)
@@ -515,6 +589,8 @@ partial class Pawn : ModelEntity
 		ConsoleSystem.SetValue("snd_occlusion", 0);
 		ConsoleSystem.SetValue("snd_doppler", 0);
 		ConsoleSystem.SetValue("steamaudio_enable", 0);
+		ConsoleSystem.SetValue("r_farz", 100000);
+		ConsoleSystem.SetValue("r_nearz", 16);
 	}
 
 	public void ChangeBallState(int InState)
@@ -560,22 +636,24 @@ partial class Pawn : ModelEntity
 					PitchTilt = MathX.Lerp(PitchTilt, AnalogInput.x, RealDelta * 24);
 					float InX = (float)Math.Pow(Math.Abs(AnalogInput.x), 2) * Math.Sign(AnalogInput.x);
 					float InY = (float)Math.Pow(Math.Abs(AnalogInput.y), 2) * Math.Sign(AnalogInput.y);
-					//Log.Info(AnalogInput);
-					GravDir = GravDir.RotateAroundAxis(FixedEyeRot.Right, PitchTilt * -23);
-					GravDir = GravDir.RotateAroundAxis(FixedEyeRot.Forward, YawTilt * -23);
+					GravDir = GravDir.RotateAroundAxis(FixedEyeRot.Right, PitchTilt * -BallMaxTilt);
+					GravDir = GravDir.RotateAroundAxis(FixedEyeRot.Forward, YawTilt * -BallMaxTilt);
 					GravDir = GravDir.Normal;
 				}
-				Vector3 AddVelocity = GravDir.Down * 588 * RealDelta;
+				Vector3 AddVelocity = GravDir.Down * BallGravity * RealDelta;
 				ClientVelocity += AddVelocity;
 				OldVelocity = ClientVelocity;
 				Vector3 OldPos = ClientPosition;
-				ClientPosition = ClientPosition + (ClientVelocity * RealDelta);
+				//TryBallCollisionContinuousSphere(RealDelta);
+				//ClientPosition = ClientPosition + (ClientVelocity * RealDelta);
 				bool DidContinuous = TryBallCollisionContinuous(RealDelta);
 				if (!DidContinuous)
 				{
-					TryBallCollisionDiscrete(RealDelta, true);
+					//ClientPosition = ClientPosition + (ClientVelocity * RealDelta);
+					TryDiscreteSteps(RealDelta, true, 4);
 				}else
 				{
+					//ClientPosition = ClientPosition + (ClientVelocity * RealDelta);
 					TryBallCollisionDiscrete(RealDelta, false);
 				}
 				if (LastHit + 0.1f < Time.Now)
@@ -595,9 +673,8 @@ partial class Pawn : ModelEntity
 				if (GroundTime > 0)
 				{
 					Vector3 RelativeVel = ClientVelocity - LastVelAtPos;
-					RelativeVel += -RelativeVel * 0.54f * RealDelta;
+					RelativeVel += -RelativeVel * BallFriction * RealDelta;
 					ClientVelocity = RelativeVel + LastVelAtPos;
-					//Log.Info(RelativeVel.Length);
 					RollingWoop.SetVolume(MathX.Clamp(MathX.Remap(RelativeVel.Length, 50, 400, 0, 0.5f), 0, 1));
 					RollingWoop.SetPitch(MathX.Clamp(MathX.Remap(RelativeVel.Length, 50, 600, 0.3f, 2.25f), 0.25f, 2));
 					RollingGrind.SetVolume(MathX.Clamp(MathX.Remap(RelativeVel.Length, 300, 600, 0, 1f), 0, 1f));
@@ -609,47 +686,67 @@ partial class Pawn : ModelEntity
 				}
 				foreach (Entity element in Entity.All)
 				{
-					if (element != null && element.Tags.Has("goaltrigger"))
+					if (element != null && element.Tags.Has("smbtrigger"))
 					{
-						SMBObject TriggerOwner = element.Owner as SMBObject;
-						Vector3 TriggerTestStart = SMBObject.TransformPosition(TriggerOwner.UninterpolatedTransform, SMBObject.InverseTransformPosition(TriggerOwner.OldTransform, OldPosition));
-						Trace GoalTrace = Trace.Ray(TriggerTestStart, ClientPosition);
-						GoalTrace.WithTag("goaltrigger");
-						TraceResult GoalTraceResult = GoalTrace.Run();
-						if (GoalTraceResult.Hit && BallState != 2)
+						SMBObject TriggerEnt = element as SMBObject;
+						Vector3 TriggerTestStart = SMBObject.TransformPosition(TriggerEnt.UninterpolatedTransform, SMBObject.InverseTransformPosition(TriggerEnt.OldTransform, OldPosition));
+						Trace TriggerTrace = Trace.Ray(TriggerTestStart, ClientPosition);
+						TriggerTrace.WithTag("smbtrigger");
+						TraceResult[] TriggerTraceResults = TriggerTrace.RunAll();
+						if (TriggerTraceResults != null)
 						{
-							GoalPost GoalEnt = GoalTraceResult.Entity.Owner as GoalPost;
-							ChangeBallState(2);
-							Particles ImpactParticle = Particles.Create("particles/goalconfetti.vpcf");
-							ImpactParticle.SetPosition(0, GoalEnt.PartyBall.Position - (GoalEnt.PartyBall.Rotation.Up * 15));
-							ImpactParticle.SetPosition(1, ClientVelocity * 0.75f);
-							ImpactParticle.Simulating = true;
-							ImpactParticle.EnableDrawing = true;
-							float TimeRemaining = GameEnt.StageMaxTime - (Time.Now - GameEnt.FirstHitTime);
-							GameEnt.Score += (int)(TimeRemaining * 100);
-							TapeStick ClosestStick = GoalEnt.GoalTape.Sticks[0];
-							float ClosestDist = 1000;
-							foreach (TapeStick Stick in GoalEnt.GoalTape.Sticks)
+							foreach (TraceResult TriggerHit in TriggerTraceResults)
 							{
-								Vector3 StickCentre = (Stick.PointA.Position + Stick.PointB.Position) / 2;
-								float Dist = (StickCentre - ClientPosition).Length;
-								if (Dist < ClosestDist)
+								if (TriggerHit.Entity.Tags.Has("goaltrigger") && BallState != 2)
 								{
-									ClosestDist = Dist;
-									ClosestStick = Stick;
+									GoalPost GoalEnt = TriggerHit.Entity.Owner as GoalPost;
+									ChangeBallState(2);
+									Particles ImpactParticle = Particles.Create("particles/goalconfetti.vpcf");
+									ImpactParticle.SetPosition(0, GoalEnt.PartyBall.Position - (GoalEnt.PartyBall.Rotation.Up * 15));
+									ImpactParticle.SetPosition(1, ClientVelocity * 0.75f);
+									ImpactParticle.Simulating = true;
+									ImpactParticle.EnableDrawing = true;
+									float TimeRemaining = GameEnt.StageMaxTime - (Time.Now - GameEnt.FirstHitTime);
+									Log.Info("Time remaining = " + TimeRemaining);
+									PlayerStateManager.AddScoreFromClient(OurManager.NetworkIdent, (int)(TimeRemaining * 100));
+									int ClosestStickIndex = 0;
+									float ClosestDist = 1000;
+									for (int i = 0; i < GoalEnt.GoalTape.Sticks.Count; i++)
+									{	
+										TapeStick Stick = GoalEnt.GoalTape.Sticks[i];
+										Vector3 StickCentre = (Stick.PointA.Position + Stick.PointB.Position) / 2;
+										float Dist = (StickCentre - ClientPosition).Length;
+										if (Dist < ClosestDist)
+										{
+											ClosestDist = Dist;
+											ClosestStickIndex = i;
+										}
+									}
+									GoalEnt.GoalTape.Sticks[ClosestStickIndex].PointA.Velocity = ClientVelocity;
+									GoalEnt.GoalTape.Sticks[ClosestStickIndex].PointB.Velocity = ClientVelocity;
+									GoalEnt.GoalTape.Sticks.RemoveAt(ClosestStickIndex);
+									GoalEnt.GoalTape.UpdateRopeMesh(true);
+									continue;
+								}else
+								{
+									SMBTrigger CheckEnt = TriggerHit.Entity as SMBTrigger;
+									if (Vector3.Dot(TriggerHit.Direction, TriggerHit.Normal) < 0)
+									{
+										CheckEnt.OnEnterTrigger(this);
+									}else
+									{
+										CheckEnt.OnExitTrigger(this);
+									}
 								}
 							}
-							GoalEnt.GoalTape.Sticks.Remove(ClosestStick);
-							GoalEnt.GoalTape.UpdateRopeMesh(true);
 						}
-						continue;
 					}
 				}
 			}
 		}else
 		if (BallState == 1)
 		{
-			Vector3 AddVelocity = new Vector3(0, 0, -1) * 588 * RealDelta;
+			Vector3 AddVelocity = new Vector3(0, 0, -1) * BallGravity * RealDelta;
 			ClientVelocity += AddVelocity;
 			ClientPosition = ClientPosition + (ClientVelocity * RealDelta);
 			TryBallCollisionDiscrete(RealDelta, true);
@@ -683,7 +780,7 @@ partial class Pawn : ModelEntity
 		BBox StageBounds = new BBox(new Vector3(0, 0, 0), new Vector3(0, 0, 0));
 		foreach (Entity element in Entity.All)
 		{
-			if (element is SMBObject)
+			if (element is SMBObject && !element.Tags.Has("BGObject"))
 			{
 				StageBounds = StageBounds.AddPoint(element.WorldSpaceBounds.Mins);
 				StageBounds = StageBounds.AddPoint(element.WorldSpaceBounds.Maxs);
@@ -706,29 +803,12 @@ partial class Pawn : ModelEntity
 		if (Input.Down( InputButton.Jump ))
 		{
 			ClientVelocity = new Vector3(ClientVelocity.x, ClientVelocity.y, ClientVelocity.z + (2000 * RealDelta));
-			//ClientPosition += new Vector3(0, 0, 800 * RealDelta);
 		}
 
 		if (Input.Down( InputButton.Duck ))
 		{
 			ClientVelocity = new Vector3(ClientVelocity.x, ClientVelocity.y, ClientVelocity.z + (-2000 * RealDelta));
-			//ClientPosition += new Vector3(0, 0, 800 * RealDelta);
 		}
-
-
-		//Vector3 SpinAxis = Vector3.Cross(LastGroundNormal, LastGroundVel).Normal;
-		//Rotation = Rotation.RotateAroundAxis(SpinAxis, Velocity.Length * -0.05f);
-
-		// If we're running serverside and Attack1 was just pressed, spawn a ragdoll
-		//if ( IsServer && Input.Pressed( InputButton.PrimaryAttack ) )
-		//{
-		//	var ragdoll = new ModelEntity();
-		//	ragdoll.SetModel( "models/citizen/citizen.vmdl" );
-		//	ragdoll.Position = EyePosition + EyeRotation.Forward * 40;
-		//	ragdoll.Rotation = Rotation.LookAt( Vector3.Random.Normal );
-		//	ragdoll.SetupPhysicsFromModel( PhysicsMotionType.Dynamic, false );
-		//	ragdoll.PhysicsGroup.Velocity = EyeRotation.Forward * 1000;
-		//}
 
 		OldPosition = ClientPosition;
 		return ClientPosition;
@@ -748,11 +828,12 @@ partial class Pawn : ModelEntity
 		//DebugOverlay.Sphere(Position, 10, new Color(0,255,0), Time.Delta, false);
 		if ( Local.Client == null )
 		{
-			ServerRenderBall.Position = Position;
 			Vector3 SpinAxis = Vector3.Cross(LastGroundNormal, LastGroundVel).Normal;
 			Rotation HelperRot = Rotation.FromAxis(SpinAxis, LastGroundVel.Length * Time.Delta * 3);
 			RenderBallAng = HelperRot * RenderBallAng;
 			ServerRenderBall.Rotation = RenderBallAng.Normal;
+			ServerRenderBall.Position = Position;
+			BallCitizen.Position = Position + (CitizenRotation.Up * -9);
 		}else
 		{
 			ServerRenderBall.EnableDrawing = false;
@@ -762,52 +843,29 @@ partial class Pawn : ModelEntity
 			GameEnt.NextGameState = Time.Now;
 		}
 
-		//MoveHelper helper = new MoveHelper( Position, Velocity );
-		//helper.Trace = helper.Trace.Radius( 10 );
-		//helper.Trace.WithTag("solid");
-		//IReadOnlyList<SMBObject> Ents = SMBObject.All;
 
-		//Vector3 VelAtPoint = MoveTrace.Body.GetVelocityAtPoint(MoveTrace.HitPosition);
-		//Vector3 RelativeVel = Velocity - VelAtPoint;
-		//Log.Info(VelAtPoint);
-		//float NormalVel = Math.Max(Math.Abs(Vector3.Dot(MoveTrace.Normal, RelativeVel)) - 20, 0) * 0.5f;
-		//Vector3 ReflecVec = Vector3.Reflect(RelativeVel.Normal, MoveTrace.Normal);
-		//ReflecVec = RelativeVel.Length * ReflecVec;
-		//ReflecVec = ReflecVec.SubtractDirection(MoveTrace.Normal, 1f);
-		//ReflecVec = ReflecVec + (MoveTrace.Normal * NormalVel);
-		//Velocity = ReflecVec;
-		//LastGroundVel = Velocity;
-		//LastGroundNormal = MoveTrace.Normal;
-		//LastHit = Time.Now;
-
-		//float DistTravelled = helper.TryMove( Time.Delta );
-//
-		//if ( DistTravelled > 0 )
-		//{
-		//	Position = helper.Position;
-		//	Velocity = helper.Velocity;
-		//}
-		//if ( MoveTrace.Hit )
-		//{
-		//}
 	}
 
-	/// <summary>
-	/// Called every frame on the client
-	/// </summary>
 	public override void FrameSimulate( Client cl )
 	{
 		base.FrameSimulate( cl );
-		//if (!IsLocalPawn)
-		//{
-		//	RenderBall.EnableDrawing = true;
-		//}
-		//visual ball stuff
 		RenderBall.Position = ClientPosition;
 		Vector3 SpinAxis = Vector3.Cross(LastGroundNormal, LastGroundVel).Normal;
 		Rotation HelperRot = Rotation.FromAxis(SpinAxis, LastGroundVel.Length * Time.Delta * 3);
 		RenderBallAng = HelperRot * RenderBallAng;
 		RenderBall.Rotation = RenderBallAng.Normal;
+
+		Rotation DesiredCitizenRotation = Rotation.LookAt((ClientVelocity * new Vector3(1, 1, 0)) + BallCamAng.ToRotation().Forward);
+		float AngleBetween = (CitizenRotation.Inverse * DesiredCitizenRotation).Angle();
+		float RotateRate = 2f;
+		float Frac = (100 / AngleBetween) * Time.Delta * RotateRate;
+		CitizenRotation = Rotation.Slerp(CitizenRotation, DesiredCitizenRotation, Frac).Normal;
+		float AmountToSpin = MathX.Lerp(0.25f, 3, (LastGroundVel.Length - 400) / 300, true);
+		Rotation HelperRot2 = Rotation.FromAxis(SpinAxis, LastGroundVel.Length * Time.Delta * AmountToSpin);
+		CitizenRotation = (HelperRot2 * CitizenRotation).Normal;
+		ServerRenderBall.Position = ClientPosition;
+		BallCitizen.Position = ClientPosition + (CitizenRotation.Up * -9);
+		BallCitizen.Rotation = CitizenRotation;
 //
 		//camera stuff
 		if (BallState == 0)
@@ -833,11 +891,11 @@ partial class Pawn : ModelEntity
 				{
 					RealVelPitch -= 360;
 				}
-				RealVelPitch = Math.Min(RealVelPitch, 72);
+				RealVelPitch = MathX.Clamp(RealVelPitch, -68, 68);
 				Vector3 VelNoZ = ClientVelocity;
 				VelNoZ.z = 0;
 				float VelNoZMag = VelNoZ.Length;
-				float CamMoveFracVelVert = Math.Min(Math.Abs(ClientVelocity.z) + 100, 500);
+				float CamMoveFracVelVert = Math.Min(Math.Abs(ClientVelocity.z * 0.75f) + 100, 500);
 				float CamMoveFracVelHoriz;
 				float SlowStart = 0.1f;
 				float FastStart = 1;
@@ -855,7 +913,6 @@ partial class Pawn : ModelEntity
 				{
 					CamMoveFracVelHoriz = 0;
 				}
-				//Log.Info(CamMoveFracVelHoriz);
 				float PitchDiffFrac = Math.Abs(MathX.Clamp(AngleDifference(BallCamAng.pitch, RealVelPitch), -30, 30) / 30);
 				float YawDiffFrac = Math.Abs(MathX.Clamp(AngleDifference(BallCamAng.yaw, VelAngles.yaw), -30, 30) / 30);
 				float CamMoveFracPitch = CamMoveFracVelVert * PitchDiffFrac * 1f;
@@ -867,7 +924,10 @@ partial class Pawn : ModelEntity
 				{
 					NewPitch = 0;
 					TraceResult StageStartTrace = Trace.Ray(ClientPosition, ClientPosition + new Vector3(0, 0, -10000)).WithTag("solid").IncludeClientside(true).Run();
-					CameraOrigin = StageStartTrace.HitPosition + (StageStartTrace.Normal * 10);
+					if (StageStartTrace.Hit)
+					{
+						CameraOrigin = StageStartTrace.HitPosition + (StageStartTrace.Normal * 10);
+					}
 				}
 				if (Time.Now < FirstHit + 0.75f)
 				{
@@ -878,8 +938,8 @@ partial class Pawn : ModelEntity
 				//PitchTilt = MathX.Lerp(PitchTilt, AnalogInput.x * 12, RealDelta * 10);
 				Rotation NewCamRotation = new Angles(NewPitch + 20f, NewYaw, 0f).ToRotation();
 				Rotation FixedEyeRot = Rotation.From(0f, NewYaw, 0f);
-				Rotation HelperRotPitch = Rotation.FromAxis(FixedEyeRot.Right, PitchTilt * 13.2f);
-				Rotation HelperRotYaw = Rotation.FromAxis(FixedEyeRot.Forward, YawTilt * 13.2f);
+				Rotation HelperRotPitch = Rotation.FromAxis(FixedEyeRot.Right, PitchTilt * BallMaxVisualTilt);
+				Rotation HelperRotYaw = Rotation.FromAxis(FixedEyeRot.Forward, YawTilt * BallMaxVisualTilt);
 				MyGame GameEnt = Game.Current as MyGame;
 				GameEnt.StageTilt = Rotation.Slerp(GameEnt.StageTilt, HelperRotPitch * HelperRotYaw, Time.Delta * 15f);
 				EyeRotation = GameEnt.StageTilt * NewCamRotation;
@@ -897,7 +957,10 @@ partial class Pawn : ModelEntity
 			{
 				Vector3 CameraOrigin = ClientPosition;
 				TraceResult StageStartTrace = Trace.Ray(ClientPosition, ClientPosition + new Vector3(0, 0, -10000)).WithTag("solid").IncludeClientside(true).Run();
-				CameraOrigin = StageStartTrace.HitPosition + (StageStartTrace.Normal * 10);
+				if (StageStartTrace.Hit)
+				{
+					CameraOrigin = StageStartTrace.HitPosition + (StageStartTrace.Normal * 10);
+				}
 				YawTilt = 0;
 				PitchTilt = 0;
 				Rotation NewCamRotation = BallCamAng.ToRotation() * Rotation.FromPitch(20);
@@ -906,7 +969,7 @@ partial class Pawn : ModelEntity
 				BBox StageBounds = new BBox(new Vector3(0, 0, 0), new Vector3(0, 0, 0));
 				foreach (Entity element in Entity.All)
 				{
-					if (element is SMBObject)
+					if (element is SMBObject && !element.Tags.Has("BGObject"))
 					{
 						StageBounds = StageBounds.AddPoint(element.WorldSpaceBounds.Mins);
 						StageBounds = StageBounds.AddPoint(element.WorldSpaceBounds.Maxs);
@@ -951,21 +1014,19 @@ partial class Pawn : ModelEntity
 			float OurDot = Vector3.Dot(DeltaPosition, CameraVelocity);
 			DeltaPosition = DeltaPosition.Normal;
 			float AdjustedDelta = Time.Delta * 60;
-			float AdjustedDot = OurDot * -0.01f * AdjustedDelta;
+			float AdjustedDot = OurDot * -0.01f;
 			if (!BlastingUp)
 			{
-				CameraVelocity += new Vector3(AdjustedDot * DeltaPosition.x * 0.05f, AdjustedDot * DeltaPosition.y * 0.05f, -CameraVelocity.z * Time.Delta);
-				CameraVelocity += -CameraVelocity * Time.Delta;
+				//float OldZ = CameraVelocity.z + (-CameraVelocity.z * Time.Delta);
+				//CameraVelocity += DeltaPosition * AdjustedDot * AdjustedDelta;
 			}
-			else
+			if (AdjustedDot > 0)
 			{
-				CameraVelocity += -CameraVelocity * Time.Delta * 2;
+				CameraVelocity += DeltaPosition * AdjustedDelta * 2.5f;
 			}
-			if (AdjustedDot < 0)
-			{
-				Log.Info(AdjustedDot);
-				CameraVelocity += new Vector3(AdjustedDot * 0.1f * DeltaPosition.y, AdjustedDot * 0.1f * DeltaPosition.x, 0);
-			}
+			CameraVelocity += -CameraVelocity * Time.Delta * 1.25f;
+			CameraVelocity += new Vector3(CameraVelocity.Length * 0.01f * DeltaPosition.y * AdjustedDelta, CameraVelocity.Length * 0.01f * DeltaPosition.x * AdjustedDelta, 0);
+			//CameraVelocity += -CameraVelocity * Time.Delta;
 			CameraPosition = CameraPosition + (CameraVelocity * Time.Delta);
 			Vector3 CameraPivot = (ClientPosition + new Vector3(0, 0, 15));
 			Vector3 DeltaPivot = (CameraPosition - CameraPivot);

@@ -34,22 +34,26 @@ public class UI_Base : RootPanel
 		MyGame GameEnt = Game.Current as MyGame;
 		Pawn Ball = Local.Client.Pawn as Pawn;
 
-    UI_ScaleFactor = 2.0/3; //REPLACE 2.0 WITH CONSOLE VARIABLE
-    ScaleString = "scale(" + UI_ScaleFactor.ToString() + ")";
-
-    UIE_HudScalableOne.Style.Set("transform",ScaleString);
-    UIE_HudScalableTwo.Style.Set("transform",ScaleString);
-    UIE_HudScalableThr.Style.Set("transform",ScaleString);
-    UIE_HudScalableFou.Style.Set("transform",ScaleString);
-    UIE_HudScalableFiv.Style.Set("transform",ScaleString);
-    UIE_HudScalableSix.Style.Set("transform",ScaleString);
-    //Log.Info(ScaleString);
+    	UI_ScaleFactor = 2.0/3; //REPLACE 2.0 WITH CONSOLE VARIABLE
+    	ScaleString = "scale(" + UI_ScaleFactor.ToString() + ")";
+	
+    	UIE_HudScalableOne.Style.Set("transform",ScaleString);
+    	UIE_HudScalableTwo.Style.Set("transform",ScaleString);
+    	UIE_HudScalableThr.Style.Set("transform",ScaleString);
+    	UIE_HudScalableFou.Style.Set("transform",ScaleString);
+    	UIE_HudScalableFiv.Style.Set("transform",ScaleString);
+    	UIE_HudScalableSix.Style.Set("transform",ScaleString);
+    	//Log.Info(ScaleString);
+    	Local.Client.SetInt("FakeScore", Local.Client.GetInt("FakeScore", 0) + 1);
 
 		if (GameEnt.CurrentGameState != 2)
 		{
 			GameEnt.HasFirstHit = false;
 		}
-		ScoreInterp = MathX.Lerp(ScoreInterp, GameEnt.Score, Time.Delta * 10, true);
+		if (Ball != null)
+		{
+			ScoreInterp = MathX.Lerp(ScoreInterp, Ball.OurManager.Score, Time.Delta * 10, true);
+		}
 		if (Ball != null && Ball.BallState == 0)
 		{
 			TimeInSeconds = (float)Math.Floor(GameEnt.StageMaxTime - (Time.Now - GameEnt.FirstHitTime));

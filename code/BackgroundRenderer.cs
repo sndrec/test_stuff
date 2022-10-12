@@ -13,7 +13,6 @@ internal class MyRenderHook : RenderHook
 	{
 		if ( renderStage == Stage.AfterOpaque )
 		{
-			Map.Camera.ZFar = 100000;
 			foreach (Entity element in Entity.All)
 			{
 				if (element.Tags.Has("BGObject") && element is ModelEntity)
