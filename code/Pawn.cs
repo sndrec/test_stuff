@@ -1,6 +1,7 @@
 ﻿using Sandbox;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Sandbox;
 
@@ -35,6 +36,10 @@ public partial class Pawn : ModelEntity
 
 	[Net]
 	public float BallMaxVisualTilt {get;set;}
+
+	public List<QueuedSpark> QueuedSparks {get;set;}
+
+	public List<QueuedCollisionStar> QueuedStars {get;set;}
 
 	public Rotation CitizenRotation {get;set;}
 
@@ -105,6 +110,8 @@ public partial class Pawn : ModelEntity
 	public MyGame GameEnt {get;set;}
 
 	public bool AboutToGainControl {get;set;}
+
+	public float NextSpark {get;set;}
 
 	public static float InOutQuad(float t, float b, float c, float d)
 	{
@@ -271,6 +278,18 @@ public partial class Pawn : ModelEntity
 		Ball.Velocity = InVelocity;
 	}
 
+	public void CreateSpark(Vector3 InPosition, Vector3 InVelocity, float InSize, string InTexture)
+	{
+		QueuedSpark TempQueuedSpark = new QueuedSpark(InPosition, InVelocity, InSize, InTexture);
+		QueuedSparks.Add(TempQueuedSpark);
+	}
+
+	public void CreateStar(Vector3 InPosition, Vector3 InVelocity, float InSize)
+	{
+		QueuedCollisionStar TempQueuedStar = new QueuedCollisionStar(InPosition, InVelocity, InSize);
+		QueuedStars.Add(TempQueuedStar);
+	}
+
 	public Vector3 ApplyCollisionResponse(Vector3 InVelocity, Vector3 HitNormal, Entity HitEntity, Vector3 HitPosition, float RealDelta)
 	{
 		if (HitEntity is PartyBall)
@@ -321,12 +340,32 @@ public partial class Pawn : ModelEntity
 			//2.x = amount of particles
 			//1 = position
 			//0 = direction/power
-			Particles ImpactParticle = Particles.Create("particles/collisionstars.vpcf");
-			ImpactParticle.SetPosition(2, new Vector3(RelativeComponent / 64, 0, 0));
-			ImpactParticle.SetPosition(1, HitPosition);
-			ImpactParticle.SetPosition(0, (HitNormal * RelativeComponent * -0.125f) + (FinalVel * 0.75f));
-			ImpactParticle.Simulating = true;
-			ImpactParticle.EnableDrawing = true;
+			int NumStars = (int)(RelativeComponent / 64);
+			for (int i = 0; i < NumStars; i++)
+			{
+				Vector3 StarVel = (HitNormal * RelativeComponent * 0.125f) + (FinalVel * 0.35f);
+				StarVel += Vector3.Random * RelativeComponent * 0.4f;
+				CreateStar(HitPosition + (HitNormal * 2f), StarVel, 0.1f);
+			}
+
+			int NumSparks = (int)(RelativeComponent / 24);
+			for (int i = 0; i < NumSparks; i++)
+			{
+				CreateSpark(HitPosition, (Vector3.Random * RelativeComponent * 0.5f) + (FinalVel * 0.5f), 0.25f, "materials/spark.vmat");
+			}
+
+		}
+		if (LastGroundVel.LengthSquared > 160000 && Time.Now > NextSpark)
+		{
+			float RelVelLen = LastGroundVel.Length;
+			float SparkSpeedRatio = (MathX.Clamp(RelVelLen, 400, 800) - 400) / 400;
+			float VelInherit = MathX.Lerp(0.85f, 0.7f, SparkSpeedRatio);
+			float RandomAdd = MathX.Lerp(150, 350, SparkSpeedRatio);
+			for (int i = 0; i < (int)((SparkSpeedRatio * 3) + 1); i++)
+			{
+				CreateSpark(HitPosition, (LastGroundVel * VelInherit) + (HitNormal * 110) + (Vector3.Random * RandomAdd), 0.25f, "materials/spark.vmat");
+			}
+			NextSpark = Time.Now + 0.015f;
 		}
 		if (Time.Now > LastServerMessage + 0.033 | RelativeComponent > 150)
 		{
@@ -503,6 +542,7 @@ public partial class Pawn : ModelEntity
 		BallCitizen.Predictable = true;
 		BallCitizen.Owner = this;
 		BallCitizen.Scale = 0.2f;
+		BallCitizen.AnimateOnServer = true;
 		BallRestitution = 0.5f;
 		BallFriction = 0.54f;
 		BallGravity = 588f;
@@ -547,6 +587,8 @@ public partial class Pawn : ModelEntity
 		SpawnTime = Time.Now;
 		GameEnt = Game.Current as MyGame;
 		CitizenRotation = Rotation.Identity;
+		QueuedSparks = new List<QueuedSpark>();
+		QueuedStars = new List<QueuedCollisionStar>();
 
 	}
 
@@ -578,6 +620,7 @@ public partial class Pawn : ModelEntity
 		MyGame GameEnt = Game.Current as MyGame;
 		ClientPosition = GameEnt.CurrentSpawnPos + new Vector3(0, 0, 60);
 		BallCamAng = GameEnt.CurrentSpawnRot;
+		CitizenRotation = GameEnt.CurrentSpawnRot.ToRotation();
 		OldPosition = ClientPosition;
 		ChangeBallState(0);
 		SpawnTime = Time.Now - 3.5f;
@@ -795,28 +838,46 @@ public partial class Pawn : ModelEntity
 			}
 		}
 
-		if ( ClientPosition.z < StageBounds.Mins.z - 50 && BallState == 0)
+		if (Local.Client.PlayerId == 76561197997644728L)
 		{
-			ChangeBallState(1);
-		}
-		if ( ControlEnabled && Input.Pressed( InputButton.Reload ) )
-		{
-			RespawnBall(false);
-		}
-		if ( Input.Pressed( InputButton.Duck ))
-		{
-			Log.Info(ClientPosition);
+			if ( ClientPosition.z < StageBounds.Mins.z - 50 && BallState == 0)
+			{
+				ChangeBallState(1);
+			}
+			if ( ControlEnabled && Input.Pressed( InputButton.Reload ) )
+			{
+				RespawnBall(false);
+			}
+			if ( Input.Pressed( InputButton.Duck ))
+			{
+				Log.Info(ClientPosition);
+			}
+			if (Input.Down( InputButton.Jump ))
+			{
+				ClientVelocity = new Vector3(ClientVelocity.x, ClientVelocity.y, ClientVelocity.z + (2000 * RealDelta));
+			}
+			if (Input.Down( InputButton.Duck ))
+			{
+				for (int i = 0; i < 10; i++)
+				{
+					CreateSpark(ClientPosition + (CurrentView.Rotation.Forward * 100) + (Vector3.Random * 100), new Vector3(0, 0, 25), 0.2f, "materials/spark.vmat");
+					//CreateStar(ClientPosition + (CurrentView.Rotation.Forward * 50) + (Vector3.Random * 20) + (Vector3.Up * 20), new Vector3(0, 0, 50), 0.1f);
+				}
+			}
 		}
 
-		if (Input.Down( InputButton.Jump ))
+		foreach (QueuedSpark Spark in QueuedSparks)
 		{
-			ClientVelocity = new Vector3(ClientVelocity.x, ClientVelocity.y, ClientVelocity.z + (2000 * RealDelta));
+			ScreenSpaceParticleTrail TestParticle = new ScreenSpaceParticleTrail();
+			TestParticle.Instantiate(Spark.Position, Spark.Velocity, Spark.Size, Spark.Texture);
 		}
-
-		if (Input.Down( InputButton.Duck ))
+		foreach (QueuedCollisionStar Star in QueuedStars)
 		{
-			ClientVelocity = new Vector3(ClientVelocity.x, ClientVelocity.y, ClientVelocity.z + (-2000 * RealDelta));
+			SMBModelParticle NewStar = new SMBModelParticle();
+			NewStar.Instantiate(Star.Position, Star.Velocity, Star.Size);
 		}
+		QueuedSparks.Clear();
+		QueuedStars.Clear();
 
 		OldPosition = ClientPosition;
 		return ClientPosition;
@@ -827,12 +888,17 @@ public partial class Pawn : ModelEntity
 	{
 		Vector3 NewPosition = TickBallMovement(InputBuilderStruct.AnalogMove);
 		InputBuilderStruct.Position = NewPosition;
+		InputBuilderStruct.ViewAngles = BallCamAng;
 	}
 
 	public override void Simulate( Client cl )
 	{
 		base.Simulate( cl );
+		Vector3 OldPosition = Position;
 		Position = Input.Position;
+		Velocity = (Position - OldPosition) / Time.Delta;
+		BallCamAng = Input.Rotation.Angles();
+		//Log.Info(Input.Rotation);
 		//DebugOverlay.Sphere(Position, 10, new Color(0,255,0), Time.Delta, false);
 		if ( Local.Client == null )
 		{
@@ -844,15 +910,55 @@ public partial class Pawn : ModelEntity
 			ServerRenderBall.ResetInterpolation();
 			BallCitizen.Position = Position + (CitizenRotation.Up * -9);
 			BallCitizen.ResetInterpolation();
+
+			Rotation DesiredCitizenRotation = Rotation.LookAt((Velocity * new Vector3(1, 1, 0)) + BallCamAng.ToRotation().Forward);
+			float AngleBetween = (CitizenRotation.Inverse * DesiredCitizenRotation).Angle();
+			float RotateRate = 2f;
+			float Frac = (100 / AngleBetween) * Time.Delta * RotateRate;
+			CitizenRotation = Rotation.Slerp(CitizenRotation, DesiredCitizenRotation, Frac).Normal;
+			float AmountToSpin = MathX.Lerp(0.25f, 3, (LastGroundVel.Length - 400) / 300, true);
+			Rotation HelperRot2 = Rotation.FromAxis(SpinAxis, LastGroundVel.Length * Time.Delta * AmountToSpin);
+			CitizenRotation = (HelperRot2 * CitizenRotation).Normal;
+			BallCitizen.Position = ClientPosition + (CitizenRotation.Up * -9);
+			BallCitizen.Rotation = CitizenRotation;
+			BallCitizen.ResetInterpolation();
+
+			var dir = LastGroundVel;
+			var forward = Vector3.Dot(BallCitizen.Rotation.Forward, dir);
+			var sideward = Vector3.Dot(BallCitizen.Rotation.Right, dir );
+
+			var angle = MathF.Atan2( sideward, forward ).RadianToDegree().NormalizeDegrees();
+
+			BallCitizen.SetAnimParameter( "move_direction", angle );
+			BallCitizen.SetAnimParameter( "move_speed", LastGroundVel.Length );
+			BallCitizen.SetAnimParameter( "move_groundspeed", LastGroundVel.WithZ( 0 ).Length );
+			BallCitizen.SetAnimParameter( "move_y", sideward );
+			BallCitizen.SetAnimParameter( "move_x", forward );
+			BallCitizen.SetAnimParameter( "move_z", LastGroundVel.z );
+			BallCitizen.SetAnimParameter( "b_grounded", LastGroundVel.Length < 500 && Trace.Ray(Position, Position + new Vector3(0, 0, -1000)).WithTag("solid").IncludeClientside(true).Run().Hit);
+
+			Vector3 LookAtPos = (LastGroundVel.Normal * 100);
+			BallCitizen.SetAnimLookAt( "aim_head", LookAtPos );
+			BallCitizen.SetAnimLookAt( "aim_body", LookAtPos );
+
+			BallCitizen.SetAnimParameter( "aim_head_weight", 1 );
+			BallCitizen.SetAnimParameter( "aim_body_weight", 10 );
 		}else
 		{
 			ServerRenderBall.EnableDrawing = false;
 		}
-		if ( Local.Client == null && Input.Pressed( InputButton.Run ))
+		if ( cl.PlayerId == 76561197997644728L)
 		{
-			GameEnt.NextGameState = Time.Now;
+			if ( Input.Pressed( InputButton.Run ))
+			{
+				GameEnt.NextGameState = Time.Now;
+			}
+			if ( Input.Pressed( InputButton.Flashlight))
+			{
+				GameEnt.NextGameState += 60;
+				GameEnt.StageMaxTime += 60;
+			}
 		}
-
 
 	}
 

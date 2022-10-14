@@ -48,7 +48,7 @@ partial class GoalPost : SMBObject
 		var glow = Components.GetOrCreate<Glow>();
         glow.Color = new Color(0.25f, 0.25f, 1);
         glow.ObscuredColor = new Color(0.25f, 0.25f, 1);
-        glow.Width = 150;
+        glow.Width = 1;
 	}
 
 	public override void ClientSpawn()
@@ -137,9 +137,9 @@ partial class GoalPost : SMBObject
 		}
 		PartyBall.Rotation = PartyBallRotation;
 		var glow = Components.GetOrCreate<Glow>();
-        glow.Color = new Color(0.25f, 0.25f, 1);
-        glow.ObscuredColor = new Color(0.25f, 0.25f, 1);
-        glow.Width = 150;
+        glow.Color = new Color(0.1f, 0.1f, 2);
+        glow.ObscuredColor = new Color(0.1f, 0.1f, 2);
+        glow.Width = 1;
         if (Local.Client.Pawn is Pawn)
         {
         	Pawn Ball = Local.Client.Pawn as Pawn;
