@@ -64,6 +64,7 @@ UI_Base {
     font-weight: semibold;
     letter-spacing: -3px;
     text-shadow: 8px 8px #000000;
+    white-space: nowrap;
   }
   .hud-time-base {
     width: 300px;
@@ -85,6 +86,7 @@ UI_Base {
     font-weight: semibold;
     letter-spacing: -9px;
     text-shadow: 8px 8px #000000;
+    white-space: nowrap;
   }
   .hud-time-smalltime {
     width: 100%;
@@ -97,6 +99,7 @@ UI_Base {
     font-weight: semibold;
     letter-spacing: -3px;
     text-shadow: 8px 8px #000000;
+    white-space: nowrap;
   }
 
   //score elements
@@ -128,6 +131,7 @@ UI_Base {
     text-shadow: 8px 8px #000000;
     position: absolute;
     left: 40px;
+    white-space: nowrap;
   }
   .hud-score-displaytext {
     width: 100%;
@@ -143,6 +147,7 @@ UI_Base {
     position: absolute;
     top: 80px;
     left: -20px;
+    white-space: nowrap;
   }
 
   //space
@@ -200,6 +205,7 @@ UI_Base {
     letter-spacing: -3px;
     text-shadow: 8px 8px #000000;
     top: -35px;
+    white-space: nowrap;
   }
   .hud-level-leveltext {
     width: 100%;
@@ -216,6 +222,7 @@ UI_Base {
     //display: inline-block;
     align-self: flex-end;
     padding-bottom: 30px;
+    white-space: nowrap;
   }
 
   //radar elements
