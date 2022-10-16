@@ -25,7 +25,7 @@ public partial class SMBModelParticle : ModelEntity
 		base.Spawn();
 	}
 
-	public void Instantiate(Vector3 InPosition, Vector3 InVelocity, float InSize)
+	public virtual void Instantiate(Vector3 InPosition, Vector3 InVelocity, float InSize)
 	{
 		SetModel("particles/collision_star.vmdl");
 		EnableAllCollisions = false;
@@ -55,7 +55,7 @@ public partial class SMBModelParticle : ModelEntity
 		{
 			SceneObject.Position = ParticleTrace.HitPosition + (ParticleTrace.Normal * 2.01f);
 			Velocity += ParticleTrace.Normal * Vector3.Dot(Velocity, ParticleTrace.Normal) * -1.5f;
-			Velocity += -Velocity * Time.Delta * 3;
+			Velocity += -Velocity * 0.25f;
 		}else
 		{
 			SceneObject.Position += Velocity * Time.Delta;

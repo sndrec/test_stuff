@@ -24,6 +24,8 @@ partial class GoalPost : SMBObject
 
 	public GoalTapeEntity GoalTape {get;set;}
 
+	public bool GoalCrossed {get;set;}
+
 	[Net]
 	public int WarpDist {get;set;}
 
@@ -36,6 +38,7 @@ partial class GoalPost : SMBObject
 		EnableDrawing = true;
 		EnableTouch = true;
 		PhysicsBody.EnableTouch = true;
+		Tags.Add("goalpost");
 		GoalTrigger = new SMBTrigger();
 		GoalTrigger.SetModel("models/goaltrigger.vmdl");
 		GoalTrigger.SetupPhysicsFromModel(PhysicsMotionType.Keyframed);
@@ -46,9 +49,10 @@ partial class GoalPost : SMBObject
 		EnableAllCollisions = true;
 		Predictable = true;
 		var glow = Components.GetOrCreate<Glow>();
-        glow.Color = new Color(0.25f, 0.25f, 1);
-        glow.ObscuredColor = new Color(0.25f, 0.25f, 1);
-        glow.Width = 1;
+        glow.Color = new Color(0.5f, 0.5f, 1);
+        glow.ObscuredColor = new Color(0.5f, 0.5f, 1);
+        glow.Width = 0.5f;
+        GoalCrossed = false;
 	}
 
 	public override void ClientSpawn()
@@ -57,6 +61,7 @@ partial class GoalPost : SMBObject
 		PartyBall.SetModel("models/partyball.vmdl");
 		PartyBall.SetupPhysicsFromModel(PhysicsMotionType.Keyframed);
 		PartyBall.Tags.Add("solid");
+		PartyBall.Tags.Add("goalpost");
 		PartyBall.Owner = this;
 		PartyBall.UseAnimGraph = false;
 		PartyBall.AnimateOnServer = false;
@@ -66,6 +71,7 @@ partial class GoalPost : SMBObject
 		PartyBall.EnableTraceAndQueries = true;
 		PartyBall.EnableSolidCollisions = true;
 		PartyBall.EnableAllCollisions = true;
+		GoalCrossed = false;
 
 		GoalTape = new GoalTapeEntity();
 		GoalTape.Owner = this;
@@ -137,15 +143,22 @@ partial class GoalPost : SMBObject
 		}
 		PartyBall.Rotation = PartyBallRotation;
 		var glow = Components.GetOrCreate<Glow>();
-        glow.Color = new Color(0.1f, 0.1f, 2);
-        glow.ObscuredColor = new Color(0.1f, 0.1f, 2);
-        glow.Width = 1;
+        glow.Color = new Color(0.5f, 0.5f, 3);
+        glow.ObscuredColor = new Color(0.5f, 0.5f, 3);
+        glow.Width = 0.5f;
         if (Local.Client.Pawn is Pawn)
         {
         	Pawn Ball = Local.Client.Pawn as Pawn;
-      		if (Ball.BallState == 2)
+      		if (Ball.BallState == 2 && GoalCrossed == false)
       		{
 				PartyBall.PlaybackRate = 1;
+				for (int i = 0; i < 150; i++)
+				{
+					ConfettiParticle Confetti = new ConfettiParticle();
+					Confetti.Instantiate(PartyBall.Position + (Vector3.Random * 10) + (Vector3.Up * -10), (Vector3.Random * (250 + (Ball.ClientVelocity.Length * 0.1f))) + (Ball.ClientVelocity * 2), 0.2f);
+					//CreateStar(ClientPosition + (CurrentView.Rotation.Forward * 50) + (Vector3.Random * 20) + (Vector3.Up * 20), new Vector3(0, 0, 50), 0.1f);
+				}
+				GoalCrossed = true;
       		}
         }
 	}

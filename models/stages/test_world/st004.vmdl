@@ -18,20 +18,16 @@
 								to = "materials/stagemat/grass01.vmat"
 							},
 							{
-								from = "check2.vmat"
-								to = "materials/stagemat/grass02.vmat"
-							},
-							{
-								from = "check3.vmat"
-								to = "materials/stagemat/grass03.vmat"
-							},
-							{
-								from = "check4.vmat"
-								to = "materials/stagemat/tw_detail6.vmat"
-							},
-							{
 								from = "fill.vmat"
 								to = "materials/stagemat/tw_fill.vmat"
+							},
+							{
+								from = "material.001.vmat"
+								to = "materials/stagemat/tw_detail8.vmat"
+							},
+							{
+								from = "material.vmat"
+								to = "materials/stagemat/grass02.vmat"
 							},
 						]
 						use_global_default = false
@@ -87,6 +83,7 @@
 							exception_list = 
 							[
 								"Cube_002",
+								"Cube_000",
 							]
 						}
 					},

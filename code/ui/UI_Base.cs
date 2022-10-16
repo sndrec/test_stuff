@@ -80,7 +80,7 @@ public class UI_Base : RootPanel
 		{
 			TimeInSeconds = GameEnt.StageMaxTime;
 		}
-		UI_ScoreDigits = Math.Ceiling(ScoreInterp).ToString();
+		UI_ScoreDigits = Math.Round(ScoreInterp).ToString();
 		UI_TimeSecond = Math.Max(TimeInSeconds, 0).ToString();
 		UI_TimeMili = MiliString;
 		UI_LevelName = GameEnt.StageName;

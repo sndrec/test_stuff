@@ -206,6 +206,10 @@ public partial class ScreenSpaceParticleTrail : Entity
 		{
 			Delete();
 		}
+		if (Vector3.Dot(Position - CurrentView.Position, CurrentView.Rotation.Forward) < 0)
+		{
+			Delete();
+		}
 	}
 
 	[Event.Frame]

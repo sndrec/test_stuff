@@ -47,6 +47,12 @@ public partial class MyGame : Sandbox.Game
 	[Net]
 	public int StageInCourse {get;set;}
 
+	[ConVar.ClientData( "smb_stagetilteffect_maxangle" )]
+	public float BallMaxVisualTilt {get;set;} = 13.2f;
+	
+	[ConVar.ClientData( "smb_manualcamera" )]
+	public bool ManualCamera {get;set;} = false;
+
 	public bool HasFirstHit {get;set;}
 
 	public float FirstHitTime {get;set;}
@@ -271,6 +277,22 @@ public partial class MyGame : Sandbox.Game
 		}
 	}
 
+	public void SpawnAllBalls()
+	{
+		foreach (Client pl in Client.All)
+		{
+			if (pl.Pawn != null)
+			{
+				pl.Pawn.Delete();
+			}
+			Pawn pawn = new Pawn();
+			pawn.Owner = pl as Entity;
+			pawn.GetPlayerStateManager();
+			pawn.UpdateCitizenClothing(pl);
+			pl.Pawn = pawn;
+		}
+	}
+
 	public void SpawnAllSpectators()
 	{
 		foreach (Client pl in Client.All)
@@ -309,7 +331,7 @@ public partial class MyGame : Sandbox.Game
 			stwfp.CreateStage();
 			SkyGenerator.CreateBackground(CurrentSky);
 			NextGameState = Time.Now + 6000;
-			SpawnAllBallsDelayed(0.1f);
+			SpawnAllBalls();
 		}else
 		if (inState == 1)
 		{
@@ -322,7 +344,7 @@ public partial class MyGame : Sandbox.Game
 			PlayNextStageInCourse(1);
 			NextGameState = Time.Now + (StageMaxTime + 5.6f);
 			SkyGenerator.CreateBackground(CurrentSky);
-			SpawnAllBallsDelayed(0.1f);
+			SpawnAllBalls();
 		}else
 		if (inState == 3)
 		{

@@ -87,6 +87,7 @@ public partial class SMBObject : ModelEntity
 		CollisionTag = "SMBObject" + Guid.NewGuid();
 		Tags.Add(CollisionTag);
 		Tags.Add("solid");
+		Tags.Add("regularfloor");
 	}
 
 	public static Vector3 RotateVector(Vector3 InPoint, Rotation rotation)

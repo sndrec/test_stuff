@@ -23,6 +23,15 @@ public class stwfp
 		SMBStage NewStage = new SMBStage("Waiting for Players...", 60, new Vector3(0, 0, 30), new Angles(0, 180, 0), "sky_jun", "waitingforplayers_1", 1);
 		SMBObject MainPlat = NewStage.AddStageObject("models/stages/waitingforplayers/waitingforplayers_1.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		MainPlat.SimulateSMBObjectCustom = RotatePlatform;
+
+		foreach (Entity element in Entity.All)
+		{
+			if (element is PlayerStateManager)
+			{
+				PlayerStateManager PSM = element as PlayerStateManager;
+				PSM.SetScore(0);
+			}
+		}
 	}
 }
 
@@ -129,9 +138,10 @@ public class st004
 {
 	public static void CreateStage()
 	{
-		SMBStage NewStage = new SMBStage("Downhill", 60, new Vector3(0, 0, 1210), new Angles(0, 0, 0), "sky_jun", "mus_jungle", 2);
-		NewStage.AddStageObject("models/stages/test_world/st004.vmdl", new Vector3(0,0,1200), Rotation.Identity);
-		NewStage.AddGoal(new Vector3(1400,-1600,-1200), Rotation.FromYaw(180));
+		MyGame GameEnt = Game.Current as MyGame;
+		SMBStage NewStage = new SMBStage("Downhill", 60, GameEnt.BlenderPos(-54.25f, 50.75f, 80.5f), new Angles(0, 90, 0), "sky_jun", "mus_jungle", 2);
+		NewStage.AddStageObject("models/stages/test_world/st004.vmdl", new Vector3(0,0,0), Rotation.Identity);
+		NewStage.AddGoal(GameEnt.BlenderPos(60.0f, -49.25f, -57.5f), Rotation.FromYaw(-90));
 	}
 }
 
@@ -161,7 +171,7 @@ public class st007
 	public static void CreateStage()
 	{
 		MyGame GameEnt = Game.Current as MyGame;
-		SMBStage NewStage = new SMBStage("Cut Corners", 60, GameEnt.BlenderPos(40, -4, 224.5f), new Angles(0, 180, 0), "sky_sky", "mus_skyhigh", 2);
+		SMBStage NewStage = new SMBStage("Cut Corners", 90, GameEnt.BlenderPos(40, -4, 224.5f), new Angles(0, 180, 0), "sky_sky", "mus_skyhigh", 2);
 		NewStage.AddStageObject("models/stages/test_world/st007.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		NewStage.AddGoal(GameEnt.BlenderPos(70.8796f, -36.0482f, -15.2052f), Rotation.From(new Angles(-29.5f, -70, 0)));
 	}
@@ -183,9 +193,9 @@ public class st009
 	public static void CreateStage()
 	{
 		MyGame GameEnt = Game.Current as MyGame;
-		SMBStage NewStage = new SMBStage("Assessment I", 60, GameEnt.BlenderPos(27.0f, -33.0f, 16.125f), new Angles(0, -90, 0), "sky_sky", "mus_skyhigh", 2);
+		SMBStage NewStage = new SMBStage("Assessment I", 120, GameEnt.BlenderPos(27.0f, -33.0f, 16.125f), new Angles(0, -90, 0), "sky_sky", "mus_skyhigh", 2);
 		NewStage.AddStageObject("models/stages/test_world/st009.vmdl", new Vector3(0,0,0), Rotation.Identity);
-		NewStage.AddGoal(GameEnt.BlenderPos(-32.5f, -1.5f, 1.75f), Rotation.From(new Angles(0, 90, 0)));
+		NewStage.AddGoal(GameEnt.BlenderPos(-64.0f, -0.5f, 1.75f), Rotation.From(new Angles(0, 90, 0)));
 	}
 }
 
@@ -344,7 +354,12 @@ public class stw1bonus
 		Log.Info("Bananas remaining: " + GameEnt.CurrentStage.UserInt1);
 		if (GameEnt.CurrentStage.UserInt1 <= 0)
 		{
-			GameEnt.NextGameState = Time.Now;
+			GameEnt.NextGameState = Time.Now + 4;
+			foreach (Client pl in Client.All)
+			{
+				Pawn Ball = pl.Pawn as Pawn;
+				Ball.ServerChangeBallState(2);
+			}
 		}
 	}
 	public static void CreateStage()

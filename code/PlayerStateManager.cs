@@ -20,17 +20,18 @@ public partial class PlayerStateManager : Entity
 	public void AddScore(int InScore)
 	{
 		Score += InScore;
-		Log.Info("New Score = " + Score);
+	}
+
+	public void SetScore(int InScore)
+	{
+		Score = InScore;
 	}
 
 	[ConCmd.Server]
 	public static void AddScoreFromClient(int InNetworkId, int InScore)
 	{
 		PlayerStateManager Manager = Entity.FindByIndex(InNetworkId) as PlayerStateManager;
-		Log.Info(Manager);
-		Log.Info("Adding score!");
 		Manager.Score += InScore;
-		Log.Info("New Score = " + Manager.Score);
 	}
 
 }
