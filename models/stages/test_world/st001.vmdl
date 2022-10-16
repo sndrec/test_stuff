@@ -37,6 +37,10 @@
 								from = "material.001.vmat"
 								to = "materials/stagemat/grass04.vmat"
 							},
+							{
+								from = "material.002.vmat"
+								to = "materials/stagemat/tw_detail.vmat"
+							},
 						]
 						use_global_default = false
 						global_default_material = ""

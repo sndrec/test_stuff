@@ -1,0 +1,117 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc29:version{3cec427c-1b0e-4d48-a90a-0436f33a6041} -->
+{
+	rootNode = 
+	{
+		_class = "RootNode"
+		children = 
+		[
+			{
+				_class = "MaterialGroupList"
+				children = 
+				[
+					{
+						_class = "DefaultMaterialGroup"
+						remaps = 
+						[
+							{
+								from = "bottlecap.vmat"
+								to = "materials/bg/field/bottlecap.vmat"
+							},
+							{
+								from = "flowerleaves.vmat"
+								to = "materials/bg/field/leef.vmat"
+							},
+							{
+								from = "flowerpetals.vmat"
+								to = "materials/bg/field/sunflower_petal.vmat"
+							},
+							{
+								from = "flowerstalk.vmat"
+								to = "materials/bg/field/sunflower.vmat"
+							},
+							{
+								from = "grassblade.vmat"
+								to = "materials/bg/field/grassblade.vmat"
+							},
+							{
+								from = "lighterbody.vmat"
+								to = "materials/bg/field/lighterbody.vmat"
+							},
+							{
+								from = "lighterbutton.vmat"
+								to = "materials/bg/field/lighterbutton.vmat"
+							},
+							{
+								from = "material.008.vmat"
+								to = "materials/confetti_surface.vmat"
+							},
+							{
+								from = "material.009.vmat"
+								to = "materials/bg/field/pop.vmat"
+							},
+							{
+								from = "material.vmat"
+								to = "materials/bg/field/w1fill.vmat"
+							},
+							{
+								from = "metalshiny.vmat"
+								to = "materials/shinymetal.vmat"
+							},
+							{
+								from = "rock_small.vmat"
+								to = "materials/bg/field/small rock2.vmat"
+							},
+							{
+								from = "rock_jaggy.vmat"
+								to = "materials/bg/field/rock_jaggy.vmat"
+							},
+							{
+								from = "rock_big.vmat"
+								to = "materials/bg/field/rock_big.vmat"
+							},
+							{
+								from = "sky.vmat"
+								to = "materials/bg/field/tiny_sky.vmat"
+							},
+							{
+								from = "straw.vmat"
+								to = "materials/bg/field/straw.vmat"
+							},
+						]
+						use_global_default = false
+						global_default_material = ""
+					},
+				]
+			},
+			{
+				_class = "RenderMeshList"
+				children = 
+				[
+					{
+						_class = "RenderMeshFile"
+						filename = "models/bg/field/field_main.fbx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 0.05
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = true
+							exception_list = 
+							[
+								"Cube_002",
+							]
+						}
+					},
+				]
+			},
+		]
+		model_archetype = ""
+		primary_associated_entity = ""
+		anim_graph_name = ""
+		base_model_name = ""
+	}
+}

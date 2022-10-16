@@ -68,7 +68,7 @@ public class st001
 			new Angles(0, 0, 0),
 			"sky_jun",
 			"mus_jungle",
-			2);
+			1);
 		NewStage.AddStageObject("models/stages/test_world/st001.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		NewStage.AddStageObject("models/stages/test_world/st001_moveplat1.vmdl", new Vector3(0,0,0), Rotation.Identity, Plat1Keyframes);
 		NewStage.AddStageObject("models/stages/test_world/st001_moveplat1.vmdl", new Vector3(-240,480,0), Rotation.Identity, Plat2Keyframes);

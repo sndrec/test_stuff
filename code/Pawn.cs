@@ -744,7 +744,7 @@ public partial class Pawn : ModelEntity
 		ConsoleSystem.SetValue("snd_occlusion", 0);
 		ConsoleSystem.SetValue("snd_doppler", 0);
 		ConsoleSystem.SetValue("steamaudio_enable", 0);
-		ConsoleSystem.SetValue("r_farz", 100000);
+		ConsoleSystem.SetValue("r_farz", 1000000);
 		ConsoleSystem.SetValue("r_nearz", 16);
 		NoCollide = true;
 		LookOffset = Angles.Zero;
@@ -1008,6 +1008,10 @@ public partial class Pawn : ModelEntity
 					ConfettiParticle Confetti = new ConfettiParticle();
 					Confetti.Instantiate(ClientPosition + (CurrentView.Rotation.Forward * 100) + (Vector3.Random * 25) + (Vector3.Up * 50), (Vector3.Random * 1000), 0.2f);
 					//CreateStar(ClientPosition + (CurrentView.Rotation.Forward * 50) + (Vector3.Random * 20) + (Vector3.Up * 20), new Vector3(0, 0, 50), 0.1f);
+				}
+				foreach (Entity element in Entity.All)
+				{
+					Log.Info(element);
 				}
 			}
 		}

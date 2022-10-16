@@ -49,7 +49,7 @@ public partial class MyGame : Sandbox.Game
 
 	[ConVar.ClientData( "smb_stagetilteffect_maxangle" )]
 	public float BallMaxVisualTilt {get;set;} = 13.2f;
-	
+
 	[ConVar.ClientData( "smb_manualcamera" )]
 	public bool ManualCamera {get;set;} = false;
 
@@ -70,6 +70,10 @@ public partial class MyGame : Sandbox.Game
 	public Rotation StageTilt {get;set;}
 
 	public bool FirstFrame {get;set;}
+
+	public Rotation LightAngles {get;set;}
+
+	public bool HasLightEnvironment {get;set;} = false;
 
 	public MyGame()
 	{
@@ -202,6 +206,24 @@ public partial class MyGame : Sandbox.Game
 			}
 		}
 		return (BallPosition, BallVelocity);
+	}
+
+	[Event.Frame]
+	public void CreateLightEnvironment()
+	{
+		if (!HasLightEnvironment)
+		{
+			foreach (Entity element in Entity.All)
+			{
+				if (element is EnvironmentLightEntity)
+				{
+					element.Delete();
+				}
+			}
+			EnvironmentLightEntity LightEnvironment = new EnvironmentLightEntity();
+			LightEnvironment.DynamicShadows = true;
+			HasLightEnvironment = true;
+		}
 	}
 
 	//states:
@@ -384,6 +406,15 @@ public partial class MyGame : Sandbox.Game
 	[Event.Tick.Server]
 	public void ServerTick()
 	{
+
+		foreach (Entity element in Entity.All)
+		{
+			if (element is EnvironmentLightEntity)
+			{
+				EnvironmentLightEntity Ent = element as EnvironmentLightEntity;
+				Ent.Delete();
+			}
+		}
 		if (Time.Now > NextGameState)
 		{
 			if (CurrentGameState == 0)
@@ -482,7 +513,7 @@ public partial class MyGame : Sandbox.Game
 		return new Transform(NewPosition, NewRotation, InTransform.Scale);
 	}
 
-	[Event.PreRender]
+	[Event.Frame]
 	public void HandleStageTilt()
 	{
 		if (!FirstFrame)
@@ -494,7 +525,18 @@ public partial class MyGame : Sandbox.Game
 		{
 			if (!element.Tags.Has("BGObject"))
 			{
-				continue;
+				if (element is EnvironmentLightEntity)
+				{
+					EnvironmentLightEntity Ent = element as EnvironmentLightEntity;
+					if (Ent != null)
+					{
+						Transform NewTransform = StageTiltTransform(new Transform(Vector3.Zero, LightAngles, 1));
+						Ent.Rotation = NewTransform.Rotation;
+					}
+				}else
+				{
+					continue;
+				}
 			}
 			if (element is ModelEntity)
 			{
