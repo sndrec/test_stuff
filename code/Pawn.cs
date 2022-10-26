@@ -8,9 +8,9 @@ namespace Sandbox;
 public partial class Pawn : ModelEntity
 {
 	/// <summary>
-	/// Called when the entity is first created 
+	/// Called when the entity is first created
 	/// </summary>
-	
+
 	[Net]
 	public float LatestNow {get;set;}
 
@@ -126,7 +126,7 @@ public partial class Pawn : ModelEntity
 	public Sound RollingGrind {get;set;}
 
 	public float LastServerMessage {get;set;}
-	
+
 	public MyGame GameEnt {get;set;}
 
 	public bool AboutToGainControl {get;set;}
@@ -185,7 +185,7 @@ public partial class Pawn : ModelEntity
 	public static float AngleDifference(float a, float b)
 	{
 		float diff = MathX.NormalizeDegrees( a - b );
-	
+
 		if ( diff < 180f )
 		{
 			return diff;
@@ -289,15 +289,15 @@ public partial class Pawn : ModelEntity
 			BallWeHit.ApplyCollisionResponseFromServer(InVelocity, -HitNormal, Ball, HitPosition, Global.TickInterval, false);
 		}
 		if (RelativeComponent < -240)
-		{	
+		{
 			GameEnt.FromEntityToAllBut(pl, "ball_impact_hard", Ball);
 		}else
 		if (RelativeComponent < -150)
-		{	
+		{
 			GameEnt.FromEntityToAllBut(pl, "ball_impact_medium", Ball);
 		}else
 		if (RelativeComponent < -100)
-		{	
+		{
 			GameEnt.FromEntityToAllBut(pl, "ball_impact_soft", Ball);
 		}
 
@@ -452,15 +452,15 @@ public partial class Pawn : ModelEntity
 			return UseVelocity;
 		}
 		if (RelativeComponent < -240)
-		{	
+		{
 			Sound BumpSound = Sound.FromEntity("ball_impact_hard", this);
 		}else
 		if (RelativeComponent < -150)
-		{	
+		{
 			Sound BumpSound = Sound.FromEntity("ball_impact_medium", this);
 		}else
 		if (RelativeComponent < -100)
-		{	
+		{
 			Sound BumpSound = Sound.FromEntity("ball_impact_soft", this);
 		}
 
@@ -556,7 +556,7 @@ public partial class Pawn : ModelEntity
 		{
 			TraceResult MoveTrace = Trace.Sphere(10, ClientPosition, ClientPosition).WithTag("solid").WithoutTags(IgnoreTags).IncludeClientside(true).Run();
 			if (MoveTrace.Hit)
-			{	
+			{
 				CollisionHappened = true;
 				if (ControlEnabled == false)
 				{
@@ -879,7 +879,7 @@ public partial class Pawn : ModelEntity
 				RenderBall.EnableDrawing = true;
 				Rotation FixedEyeRot = Rotation.From(0f, BallCamAng.yaw, 0f);
 				//physics
-		
+
 				Rotation GravDir = new Rotation(0f, 0f, -1f, 0f);
 				if (ControlEnabled == true)
 				{
@@ -909,7 +909,7 @@ public partial class Pawn : ModelEntity
 				}
 
 				foreach (Entity element in Entity.All)
-				{	
+				{
 					if (element is Pawn && element != this && !NoCollide)
 					{
 						Pawn Ball = element as Pawn;
@@ -984,11 +984,14 @@ public partial class Pawn : ModelEntity
 									//ImpactParticle.EnableDrawing = true;
 									float TimeRemaining = GameEnt.StageMaxTime - (Time.Now - GameEnt.FirstHitTime);
 									Log.Info("Time remaining = " + TimeRemaining);
+
+									KillFeed.Current?.AddEntry( Local.Client.PlayerId, Local.Client.Name, TimeRemaining.ToString(), "" );
+
 									PlayerStateManager.AddScoreFromClient(OurManager.NetworkIdent, (int)(TimeRemaining * 100));
 									int ClosestStickIndex = 0;
 									float ClosestDist = 1000;
 									for (int i = 0; i < GoalEnt.GoalTape.Sticks.Count; i++)
-									{	
+									{
 										TapeStick Stick = GoalEnt.GoalTape.Sticks[i];
 										Vector3 StickCentre = (Stick.PointA.Position + Stick.PointB.Position) / 2;
 										float Dist = (StickCentre - ClientPosition).Length;
@@ -1161,7 +1164,7 @@ public partial class Pawn : ModelEntity
 			if (WantToEnableCollision && NoCollide)
 			{
 				foreach (Entity element in Entity.All)
-				{	
+				{
 					if (element is Pawn && element != this)
 					{
 						Pawn Ball = element as Pawn;
@@ -1229,9 +1232,9 @@ public partial class Pawn : ModelEntity
 		var dir = LastGroundVelServer;
 		var forward = Vector3.Dot(BallCitizen.Rotation.Forward, dir);
 		var sideward = Vector3.Dot(BallCitizen.Rotation.Right, dir );
-		
+
 		var angle = MathF.Atan2( sideward, forward ).RadianToDegree().NormalizeDegrees();
-		
+
 		BallCitizen.SetAnimParameter( "move_direction", angle );
 		BallCitizen.SetAnimParameter( "move_speed", LastGroundVelServer.Length );
 		BallCitizen.SetAnimParameter( "move_groundspeed", LastGroundVelServer.WithZ( 0 ).Length );
@@ -1290,9 +1293,9 @@ public partial class Pawn : ModelEntity
 		var dir = LastGroundVel;
 		var forward = Vector3.Dot(BallCitizen.Rotation.Forward, dir);
 		var sideward = Vector3.Dot(BallCitizen.Rotation.Right, dir );
-		
+
 		var angle = MathF.Atan2( sideward, forward ).RadianToDegree().NormalizeDegrees();
-		
+
 		BallCitizen.SetAnimParameter( "move_direction", angle );
 		BallCitizen.SetAnimParameter( "move_speed", LastGroundVel.Length );
 		BallCitizen.SetAnimParameter( "move_groundspeed", LastGroundVel.WithZ( 0 ).Length );

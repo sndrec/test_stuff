@@ -15,6 +15,10 @@ UI_Base {
     //background-color: #ff0000;
     align-items: flex-start;
   }
+  .right {
+    //background-color: #ff0000;
+    float: right;
+  }
   .bottom {
     background-color: #ff0000;
   }
@@ -150,13 +154,68 @@ UI_Base {
     white-space: nowrap;
   }
 
-  //space
-  .hud-right-layout {
-    width: 40%;
-    height: 33%;
-    justify-content: flex-end;
+  //killfeed?
+  .hud-timefeed-layout {
+    width: 0px;
+    height: 0px;
+    //justify-content: flex-end;
     //background-color: #000000;
+    //transform: scale(0.6);
+    //background-color: #ffffff;
+    position: absolute;
+    right: 0;
+  }
+  .hud-timefeed-layout-scalable {
     transform: scale(0.6);
+  }
+  .hud-timefeed-justbox {
+    height: 800px;
+    width: 500px;
+    position: absolute;
+    //background-color: #000000;
+    //background-color: #ffffff;
+    right: 40px;
+    top: 40px;
+    display: flex;
+    flex-direction: column;
+  }
+  .hud-timefeed-item {
+    width: 100%;
+    height: 80px;
+    background-color: #33333399;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+  .hud-timefeed-icon {
+    //Image.SetTexture("avatar:playersteamid")
+    width: 60px;
+    height: 60px;
+    background-color: #ffffff;
+    margin: 10px 8px 10px 10px;
+    border-radius: 5px;
+  }
+  .hud-timefeed-nametext {
+    font-family: Poppins;
+    font-weight: semibold;
+    font-size: 40px;
+    width: 220px;
+    padding: 10px 0;
+    text-shadow: 3px 3px #000000;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hud-timefeed-timetext {
+    font-family: Poppins;
+    font-weight: semibold;
+    font-size: 40px;
+    text-align: right;
+    position: absolute;
+    right: 20px;
+    padding: 10px 0;
+    text-shadow: 3px 3px #000000;
+    color: white;
   }
 
   //space
@@ -171,11 +230,16 @@ UI_Base {
   .hud-level-layout {
     width: 0px;
     height: 0px;
-    transform: scale(0.6);
-    background-color: #0000ff;
+    //transform: scale(0.6);
+    //background-color: #0000ff;
     position: absolute;
     bottom: 20;
     left: 20;
+    display: flex;
+    flex-direction: column;
+  }
+  .hud-level-layout-scalable {
+    transform: scale(0.6);
   }
   .hud-level-justbox {
     height: 200px;
@@ -231,5 +295,20 @@ UI_Base {
     height: 100%;
     //justify-content: right;
     transform: scale(0.6);
+  }
+
+  .canwescalethesucker {
+    //transform: scale(0.6);
+    //background-color: #000000;
+    position: absolute;
+    left: 0px;
+    bottom: 134px;
+  }
+  .canwescaletheothersucker {
+    //transform: scale(0.6);
+    //background-color: #000000;
+    //position: absolute;
+    //left: 0px;
+    //top: 0px;
   }
 }

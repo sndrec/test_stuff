@@ -32,20 +32,44 @@
           </panel>
         </panel>
 
-        <panel class="hud-third">
-          <panel @ref="UIE_HudScalableThr" class="hud-right-layout"/>
+        <panel class="hud-third right">
+          <panel class="hud-timefeed-layout">
+            <killfeed class="canwescaletheothersucker"/>
+            <panel @ref="UIE_HudScalableThr" class="hud-timefeed-layout-scalable">
+              <!--<panel class="hud-timefeed-justbox">
+                <panel class="hud-timefeed-item">
+                  <image class="hud-timefeed-icon"/>
+                  <label class="hud-timefeed-nametext">abcdefghijklmnopqrstuvwxyz</label>
+                  <label class="hud-timefeed-timetext">200.000</label>
+                </panel>
+                <panel class="hud-timefeed-item">
+                  <image class="hud-timefeed-icon"/>
+                  <label class="hud-timefeed-nametext">Hi lol</label>
+                  <label class="hud-timefeed-timetext">175.545</label>
+                </panel>
+                <panel class="hud-timefeed-item">
+                  <image class="hud-timefeed-icon"/>
+                  <label class="hud-timefeed-nametext">Big Gay Idiot</label>
+                  <label class="hud-timefeed-timetext">121.411</label>
+                </panel>
+              </panel>-->
+            </panel>
+          </panel>
         </panel>
       </panel>
 
       <panel class="hud-half">
         <panel class="hud-third">
 
-          <panel @ref="UIE_HudScalableFou" class="hud-level-layout">
-            <panel class="hud-level-justbox">
-              <panel class="hud-level-numbox">
-                <label @text="UI_LevelNumber" class="hud-level-numtext">0</label>
+          <panel class="hud-level-layout">
+            <chatbox class="canwescalethesucker"></chatbox>
+            <panel @ref="UIE_HudScalableFou" class="hud-level-layout-scalable">
+              <panel class="hud-level-justbox">
+                <panel class="hud-level-numbox">
+                  <label @text="UI_LevelNumber" class="hud-level-numtext">0</label>
+                </panel>
+                <label @text="UI_LevelName" class="hud-level-leveltext">Level Goes Here</label>
               </panel>
-              <label @text="UI_LevelName" class="hud-level-leveltext">Level Goes Here</label>
             </panel>
           </panel>
 
