@@ -14,20 +14,8 @@
 						remaps = 
 						[
 							{
-								from = "check.vmat"
-								to = "materials/stagemat/skyhigh/check1.vmat"
-							},
-							{
-								from = "check2.vmat"
-								to = "materials/stagemat/skyhigh/check2.vmat"
-							},
-							{
 								from = "check4.vmat"
-								to = "materials/stagemat/skyhigh/trim2.vmat"
-							},
-							{
-								from = "fill.vmat"
-								to = "materials/stagemat/skyhigh/fill.vmat"
+								to = "materials/stagemat/field/w1detaildoublebright.vmat"
 							},
 						]
 						use_global_default = false

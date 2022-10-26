@@ -10,7 +10,7 @@ namespace Sandbox;
 [Library( "goal_post" ), HammerEntity]
 [Title( "Monkey Ball Goalpost" ), Category( "Stage" ), Icon( "place" )]
 [EditorModel( "models/goalpost.vmdl" )]
-partial class GoalPost : SMBObject
+public partial class GoalPost : SMBObject
 {
 	/// <summary>
 	/// Called when the entity is first created 
@@ -48,11 +48,15 @@ partial class GoalPost : SMBObject
 		GoalTrigger.Owner = this;
 		EnableAllCollisions = true;
 		Predictable = true;
-		var glow = Components.GetOrCreate<Glow>();
-        glow.Color = new Color(0.5f, 0.5f, 1);
-        glow.ObscuredColor = new Color(0.5f, 0.5f, 1);
-        glow.Width = 0.5f;
         GoalCrossed = false;
+	}
+
+	public void SetPostAndTriggerModel(string InPostModel, string InTriggerModel)
+	{
+		SetModel(InPostModel);
+		SetupPhysicsFromModel(PhysicsMotionType.Keyframed);
+		GoalTrigger.SetModel(InTriggerModel);
+		GoalTrigger.SetupPhysicsFromModel(PhysicsMotionType.Keyframed);
 	}
 
 	public override void ClientSpawn()
@@ -143,9 +147,9 @@ partial class GoalPost : SMBObject
 		}
 		PartyBall.Rotation = PartyBallRotation;
 		var glow = Components.GetOrCreate<Glow>();
-        glow.Color = new Color(0.5f, 0.5f, 3);
-        glow.ObscuredColor = new Color(0.5f, 0.5f, 3);
-        glow.Width = 0.5f;
+        glow.Color = new Color(0.25f, 0.25f, 1f);
+        glow.ObscuredColor = new Color(0.25f, 0.25f, 1f);
+        glow.Width = 0.25f;
         if (Local.Client.Pawn is Pawn)
         {
         	Pawn Ball = Local.Client.Pawn as Pawn;

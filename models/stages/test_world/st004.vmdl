@@ -15,19 +15,19 @@
 						[
 							{
 								from = "check.vmat"
-								to = "materials/stagemat/grass01.vmat"
+								to = "materials/stagemat/field/grass1.vmat"
 							},
 							{
 								from = "fill.vmat"
-								to = "materials/stagemat/tw_fill.vmat"
+								to = "materials/stagemat/field/w1fill.vmat"
 							},
 							{
 								from = "material.001.vmat"
-								to = "materials/stagemat/tw_detail8.vmat"
+								to = "materials/stagemat/field/fielddetail.vmat"
 							},
 							{
 								from = "material.vmat"
-								to = "materials/stagemat/grass02.vmat"
+								to = "materials/stagemat/field/grass2.vmat"
 							},
 						]
 						use_global_default = false

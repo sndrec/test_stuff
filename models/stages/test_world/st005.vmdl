@@ -11,17 +11,7 @@
 				[
 					{
 						_class = "DefaultMaterialGroup"
-						remaps = 
-						[
-							{
-								from = "materials/stagemat/skyhigh/check1.vmat"
-								to = "materials/stagemat/skyhigh/check1.vmat"
-							},
-							{
-								from = "fillconcrete.vmat"
-								to = "materials/stagemat/skyhigh/trim3.vmat"
-							},
-						]
+						remaps = [  ]
 						use_global_default = false
 						global_default_material = ""
 					},

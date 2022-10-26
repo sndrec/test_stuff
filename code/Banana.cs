@@ -10,22 +10,23 @@ public partial class Banana : SMBTrigger
 {
 
 	[Net]
-	Pawn Collector {get;set;}
+	public Pawn Collector {get;set;}
 
 	[Net]
-	float CollectTime {get;set;}
+	public float CollectTime {get;set;}
 
 	[Net]
-	bool ServerKnowsCollected {get;set;}
+	public bool ServerKnowsCollected {get;set;}
 
 	[Net]
-	Vector3 PosWhenCollected {get;set;}
+	public Vector3 PosWhenCollected {get;set;}
 
-	bool IsCollected {get;set;}
+	public bool IsCollected {get;set;}
 
-	Vector3 ClientsideBananaPos {get;set;}
+	public Vector3 ClientsideBananaPos {get;set;}
+	public Rotation ClientsideBananaRot {get;set;}
 
-	Rotation ClientsideBananaRot {get;set;}
+	public Vector3 OffsetToBall {get;set;}
 
 	public override void Spawn()
 	{
@@ -35,15 +36,12 @@ public partial class Banana : SMBTrigger
 		SetupPhysicsFromModel(PhysicsMotionType.Keyframed);
 		EnableDrawing = true;
 		Predictable = true;
-		ClientsideBananaPos = Position;
-		ClientsideBananaRot = Rotation;
 	}
 	public override void ClientSpawn()
 	{
 		base.ClientSpawn();
 		Predictable = true;
-		ClientsideBananaPos = Position;
-		ClientsideBananaRot = Rotation;
+		ClientsideBananaRot = Rotation.Identity;
 	}
 
 	public override void OnEnterTrigger(Pawn InBall)
@@ -51,8 +49,13 @@ public partial class Banana : SMBTrigger
 		base.OnEnterTrigger(InBall);
 		if (!IsCollected)
 		{
+			Pawn Ball = Local.Client.Pawn as Pawn;
+			if (Ball != null)
+			{
+				OffsetToBall = ClientsideBananaPos - Ball.ClientPosition;
+			}
 			IsCollected = true;
-			CollectedBy(this.NetworkIdent, InBall.NetworkIdent);
+			BananaCollectedBy(this.NetworkIdent, InBall.NetworkIdent);
 		}
 	}
 	public override void OnExitTrigger(Pawn InBall)
@@ -60,13 +63,18 @@ public partial class Banana : SMBTrigger
 		base.OnExitTrigger(InBall);
 		if (!IsCollected)
 		{
+			Pawn Ball = Local.Client.Pawn as Pawn;
+			if (Ball != null)
+			{
+				OffsetToBall = ClientsideBananaPos - Ball.ClientPosition;
+			}
 			IsCollected = true;
-			CollectedBy(this.NetworkIdent, InBall.NetworkIdent);
+			BananaCollectedBy(this.NetworkIdent, InBall.NetworkIdent);
 		}
 	}
 
 	[ConCmd.Server]
-	public static void CollectedBy(int InNetworkIdent, int InNetworkIdent2)
+	public static void BananaCollectedBy(int InNetworkIdent, int InNetworkIdent2)
 	{
 		Banana OurBanana = Entity.FindByIndex(InNetworkIdent) as Banana;
 		if (OurBanana == null)
@@ -77,6 +85,7 @@ public partial class Banana : SMBTrigger
 		{
 			return;
 		}
+		OurBanana.SetParent(null);
 		Pawn Ball = Entity.FindByIndex(InNetworkIdent2) as Pawn;
 		Ball.OurManager.AddScore(100);
 		Sound.FromEntity("fx_banana", OurBanana);
@@ -92,9 +101,15 @@ public partial class Banana : SMBTrigger
 	[Event.Tick.Server]
 	public virtual void DestroyAfterCollected()
 	{
+		
 		if (ServerKnowsCollected)
 		{
+			//Rotation *= Rotation.FromYaw(720 * Time.Delta);
 			Pawn Ball = Owner as Pawn;
+			if (Ball == null)
+			{
+				return;
+			}
 			float Ratio1 = Math.Min((Time.Now - CollectTime) * 2, 1);
 			float Ratio2 = Math.Min(((Time.Now - CollectTime) - 0.5f) * 2, 1);
 			Vector3 TargetPos1 = Ball.Position + (Vector3.Up * 32);
@@ -112,24 +127,27 @@ public partial class Banana : SMBTrigger
 		{
 			Delete();
 		}
+		
 		Predictable = true;
 	}
 
-	[Event.Frame]
+	[Event.PreRender]
 	public virtual void BananaFrame()
 	{
+		Pawn Ball = Local.Client.Pawn as Pawn;
 		if (!ServerKnowsCollected)
 		{
 			ClientsideBananaPos = Position;
-			ClientsideBananaRot = Rotation.FromYaw(Time.Now * 360);
 			SceneObject.Position = ClientsideBananaPos;
+			ClientsideBananaRot *= Rotation.FromYaw(360 * Time.Delta);
 			SceneObject.Rotation = ClientsideBananaRot;
+			SceneObject.Transform = SceneObject.Transform.WithScale(1);
 		}else
 		{
-			ClientsideBananaRot *= Rotation.FromYaw(Time.Delta * 720);
-			if (Owner == Local.Client.Pawn)
+			ClientsideBananaRot *= Rotation.FromYaw(720 * Time.Delta);
+			SceneObject.Rotation = ClientsideBananaRot;
+			if (Ball != null && Owner == Ball)
 			{
-				Pawn Ball = Owner as Pawn;
 				float Ratio1 = Math.Min((Time.Now - CollectTime) * 2, 1);
 				float Ratio2 = Math.Min(((Time.Now - CollectTime) - 0.5f) * 2, 1);
 				Vector3 TargetPos1 = Ball.ClientPosition + (CurrentView.Rotation.Up * 32) + (CurrentView.Rotation.Forward * 12);
@@ -137,17 +155,15 @@ public partial class Banana : SMBTrigger
 				if (Ratio2 > 0)
 				{
 					ClientsideBananaPos = Vector3.Lerp(TargetPos1, TargetPos2, Ratio2, true);
-					Scale = MathX.Clamp(1 - Ratio2, 0.001f, 1);
+					SceneObject.Transform = SceneObject.Transform.WithScale(MathX.Clamp(1 - Ratio2, 0.001f, 1));
 				}else
 				{
-					ClientsideBananaPos = Vector3.Lerp(PosWhenCollected, TargetPos1, Ratio1, true);
+					ClientsideBananaPos = Vector3.Lerp(Ball.ClientPosition + OffsetToBall, TargetPos1, Ratio1, true);
 				}
-				Position = ClientsideBananaPos;
-				Rotation = ClientsideBananaRot;
 				SceneObject.Position = ClientsideBananaPos;
-				SceneObject.Rotation = ClientsideBananaRot;
 			}
 		}
+		
 	}
 
 

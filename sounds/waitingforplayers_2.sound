@@ -3,14 +3,14 @@
 	data = 
 	{
 		UI = true
-		Volume = 0.5
+		Volume = 0.25
 		VolumeRandom = 0
 		Pitch = 1
 		PitchRandom = 0
 		Decibels = 70
 		Sounds = 
 		[
-			resource:"sounds/playpoints.vsnd",
+			"sounds/playpoints.vsnd",
 		]
 		SelectionMode = "Forward"
 		MaximumDistance = 1143.9335

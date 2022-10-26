@@ -18,12 +18,10 @@ public class course_w1
 
 	public static string CourseDescription = "A simple course, for beginner players to get their footing.";
 
-	public static void PlayNextStage()
+	public static void PlayDesiredStage(int StageIndex)
 	{
-		CurrentStage++;
 		MyGame GameEnt = Game.Current as MyGame;
-		GameEnt.StageInCourse = CurrentStage;
-		switch (CurrentStage)
+		switch (StageIndex)
 		{
 			case 1:
 				st001.CreateStage();
@@ -38,31 +36,71 @@ public class course_w1
 				st004.CreateStage();
 				break;
 			case 5:
-				stw1bonus.CreateStage();
-				break;
-			case 6:
-				st005.CreateStage();
-				break;
-			case 7:
 				st006.CreateStage();
 				break;
-			case 8:
+			case 6:
 				st007.CreateStage();
+				break;
+			case 7:
+				st011.CreateStage();
+				break;
+			case 8:
+				st012.CreateStage();
 				break;
 			case 9:
 				st008.CreateStage();
 				break;
 			case 10:
-				st009.CreateStage();
+				stw1bonus.CreateStage();
 				break;
 			case 11:
-				staward.CreateStage();
+				st005.CreateStage();
 				break;
 			case 12:
+				st013.CreateStage();
+				break;
+			case 13:
+				st010.CreateStage();
+				break;
+			case 14:
+				st014.CreateStage();
+				break;
+			case 15:
+				st015.CreateStage();
+				break;
+			case 16:
+				st016.CreateStage();
+				break;
+			case 17:
+				st017.CreateStage();
+				break;
+			case 18:
+				st018.CreateStage();
+				break;
+			case 19:
+				st019.CreateStage();
+				break;
+			case 20:
+				st009.CreateStage();
+				break;
+			case 21:
+				staward.CreateStage();
+				break;
+			case 22:
 				GameEnt.EndCourse();
 				CurrentStage = 0;
 				break;
+			case 23:
+				break;
 		}
+	}
+
+	public static void PlayNextStage()
+	{
+		CurrentStage++;
+		MyGame GameEnt = Game.Current as MyGame;
+		GameEnt.StageInCourse = CurrentStage;
+		PlayDesiredStage(CurrentStage);
 	}
 }
 
@@ -82,7 +120,7 @@ public class course_test
 		switch (CurrentStage)
 		{
 			default:
-				staward.CreateStage();
+				st019.CreateStage();
 				break;
 		}
 	}

@@ -14,8 +14,8 @@
 						remaps = 
 						[
 							{
-								from = "gxmat98.vmat"
-								to = "materials/banana.vmat"
+								from = "material.vmat"
+								to = "materials/terrymeat.vmat"
 							},
 						]
 						use_global_default = false
@@ -43,6 +43,7 @@
 							exception_list = 
 							[
 								"OBJ_BANANA_ENDING",
+								"OBJ_BANANA_ENDING_003",
 							]
 						}
 					},

@@ -187,8 +187,8 @@ public partial class ScreenSpaceParticleTrail : Entity
 	public virtual void UpdateParticle()
 	{
 		Velocity += new Vector3(0, 0, -400) * Time.Delta;
-		TraceResult ParticleTrace = Trace.Ray(Position, Position + (Velocity * Time.Delta)).WithTag("solid").IncludeClientside(true).Run();
-		if (ParticleTrace.Hit)
+		TraceResult ParticleTrace = Trace.Ray(Position, Position + (Velocity * Time.Delta)).WithTag("solid").WithoutTags("smbtrigger").IncludeClientside(true).Run();
+		if (ParticleTrace.Hit && Vector3.Dot(ParticleTrace.Normal, Velocity) < 0)
 		{
 			Position = ParticleTrace.HitPosition;
 			Velocity += ParticleTrace.Normal * Vector3.Dot(Velocity, ParticleTrace.Normal) * -1.75f;

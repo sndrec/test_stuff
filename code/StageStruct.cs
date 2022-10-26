@@ -13,6 +13,7 @@ public partial class SMBStage
 
 	public string Name {get;set;}
 	public float MaxTime {get;set;}
+	public float StartTime {get;set;}
 	public Vector3 SpawnPosition {get;set;}
 	public Angles SpawnRotation {get;set;}
 	public string StageSky {get;set;}
@@ -38,16 +39,19 @@ public partial class SMBStage
 	public float UserFloat2;
 	public float UserFloat3;
 	public float UserFloat4;
+	public BBox StageBounds;
 
 	public SMBStage(string InName, float InMaxTime, Vector3 InSpawnPos, Angles InSpawnRot, string InSkyName, string InGameMusic, float InBGScale)
 	{
 		Name = InName;
 		MaxTime = InMaxTime;
+		StartTime = Time.Now;
 		StageObjects = new List<SMBObject>();
 		BGObjects = new List<ModelEntity>();
 		SpawnPosition = InSpawnPos;
 		SpawnRotation = InSpawnRot;
 		StageSky = InSkyName;
+		StageBounds = new BBox(Vector3.Zero, Vector3.Zero);
 		MyGame GameEnt = Game.Current as MyGame;
 		GameEnt.CurrentSpawnPos = InSpawnPos;
 		GameEnt.CurrentSpawnRot = InSpawnRot;
@@ -57,6 +61,7 @@ public partial class SMBStage
 		GameEnt.DesiredSong = InGameMusic;
 		GameEnt.BGScale = InBGScale;
 		GameEnt.StageName = InName;
+		GameEnt.StageBounds = StageBounds;
 	}
 
 	public void OnFalloutManager(Pawn InBall)
@@ -115,6 +120,19 @@ public partial class SMBStage
 		return NewObject;
 	}
 
+	public SMBFalloutVolume AddFalloutVolume(string InModel, Vector3 InPosition, Rotation InRotation)
+	{
+		SMBFalloutVolume NewObject = new SMBFalloutVolume();
+		NewObject.SetModel(InModel);
+		NewObject.SetupPhysicsFromModel(PhysicsMotionType.Keyframed);
+		NewObject.Position = InPosition;
+		NewObject.Rotation = InRotation;
+		NewObject.EnableAllCollisions = true;
+		NewObject.EnableDrawing = true;
+		StageObjects.Add(NewObject);
+		return NewObject;
+	}
+
 	public Banana AddBanana(Vector3 InPosition)
 	{
 		Banana NewBanana = new Banana();
@@ -123,6 +141,24 @@ public partial class SMBStage
 		NewBanana.EnableDrawing = true;
 		StageObjects.Add(NewBanana);
 		return NewBanana;
+	}
+
+	public BananaBunch AddBananaBunch(Vector3 InPosition)
+	{
+		BananaBunch NewBanana = new BananaBunch();
+		NewBanana.Position = InPosition;
+		NewBanana.EnableAllCollisions = true;
+		NewBanana.EnableDrawing = true;
+		StageObjects.Add(NewBanana);
+		return NewBanana;
+	}
+
+	public void AddBananas(List<Vector3> Poses)
+	{
+		foreach (Vector3 Pos in Poses)
+		{
+			AddBanana(Pos);
+		}
 	}
 
 	public SMBObject AddBGObject(string InModel, Vector3 InPosition, Rotation InRotation)
@@ -139,51 +175,21 @@ public partial class SMBStage
 		return NewObject;
 	}
 
-	public SMBObject AddBGObject(string InModel, Vector3 InPosition, Rotation InRotation, List<AnimKeyframe> InKeyframes)
-	{
-		SMBObject NewObject = new SMBObject();
-		NewObject.SetModel(InModel);
-		NewObject.SetupPhysicsFromModel(PhysicsMotionType.Keyframed);
-		NewObject.Position = InPosition;
-		NewObject.Rotation = InRotation;
-		NewObject.EnableAllCollisions = true;
-		NewObject.EnableDrawing = true;
-		NewObject.Keyframes = InKeyframes;
-		NewObject.Keyframes.Sort((x, y) => x.Time.CompareTo(y.Time));
-		NewObject.CurrentKeyFrameIndex = 0;
-		NewObject.NextKeyFrameIndex = 1;
-		NewObject.AnimPlaybackRate = 1;
-		NewObject.AnimTime = 0;
-		BGObjects.Add(NewObject);
-		NewObject.Tags.Add("BGObject");
-		return NewObject;
-	}
-
-	public SMBObject AddStageObject(string InModel, Vector3 InPosition, Rotation InRotation, List<AnimKeyframe> InKeyframes)
-	{
-		SMBObject NewObject = new SMBObject();
-		NewObject.SetModel(InModel);
-		NewObject.SetupPhysicsFromModel(PhysicsMotionType.Keyframed);
-		NewObject.Position = InPosition;
-		NewObject.Rotation = InRotation;
-		NewObject.EnableAllCollisions = true;
-		NewObject.EnableDrawing = true;
-		NewObject.Keyframes = InKeyframes;
-		NewObject.Keyframes.Sort((x, y) => x.Time.CompareTo(y.Time));
-		NewObject.CurrentKeyFrameIndex = 0;
-		NewObject.NextKeyFrameIndex = 1;
-		NewObject.AnimPlaybackRate = 1;
-		NewObject.AnimTime = 0;
-		StageObjects.Add(NewObject);
-		return NewObject;
-	}
-
-	public void AddGoal(Vector3 InPosition, Rotation InRotation)
+	public GoalPost AddGoal(Vector3 InPosition, Rotation InRotation, string PostModel = "models/goalpost.vmdl", string TriggerModel = "models/goaltrigger.vmdl")
 	{
 		GoalPost NewGoal = new GoalPost();
 		NewGoal.Position = InPosition;
 		NewGoal.Rotation = InRotation;
+		NewGoal.SetPostAndTriggerModel(PostModel, TriggerModel);
 		StageObjects.Add(NewGoal);
+		return NewGoal;
+	}
+
+	public void SetStageBounds(BBox InBounds)
+	{
+		StageBounds = InBounds;
+		MyGame GameEnt = Game.Current as MyGame;
+		GameEnt.StageBounds = StageBounds;
 	}
 
 	public void DestroyStage()

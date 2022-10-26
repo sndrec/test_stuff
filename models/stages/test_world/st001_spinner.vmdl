@@ -15,11 +15,11 @@
 						[
 							{
 								from = "material.vmat"
-								to = "materials/stagemat/tw_detail2.vmat"
+								to = "materials/stagemat/field/w1circletex.vmat"
 							},
 							{
 								from = "fill.vmat"
-								to = "materials/stagemat/tw_fill.vmat"
+								to = "materials/stagemat/field/w1fill.vmat"
 							},
 						]
 						use_global_default = false

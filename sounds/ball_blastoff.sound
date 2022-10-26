@@ -7,13 +7,13 @@
 		VolumeRandom = 0
 		Pitch = 1
 		PitchRandom = 0
-		Decibels = 90
+		Decibels = 120
 		Sounds = 
 		[
-			resource:"sounds/fx_ball_woosh.vsnd",
+			resource:"sounds/ball_launch.vsnd",
 		]
 		SelectionMode = "Random"
-		MaximumDistance = 1870.0942
-		MinimumDistance = 93.504715
+		MaximumDistance = 3299.7227
+		MinimumDistance = 164.98613
 	}
 }

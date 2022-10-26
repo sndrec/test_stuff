@@ -21,19 +21,34 @@ public partial class SMBObject : ModelEntity
 	[Net]
 	public Transform UninterpolatedTransform {get;set;}
 
-	public float LoopStart {get;set;}
+	public float PosLoopStart {get;set;}
 
-	public float LoopEnd {get;set;}
+	public float PosLoopEnd {get;set;}
 
-	public float AnimTime {get;set;}
+	public float RotLoopStart {get;set;}
 
-	public float AnimPlaybackRate {get;set;}
+	public float RotLoopEnd {get;set;}
 
-	public int CurrentKeyFrameIndex {get;set;}
+	public float PosAnimTime {get;set;}
 
-	public int NextKeyFrameIndex {get;set;}
+	public float RotAnimTime {get;set;}
 
-	public List<AnimKeyframe> Keyframes {get;set;}
+	public float PosAnimPlaybackRate {get;set;}
+
+	public float RotAnimPlaybackRate {get;set;}
+
+	public float SpawnTime {get;set;}
+
+	public int CurrentPosKeyFrameIndex {get;set;}
+
+	public int NextPosKeyFrameIndex {get;set;}
+
+	public int CurrentRotKeyFrameIndex {get;set;}
+
+	public int NextRotKeyFrameIndex {get;set;}
+
+	public List<PosAnimKeyFrame> PosKeyFrames {get;set;}
+	public List<RotAnimKeyFrame> RotKeyFrames {get;set;}
 
 	public delegate void SimulateSMBObjectDelegate(SMBObject InObject);
 	public SimulateSMBObjectDelegate SimulateSMBObjectCustom;
@@ -65,19 +80,52 @@ public partial class SMBObject : ModelEntity
 		return c * (float)Math.Sin(t / d * (3.141592 / 2)) + b;
 	}
 
-	public virtual void AddKeyframe(AnimKeyframe InFrame)
+	public virtual void AddPosKeyFrame(PosAnimKeyFrame InFrame)
 	{
-		Keyframes.Add(InFrame);
-		Keyframes.Sort((x, y) => x.Time.CompareTo(y.Time));
+		PosKeyFrames.Add(InFrame);
+		PosKeyFrames.Sort((x, y) => x.Time.CompareTo(y.Time));
 	}
 
-	public virtual void AddKeyframes(List<AnimKeyframe> InKeyframes)
+	public virtual void AddRotKeyFrame(RotAnimKeyFrame InFrame)
 	{
-		foreach (AnimKeyframe KeyFrame in InKeyframes)
+		RotKeyFrames.Add(InFrame);
+		RotKeyFrames.Sort((x, y) => x.Time.CompareTo(y.Time));
+	}
+
+	public virtual void AddPosKeyFrames(List<PosAnimKeyFrame> InKeyFrames)
+	{
+		foreach (PosAnimKeyFrame KeyFrame in InKeyFrames)
 		{
-			Keyframes.Add(KeyFrame);
+			PosKeyFrames.Add(KeyFrame);
 		}
-		Keyframes.Sort((x, y) => x.Time.CompareTo(y.Time));
+		PosKeyFrames.Sort((x, y) => x.Time.CompareTo(y.Time));
+	}
+
+	public virtual void AddRotKeyFrames(List<RotAnimKeyFrame> InKeyFrames)
+	{
+		foreach (RotAnimKeyFrame KeyFrame in InKeyFrames)
+		{
+			RotKeyFrames.Add(KeyFrame);
+		}
+		RotKeyFrames.Sort((x, y) => x.Time.CompareTo(y.Time));
+	}
+	public virtual void EnableKeyFrameAnimation(bool EnablePos, bool EnableRot, float PosPlaybackRate = 1, float RotPlaybackRate = 1)
+	{
+		if (EnablePos)
+		{
+			CurrentPosKeyFrameIndex = 0;
+			NextPosKeyFrameIndex = 1;
+			PosAnimPlaybackRate = PosPlaybackRate;
+			PosAnimTime = 0;
+		}
+
+		if (EnableRot)
+		{
+			CurrentRotKeyFrameIndex = 0;
+			NextRotKeyFrameIndex = 1;
+			RotAnimPlaybackRate = RotPlaybackRate;
+			RotAnimTime = 0;
+		}
 	}
 
 	public override void Spawn()
@@ -88,6 +136,9 @@ public partial class SMBObject : ModelEntity
 		Tags.Add(CollisionTag);
 		Tags.Add("solid");
 		Tags.Add("regularfloor");
+		PosKeyFrames = new List<PosAnimKeyFrame>();
+		RotKeyFrames = new List<RotAnimKeyFrame>();
+		SpawnTime = Time.Now;
 	}
 
 	public static Vector3 RotateVector(Vector3 InPoint, Rotation rotation)
@@ -132,47 +183,84 @@ public partial class SMBObject : ModelEntity
 		//Rotation = Rotation.Normal;
 		//Scale = 1f;
 		//Position += new Vector3(10 * Time.Delta, 0, 0);
-		if (Keyframes != null && Keyframes.Count > 1)
+		if (PosKeyFrames != null && PosKeyFrames.Count > 1)
 		{
-			AnimKeyframe CurrentKeyFrame = Keyframes[CurrentKeyFrameIndex];
-			AnimKeyframe NextKeyFrame = Keyframes[NextKeyFrameIndex];
+			PosAnimKeyFrame CurrentPosKeyFrame = PosKeyFrames[CurrentPosKeyFrameIndex];
+			PosAnimKeyFrame NextPosKeyFrame = PosKeyFrames[NextPosKeyFrameIndex];
 	
 			float Ratio = 0;
-			Vector3 StartPosition = CurrentKeyFrame.Position;
-			Vector3 EndPosition = NextKeyFrame.Position;
-			Rotation StartRotation = CurrentKeyFrame.Rotation;
-			Rotation EndRotation = NextKeyFrame.Rotation;
-			float t = (AnimTime - CurrentKeyFrame.Time) / (NextKeyFrame.Time - CurrentKeyFrame.Time);
-			if (CurrentKeyFrame.InterpType == 0)
+			Vector3 StartPosition = CurrentPosKeyFrame.Position;
+			Vector3 EndPosition = NextPosKeyFrame.Position;
+			float t = (PosAnimTime - CurrentPosKeyFrame.Time) / (NextPosKeyFrame.Time - CurrentPosKeyFrame.Time);
+			if (CurrentPosKeyFrame.InterpType == 0)
 			{
 				Ratio = InterpLinear(t, 0, 1, 1);
 			}else
-			if (CurrentKeyFrame.InterpType == 1)
+			if (CurrentPosKeyFrame.InterpType == 1)
 			{
 				Ratio = InterpInSine(t, 0, 1, 1);
 			}else
-			if (CurrentKeyFrame.InterpType == 2)
+			if (CurrentPosKeyFrame.InterpType == 2)
 			{
 				Ratio = InterpOutSine(t, 0, 1, 1);
 			}else
-			if (CurrentKeyFrame.InterpType == 3)
+			if (CurrentPosKeyFrame.InterpType == 3)
 			{
 				Ratio = InterpInOutSine(t, 0, 1, 1);
 			}
 			Position = Vector3.Lerp(StartPosition, EndPosition, Ratio, true);
+	
+			PosAnimTime = PosAnimTime + (Time.Delta * PosAnimPlaybackRate);
+			if (PosAnimTime > PosKeyFrames[NextPosKeyFrameIndex].Time)
+			{
+				CurrentPosKeyFrameIndex++;
+				NextPosKeyFrameIndex = CurrentPosKeyFrameIndex + 1;
+			}
+			if (CurrentPosKeyFrameIndex == (PosKeyFrames.Count - 1))
+			{
+				CurrentPosKeyFrameIndex = 0;
+				NextPosKeyFrameIndex = 1;
+				PosAnimTime = 0;
+			}
+		}
+		if (RotKeyFrames != null && RotKeyFrames.Count > 1)
+		{
+			RotAnimKeyFrame CurrentRotKeyFrame = RotKeyFrames[CurrentRotKeyFrameIndex];
+			RotAnimKeyFrame NextRotKeyFrame = RotKeyFrames[NextRotKeyFrameIndex];
+	
+			float Ratio = 0;
+			Rotation StartRotation = CurrentRotKeyFrame.Rotation;
+			Rotation EndRotation = NextRotKeyFrame.Rotation;
+			float t = (RotAnimTime - CurrentRotKeyFrame.Time) / (NextRotKeyFrame.Time - CurrentRotKeyFrame.Time);
+			if (CurrentRotKeyFrame.InterpType == 0)
+			{
+				Ratio = InterpLinear(t, 0, 1, 1);
+			}else
+			if (CurrentRotKeyFrame.InterpType == 1)
+			{
+				Ratio = InterpInSine(t, 0, 1, 1);
+			}else
+			if (CurrentRotKeyFrame.InterpType == 2)
+			{
+				Ratio = InterpOutSine(t, 0, 1, 1);
+			}else
+			if (CurrentRotKeyFrame.InterpType == 3)
+			{
+				Ratio = InterpInOutSine(t, 0, 1, 1);
+			}
 			Rotation = Rotation.Slerp(StartRotation, EndRotation, Ratio);
 	
-			AnimTime = AnimTime + (Time.Delta * AnimPlaybackRate);
-			if (AnimTime > Keyframes[NextKeyFrameIndex].Time)
+			RotAnimTime = RotAnimTime + (Time.Delta * RotAnimPlaybackRate);
+			if (RotAnimTime > RotKeyFrames[NextRotKeyFrameIndex].Time)
 			{
-				CurrentKeyFrameIndex++;
-				NextKeyFrameIndex = CurrentKeyFrameIndex + 1;
+				CurrentRotKeyFrameIndex++;
+				NextRotKeyFrameIndex = CurrentRotKeyFrameIndex + 1;
 			}
-			if (CurrentKeyFrameIndex == (Keyframes.Count - 1))
+			if (CurrentRotKeyFrameIndex == (RotKeyFrames.Count - 1))
 			{
-				CurrentKeyFrameIndex = 0;
-				NextKeyFrameIndex = 1;
-				AnimTime = 0;
+				CurrentRotKeyFrameIndex = 0;
+				NextRotKeyFrameIndex = 1;
+				RotAnimTime = 0;
 			}
 		}
 		if (SimulateSMBObjectCustom != null)

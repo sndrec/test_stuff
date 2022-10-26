@@ -14,8 +14,12 @@
 						remaps = 
 						[
 							{
-								from = "gxmat95.vmat"
-								to = "materials/banana.vmat"
+								from = "material.001.vmat"
+								to = "materials/terrymeat_cover.vmat"
+							},
+							{
+								from = "material.vmat"
+								to = "materials/terrymeat.vmat"
 							},
 						]
 						use_global_default = false
@@ -43,8 +47,23 @@
 							exception_list = 
 							[
 								"OBJ_BANANA_02_LOD100",
+								"OBJ_BANANA_ENDING_001",
 							]
 						}
+					},
+				]
+			},
+			{
+				_class = "PhysicsShapeList"
+				children = 
+				[
+					{
+						_class = "PhysicsShapeSphere"
+						parent_bone = ""
+						surface_prop = "default"
+						collision_tags = "solid"
+						radius = 32.0
+						center = [ 0.0, 0.0, 0.0 ]
 					},
 				]
 			},

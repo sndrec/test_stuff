@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Sandbox;
 
-partial class PartyBall : AnimatedEntity
+public partial class PartyBall : AnimatedEntity
 {	
 
 	public Rotation AngVel {get;set;}

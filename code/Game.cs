@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 //
 // You don't need to put things in a namespace, but it doesn't hurt.
@@ -47,6 +48,9 @@ public partial class MyGame : Sandbox.Game
 	[Net]
 	public int StageInCourse {get;set;}
 
+	[Net]
+	public BBox StageBounds {get;set;}
+
 	[ConVar.ClientData( "smb_stagetilteffect_maxangle" )]
 	public float BallMaxVisualTilt {get;set;} = 13.2f;
 
@@ -61,7 +65,7 @@ public partial class MyGame : Sandbox.Game
 
 	public string PlayingSong {get;set;}
 
-	public Sound GameMusic {get;set;}
+	public List<Sound> GameMusic {get;set;}
 
 	public int CurrentCourse {get;set;}
 
@@ -81,6 +85,8 @@ public partial class MyGame : Sandbox.Game
 		NextGameState = Time.Now + 30;
 		CurrentCourse = 1;
 		FirstFrame = false;
+		GameMusic = new List<Sound>{};
+		StageBounds = new BBox(Vector3.Zero, Vector3.Zero);
 		if ( IsClient )
     	{
 			_ = new UI_Base();
@@ -224,6 +230,15 @@ public partial class MyGame : Sandbox.Game
 			LightEnvironment.DynamicShadows = true;
 			HasLightEnvironment = true;
 		}
+		//Map.Scene.GradientFog.Enabled = true;
+		//Map.Scene.GradientFog.Color = new Color(0.05f, 0.1f, 0.15f);
+		//Map.Scene.GradientFog.StartDistance = 0;
+		//Map.Scene.GradientFog.EndDistance = 1500000;
+		//Map.Scene.GradientFog.MaximumOpacity = 1;
+		//Map.Scene.GradientFog.StartHeight = 4999999;
+		//Map.Scene.GradientFog.EndHeight = 5000000;
+		//Map.Scene.GradientFog.DistanceFalloffExponent = 0.35f;
+		//Map.Scene.GradientFog.VerticalFalloffExponent = 0.35f;
 	}
 
 	//states:
@@ -241,6 +256,11 @@ public partial class MyGame : Sandbox.Game
 	public Vector3 BlenderPos(float x, float y, float z)
 	{
 		return new Vector3(y * -20, x * 20, z * 20);
+	}
+
+	public Vector3 ConfigPos(float x, float y, float z)
+	{
+		return new Vector3(y * -0.2f, x * -0.2f, z * 0.2f);
 	}
 
 	public void FromEntityToAllBut(Client Avoid, string InSound, Entity InEnt)
@@ -276,6 +296,19 @@ public partial class MyGame : Sandbox.Game
 		}
 	}
 
+	public virtual void PlaySpecificStageInCourse(int InCourse, int InIndex)
+	{
+		switch (InCourse)
+		{
+			case 1:
+				course_w1.PlayDesiredStage(InIndex);
+				break;
+			default:
+				course_test.PlayNextStage();
+				break;
+		}
+	}
+
 	public async void PlayGlobalSoundDelayed(string InLine, float InDelay)
 	{
 		await Task.DelaySeconds(InDelay);
@@ -294,7 +327,6 @@ public partial class MyGame : Sandbox.Game
 			Pawn pawn = new Pawn();
 			pawn.Owner = pl as Entity;
 			pawn.GetPlayerStateManager();
-			pawn.UpdateCitizenClothing(pl);
 			pl.Pawn = pawn;
 		}
 	}
@@ -310,7 +342,6 @@ public partial class MyGame : Sandbox.Game
 			Pawn pawn = new Pawn();
 			pawn.Owner = pl as Entity;
 			pawn.GetPlayerStateManager();
-			pawn.UpdateCitizenClothing(pl);
 			pl.Pawn = pawn;
 		}
 	}
@@ -457,21 +488,57 @@ public partial class MyGame : Sandbox.Game
 		//Log.Info(NextGameState - Time.Now);
 	}
 
+	public async void StartMusicDelayed()
+	{
+		foreach (Sound Song in GameMusic)
+		{
+			Song.SetVolume(0);
+		}
+		await Task.DelaySeconds(0.3f);
+		foreach (Sound Song in GameMusic)
+		{
+			Song.Stop();
+		}
+		GameMusic.Clear();
+		Sound NewSong = Sound.FromWorld(PlayingSong, new Vector3(0,0,0));
+		GameMusic.Add(NewSong);
+	}
+
 	[Event.Tick.Client]
 	public void ManageGameMusic()
 	{
+		if (Time.Delta > 0.02f)
+		{
+			return;
+		}
+		if (GameMusic.Count > 1)
+		{
+			foreach (Sound Song in GameMusic)
+			{
+				Song.Stop();
+			}
+			GameMusic.Clear();
+		}
 		if (PlayingSong != DesiredSong)
 		{
 			PlayingSong = DesiredSong;
-			GameMusic.Stop();
-			GameMusic = Sound.FromWorld(PlayingSong, new Vector3(0,0,0));
+			foreach (Sound Song in GameMusic)
+			{
+				Song.SetVolume(0);
+			}
+			StartMusicDelayed();
 		}
 		else
 		{
-			if (GameMusic.Finished)
+			if (GameMusic.Count >= 1 && GameMusic[0].Finished)
 			{
-				GameMusic.Stop();
-				GameMusic = Sound.FromWorld(PlayingSong, new Vector3(0,0,0));
+				foreach (Sound Song in GameMusic)
+				{
+					Song.Stop();
+				}
+				GameMusic.Clear();
+				Sound NewSong = Sound.FromWorld(PlayingSong, new Vector3(0,0,0));
+				GameMusic.Add(NewSong);
 			}
 		}
 	}

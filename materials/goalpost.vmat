@@ -4,9 +4,6 @@ Layer0
 {
 	shader "complex.vfx"
 
-	//---- PBR ----
-	F_SELF_ILLUM 1
-
 	//---- Ambient Occlusion ----
 	g_flAmbientOcclusionDirectDiffuse "0.000"
 	g_flAmbientOcclusionDirectSpecular "0.000"
@@ -35,14 +32,6 @@ Layer0
 
 	//---- Roughness ----
 	TextureRoughness "[0.101000 0.101000 0.101000 0.000000]"
-
-	//---- Self Illum ----
-	g_flSelfIllumAlbedoFactor "1.000"
-	g_flSelfIllumBrightness "2.515"
-	g_flSelfIllumScale "1.000"
-	g_vSelfIllumScrollSpeed "[0.000 0.000]"
-	g_vSelfIllumTint "[1.000000 1.000000 1.000000 0.000000]"
-	TextureSelfIllumMask "[0.327000 0.327000 0.327000 0.000000]"
 
 	//---- Texture Coordinates ----
 	g_nScaleTexCoordUByModelScaleAxis "0"
