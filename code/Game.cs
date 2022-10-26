@@ -275,6 +275,19 @@ public partial class MyGame : Sandbox.Game
 		}
 	}
 
+	[ConCmd.Server]
+	public static void SendKillfeedEntry(string lsteamid, string left, string right, string method)
+	{
+		MyGame GameEnt = Game.Current as MyGame;
+		GameEnt.ReceiveKillfeedEntry(Convert.ToInt64(lsteamid), left, right, method);
+	}
+
+	[ClientRpc]
+	public virtual void ReceiveKillfeedEntry(long lsteamid, string left, string right, string method)
+	{
+		KillFeed.Current?.AddEntry(lsteamid, left, right, method);
+	}
+
 	public void DestroyCurrentSMBStage()
 	{
 		if (CurrentStage != null)
@@ -394,7 +407,7 @@ public partial class MyGame : Sandbox.Game
 		if (inState == 2)
 		{
 			DestroyCurrentSMBStage();
-			PlayNextStageInCourse(-1);
+			PlayNextStageInCourse(1);
 			NextGameState = Time.Now + (StageMaxTime + 5.6f);
 			SkyGenerator.CreateBackground(CurrentSky);
 			SpawnAllBalls();

@@ -41,6 +41,9 @@ public partial class Pawn : ModelEntity
 	[Net]
 	public string ClothingString {get;set;}
 
+	[Net]
+	public bool HasClothesString {get;set;} = false;
+
 	public AnimatedEntity BallCitizen {get;set;}
 
 	public Vector3 StoredAnalogInput {get;set;}
@@ -531,7 +534,7 @@ public partial class Pawn : ModelEntity
 		if (Ball != null)
 		{
 			Ball.ClothingString = InJson;
-			Ball.UpdateCitizenClothing(Ball.Owner as Client);
+			Ball.HasClothesString = true;
 		}
 	}
 
@@ -750,8 +753,6 @@ public partial class Pawn : ModelEntity
 		BallCitizen.Scale = 0.2f;
 		BallCitizen.AnimateOnServer = false;
 		BallCitizen.AnimGraph = AnimationGraph.Load("models/citizen/citizen_ro.vanmgrph");
-		//UpdateCitizenClothing(Owner as Client);
-
 	}
 
 	protected override void OnDestroy()
@@ -1002,7 +1003,7 @@ public partial class Pawn : ModelEntity
 										Milliseconds = Milliseconds + "0";
 									}
 
-									KillFeed.Current?.AddEntry( Local.Client.PlayerId, Local.Client.Name, TimeInSeconds + Milliseconds, "" );
+									MyGame.SendKillfeedEntry( Local.Client.PlayerId.ToString(), Local.Client.Name, TimeInSeconds + Milliseconds, "" );
 
 									PlayerStateManager.AddScoreFromClient(OurManager.NetworkIdent, (int)(TimeRemaining * 100));
 									int ClosestStickIndex = 0;
@@ -1233,6 +1234,11 @@ public partial class Pawn : ModelEntity
 	[Event.Frame]
 	public void SmoothServerBallPos()
 	{
+		if (!Clothed && HasClothesString)
+		{
+			UpdateCitizenClothing(Owner as Client);
+		}
+
 		if (Owner == Local.Client as Entity)
 		{
 			return;

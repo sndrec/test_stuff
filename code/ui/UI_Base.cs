@@ -55,18 +55,8 @@ public class UI_Base : RootPanel
 		{
 			ScoreInterp = MathX.Lerp(ScoreInterp, Ball.OurManager.Score, Time.Delta * 10, true);
 		}
-		if (Ball != null)
-		{
-			if (Ball.BallState != 2)
-			{
-				TimeInSeconds = (float)Math.Floor(GameEnt.StageMaxTime - (Time.Now - GameEnt.FirstHitTime));
-				Milliseconds = (float)(1 - (Math.Floor(((Time.Now - GameEnt.FirstHitTime) % 1) * 1000) / 1000));
-			}else
-			{
-				TimeInSeconds = (float)Math.Floor(Ball.GoalTime);
-				Milliseconds = (float)(Math.Floor((Ball.GoalTime % 1) * 1000) / 1000);
-			}
-		}
+		TimeInSeconds = (float)Math.Floor(GameEnt.StageMaxTime - (Time.Now - GameEnt.FirstHitTime));
+		Milliseconds = (float)(1 - (Math.Floor(((Time.Now - GameEnt.FirstHitTime) % 1) * 1000) / 1000));
 		string MiliString = Milliseconds.ToString();
 		if (MiliString.Length > 1)
 		{
