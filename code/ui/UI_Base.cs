@@ -19,6 +19,7 @@ public class UI_Base : RootPanel
     public float ScoreInterp {get;set;}
     public float TimeInSeconds {get;set;}
     public float Milliseconds {get;set;}
+    public float UseTime {get;set;}
 
     public Panel UIE_HudScalableOne {get;set;}
     public Panel UIE_HudScalableTwo {get;set;}
@@ -54,10 +55,17 @@ public class UI_Base : RootPanel
 		{
 			ScoreInterp = MathX.Lerp(ScoreInterp, Ball.OurManager.Score, Time.Delta * 10, true);
 		}
-		if (Ball != null && Ball.BallState == 0)
+		if (Ball != null)
 		{
-			TimeInSeconds = (float)Math.Floor(GameEnt.StageMaxTime - (Time.Now - GameEnt.FirstHitTime));
-			Milliseconds = (float)(1 - (Math.Floor(((Time.Now - GameEnt.FirstHitTime) % 1) * 1000) / 1000));
+			if (Ball.BallState != 2)
+			{
+				TimeInSeconds = (float)Math.Floor(GameEnt.StageMaxTime - (Time.Now - GameEnt.FirstHitTime));
+				Milliseconds = (float)(1 - (Math.Floor(((Time.Now - GameEnt.FirstHitTime) % 1) * 1000) / 1000));
+			}else
+			{
+				TimeInSeconds = (float)Math.Floor(Ball.GoalTime);
+				Milliseconds = (float)(Math.Floor((Ball.GoalTime % 1) * 1000) / 1000);
+			}
 		}
 		string MiliString = Milliseconds.ToString();
 		if (MiliString.Length > 1)

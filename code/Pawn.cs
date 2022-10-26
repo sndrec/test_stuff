@@ -129,6 +129,8 @@ public partial class Pawn : ModelEntity
 
 	public MyGame GameEnt {get;set;}
 
+	public float GoalTime {get;set;} = 0;
+
 	public bool AboutToGainControl {get;set;}
 
 	public float NextSpark {get;set;}
@@ -984,8 +986,23 @@ public partial class Pawn : ModelEntity
 									//ImpactParticle.EnableDrawing = true;
 									float TimeRemaining = GameEnt.StageMaxTime - (Time.Now - GameEnt.FirstHitTime);
 									Log.Info("Time remaining = " + TimeRemaining);
+									GoalTime = TimeRemaining;
+									string TimeInSeconds = ((float)Math.Floor(TimeRemaining)).ToString();
+									string Milliseconds = ((float)(Math.Floor((TimeRemaining % 1) * 1000) / 1000)).ToString();
+									if (Milliseconds.Length > 1)
+									{
+										Milliseconds = Milliseconds.Substring(1, Milliseconds.Length - 1);
+									}
+									if (Milliseconds.Length > 4)
+									{
+										Milliseconds = Milliseconds.Substring(0, 4);
+									}
+									if (Milliseconds.Length < 4)
+									{
+										Milliseconds = Milliseconds + "0";
+									}
 
-									KillFeed.Current?.AddEntry( Local.Client.PlayerId, Local.Client.Name, TimeRemaining.ToString(), "" );
+									KillFeed.Current?.AddEntry( Local.Client.PlayerId, Local.Client.Name, TimeInSeconds + Milliseconds, "" );
 
 									PlayerStateManager.AddScoreFromClient(OurManager.NetworkIdent, (int)(TimeRemaining * 100));
 									int ClosestStickIndex = 0;
