@@ -394,7 +394,7 @@ public partial class MyGame : Sandbox.Game
 		if (inState == 2)
 		{
 			DestroyCurrentSMBStage();
-			PlayNextStageInCourse(1);
+			PlayNextStageInCourse(-1);
 			NextGameState = Time.Now + (StageMaxTime + 5.6f);
 			SkyGenerator.CreateBackground(CurrentSky);
 			SpawnAllBalls();

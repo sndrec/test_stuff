@@ -63,7 +63,7 @@ public class course_w1
 				st010.CreateStage();
 				break;
 			case 14:
-				st014.CreateStage();
+				st019.CreateStage();
 				break;
 			case 15:
 				st015.CreateStage();
@@ -78,7 +78,7 @@ public class course_w1
 				st018.CreateStage();
 				break;
 			case 19:
-				st019.CreateStage();
+				st014.CreateStage();
 				break;
 			case 20:
 				st009.CreateStage();
@@ -120,7 +120,7 @@ public class course_test
 		switch (CurrentStage)
 		{
 			default:
-				st019.CreateStage();
+				st015.CreateStage();
 				break;
 		}
 	}

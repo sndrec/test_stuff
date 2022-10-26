@@ -529,6 +529,7 @@ public partial class Pawn : ModelEntity
 		if (Ball != null)
 		{
 			Ball.ClothingString = InJson;
+			Ball.UpdateCitizenClothing(Ball.Owner as Client);
 		}
 	}
 
@@ -696,9 +697,9 @@ public partial class Pawn : ModelEntity
 		}
 	}
 
-	public async void UpdateCitizenClothing(Client cl)
+	[ClientRpc]
+	public void UpdateCitizenClothing(Client cl)
 	{
-		await Task.DelaySeconds(0.5f);
 		if (Clothed)
 		{
 			return;
@@ -747,7 +748,7 @@ public partial class Pawn : ModelEntity
 		BallCitizen.Scale = 0.2f;
 		BallCitizen.AnimateOnServer = false;
 		BallCitizen.AnimGraph = AnimationGraph.Load("models/citizen/citizen_ro.vanmgrph");
-		UpdateCitizenClothing(Owner as Client);
+		//UpdateCitizenClothing(Owner as Client);
 
 	}
 

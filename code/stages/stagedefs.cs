@@ -831,7 +831,7 @@ public class st015
 {
 	public static void RotatePlatform(SMBObject InObject)
 	{
-		InObject.Rotation *= Rotation.FromPitch(Time.Delta * 90);
+		InObject.Rotation *= Rotation.FromPitch(Time.Delta * -105);
 	}
 	public static void CreateStage()
 	{
@@ -856,13 +856,14 @@ public class st015
 		MyGame GameEnt = Game.Current as MyGame;
 		SMBStage NewStage = new SMBStage("Crash Course", 120, GameEnt.BlenderPos(-2f, 0f, 0.5f), new Angles(0, 90, 0), "sky_sky", "mus_desertruins_intro", 2);
 		NewStage.AddStageObject("models/stages/test_world/st015_main.vmdl", new Vector3(0,0,0), Rotation.Identity);
-		SMBObject Spinner = NewStage.AddStageObject("models/stages/test_world/st015_cylinder.vmdl", GameEnt.BlenderPos(8f, 0f, -4f), Rotation.Identity);
+		SMBObject Spinner = NewStage.AddStageObject("models/stages/test_world/st015_cylinder.vmdl", GameEnt.BlenderPos(8f, 0f, -4f), Rotation.FromPitch(100));
 		Spinner.SimulateSMBObjectCustom = RotatePlatform;
 		SMBObject Spinwire1 = NewStage.AddStageObject("models/stages/test_world/st015_spinwire.vmdl", GameEnt.BlenderPos(16.0f, 8f, -1.001f), Rotation.Identity);
 		SMBObject Spinwire2 = NewStage.AddStageObject("models/stages/test_world/st015_spinwire.vmdl", GameEnt.BlenderPos(16.0f, 8f, -1.002f), Rotation.Identity);
 		SMBObject Hammer1 = NewStage.AddStageObject("models/stages/test_world/st015_hammer.vmdl", GameEnt.BlenderPos(-4f, -18.0f, 10.25f), Rotation.Identity);
 		SMBObject Hammer2 = NewStage.AddStageObject("models/stages/test_world/st015_hammer.vmdl", GameEnt.BlenderPos(4f, -18.0f, 10.25f), Rotation.Identity);
 		SMBObject Hammer3 = NewStage.AddStageObject("models/stages/test_world/st015_hammer.vmdl", GameEnt.BlenderPos(12f, -18.0f, 10.25f), Rotation.Identity);
+		SMBObject Hammer4 = NewStage.AddStageObject("models/stages/test_world/st015_goalholder.vmdl", GameEnt.BlenderPos(20f, -18.0f, 12.5f), Rotation.Identity);
 		Spinwire1.AddRotKeyFrames(Spinner1KeyFrames);
 		Spinwire1.EnableKeyFrameAnimation(false, true);
 		Spinwire1.RotAnimTime = 1.5f;
@@ -874,11 +875,15 @@ public class st015
 		Hammer1.RotAnimTime = 0f;
 		Hammer2.AddRotKeyFrames(HammerKeyFrames);
 		Hammer2.EnableKeyFrameAnimation(false, true);
-		Hammer2.RotAnimTime = 1.333f;
+		Hammer2.RotAnimTime = 1f;
 		Hammer3.AddRotKeyFrames(HammerKeyFrames);
 		Hammer3.EnableKeyFrameAnimation(false, true);
-		Hammer3.RotAnimTime = 2.666f;
-		NewStage.AddGoal(GameEnt.BlenderPos(21f, -18f, -1f), Rotation.From(new Angles(0f, -90f, 0)));
+		Hammer3.RotAnimTime = 2f;
+		Hammer4.AddRotKeyFrames(HammerKeyFrames);
+		Hammer4.EnableKeyFrameAnimation(false, true);
+		Hammer4.RotAnimTime = 3f;
+		GoalPost Goal = NewStage.AddGoal(GameEnt.BlenderPos(20f, -18f, -1f), Rotation.From(new Angles(0f, 0f, 0)));
+		Goal.SetParent(Hammer4);
 	}
 }
 
@@ -974,21 +979,24 @@ public class st017
 	public static void SimulatePlatter(SMBObject InObject)
 	{
 		float CurTime = Time.Now - InObject.SpawnTime;
-		InObject.Rotation = Rotation.From((float)Math.Sin(CurTime) * 6, 0, (float)Math.Cos(CurTime) * 6);
+		InObject.Rotation = Rotation.From((float)Math.Sin(CurTime * 2) * 3, 0, (float)Math.Cos(CurTime * 2) * 3);
+		InObject.Position = new Vector3(0, 0, 50);
 	}
 	public static void RotatePlatform(SMBObject InObject)
 	{
 		//InObject.Rotation *= Rotation.FromYaw(Time.Delta * -25).Normal;
 		float CurTime = Time.Now - InObject.SpawnTime;
-		InObject.Rotation = Rotation.From((float)Math.Sin(CurTime) * 6, 0, (float)Math.Cos(CurTime) * 6);
-		InObject.Rotation = (InObject.Rotation * Rotation.FromYaw(CurTime * 15)).Normal;
+		InObject.Rotation = Rotation.From((float)Math.Sin(CurTime * 2) * 3, 0, (float)Math.Cos(CurTime * 2) * 3);
+		InObject.Rotation = (InObject.Rotation * Rotation.FromYaw(CurTime * 25)).Normal;
+		InObject.Position = new Vector3(0, 0, 50);
 	}
 	public static void RotatePlatform2(SMBObject InObject)
 	{
 		//InObject.Rotation *= Rotation.FromYaw(Time.Delta * 35).Normal;
 		float CurTime = Time.Now - InObject.SpawnTime;
-		InObject.Rotation = Rotation.From((float)Math.Sin(CurTime) * 6, 0, (float)Math.Cos(CurTime) * 6);
-		InObject.Rotation = (InObject.Rotation * Rotation.FromYaw(CurTime * -25)).Normal;
+		InObject.Rotation = Rotation.From((float)Math.Sin(CurTime * 2) * 3, 0, (float)Math.Cos(CurTime * 2) * 3);
+		InObject.Rotation = (InObject.Rotation * Rotation.FromYaw(CurTime * -35)).Normal;
+		InObject.Position = new Vector3(0, 0, 50);
 	}
 	public static void CreateStage()
 	{
