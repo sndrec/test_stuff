@@ -89,8 +89,6 @@ partial class SpectatorPawn : ModelEntity
 		SpecVelocity += -SpecVelocity * RealDelta * 10;
 		SpecPosition += SpecVelocity * RealDelta;
 		//Rotation MouseLookDiff = (OldLookRotation.Inverse * Input.Rotation).Normal;
-		InputBuilderStruct.Position = SpecPosition;
-		InputBuilderStruct.ViewAngles += InputBuilderStruct.AnalogLook;
 
 		if (SpecPlayerIndex >= Client.All.Count)
 		{
@@ -103,8 +101,7 @@ partial class SpectatorPawn : ModelEntity
 			Pawn SpecBall = Client.All[SpecPlayerIndex].Pawn as Pawn;
 			if (SpecBall != null)
 			{
-				SpecPosition = Vector3.Lerp(SpecPosition, SpecBall.SRBPos, Time.Delta * 30);
-				InputBuilderStruct.Position = SpecPosition + (InputBuilderStruct.ViewAngles.ToRotation().Forward * -60);
+				SpecPosition = SpecBall.SRBPos;
 			}else
 			{
 				bool CanSpecPlayer = false;
@@ -314,6 +311,17 @@ partial class SpectatorPawn : ModelEntity
 					SpecPlayerIndex = 0;
 					SpecPosition = SpecPosition + (InputBuilderStruct.ViewAngles.ToRotation().Forward * -60);
 				}
+			}
+		}
+		InputBuilderStruct.Position = SpecPosition;
+		InputBuilderStruct.ViewAngles += InputBuilderStruct.AnalogLook;
+		if (SpectatingPlayer)
+		{
+			Pawn SpecBall = Client.All[SpecPlayerIndex].Pawn as Pawn;
+			if (SpecBall != null)
+			{
+				SpecPosition = SpecBall.SRBPos;
+				InputBuilderStruct.Position = SpecPosition + (InputBuilderStruct.ViewAngles.ToRotation().Forward * -60);
 			}
 		}
 	}

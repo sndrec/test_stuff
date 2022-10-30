@@ -120,6 +120,8 @@ public partial class GoalPost : SMBObject
 		GoalTape.Points[GoalTape.Points.Count - 1].Position = TapeEnd;
 	}
 
+
+	//todo: make this based off of gravity and not the visual stage tilt
 	[Event.Frame]
 	public void SimulatePartyBall()
 	{

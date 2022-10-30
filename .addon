@@ -29,6 +29,59 @@
       "Keyboard": true,
       "Gamepad": true
     },
-    "ParentPackage": ""
+    "ParentPackage": "",
+    "PackageSettings": [
+      {
+        "DisplayType": "Boolean",
+        "Choices": [],
+        "ConVarName": "smb_playercollision",
+        "DisplayName": "Player Collision",
+        "DefaultValue": "true",
+        "Description": "Should players collide with each other?",
+        "Group": "Gameplay"
+      },
+      {
+        "DisplayType": "Float",
+        "Choices": [],
+        "ConVarName": "smb_ball_restitution",
+        "DisplayName": "Ball Bounciness",
+        "DefaultValue": "0.5",
+        "Description": "Percentage of speed kept when bouncing.",
+        "Group": "Gameplay",
+        "Maximum": 2
+      },
+      {
+        "DisplayType": "Float",
+        "Choices": [],
+        "ConVarName": "smb_ball_friction",
+        "DisplayName": "Ball Friction",
+        "DefaultValue": "0.53999996",
+        "Description": "Percentage of speed lost per second when touching any surface.",
+        "Group": "Gameplay",
+        "Maximum": 2
+      },
+      {
+        "DisplayType": "Float",
+        "Choices": [],
+        "ConVarName": "smb_ball_gravity",
+        "DisplayName": "Ball Gravity",
+        "DefaultValue": "588",
+        "Description": "Gravity acceleration in units per second.",
+        "Group": "Gameplay",
+        "Minimum": 10,
+        "Maximum": 2000
+      },
+      {
+        "DisplayType": "Float",
+        "Choices": [],
+        "ConVarName": "smb_ball_gravity_tilt",
+        "DisplayName": "Ball Gravity Tilt Max",
+        "DefaultValue": "23",
+        "Description": "How far gravity tilts when pushing the joystick fully forward.\nMeasured in degrees.",
+        "Group": "Gameplay",
+        "Minimum": 1,
+        "Maximum": 90
+      }
+    ]
   }
 }

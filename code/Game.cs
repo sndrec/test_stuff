@@ -57,6 +57,21 @@ public partial class MyGame : Sandbox.Game
 	[ConVar.ClientData( "smb_manualcamera" )]
 	public bool ManualCamera {get;set;} = false;
 
+	[ConVar.Replicated("smb_playercollision")]
+	public bool PlayerCollision {get;set;} = true;
+
+	[ConVar.Replicated("smb_ball_restitution")]
+	public float BallRestitution {get;set;} = 0.5f;
+
+	[ConVar.Replicated("smb_ball_friction")]
+	public float BallFriction {get;set;} = 0.54f;
+
+	[ConVar.Replicated("smb_ball_gravity")]
+	public float BallGravity {get;set;} = 588f;
+
+	[ConVar.Replicated("smb_ball_gravity_tilt")]
+	public float BallGravityTilt {get;set;} = 23f;
+
 	public bool AllPlayersReady {get;set;} = false;
 
 	public bool HasFirstHit {get;set;}

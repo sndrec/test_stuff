@@ -263,7 +263,7 @@ public partial class Pawn : ModelEntity
 			int NumSparks = (int)(RelativeComponent / 24);
 			for (int i = 0; i < NumSparks; i++)
 			{
-				CreateSpark(HitPosition + HitNormal, (Vector3.Random * RelativeComponent * 0.5f) + (FinalVel * 0.5f), 0.25f, "materials/spark.vmat");
+				CreateSpark(HitPosition + HitNormal, (Vector3.Random * RelativeComponent * 0.5f) + (FinalVel * 0.5f), 0.125f, "materials/spark.vmat");
 			}
 		}
 	}
@@ -343,7 +343,7 @@ public partial class Pawn : ModelEntity
 			float RandomAdd = MathX.Lerp(150, 350, SparkSpeedRatio);
 			for (int i = 0; i < (int)((SparkSpeedRatio * 3) + 1); i++)
 			{
-				Ball.CreateSparkFromServer(HitPosition + HitNormal, (Ball.LastGroundVelServer * VelInherit) + (HitNormal * 110) + (Vector3.Random * RandomAdd), 0.25f, "materials/spark.vmat");
+				Ball.CreateSparkFromServer(HitPosition + HitNormal, (Ball.LastGroundVelServer * VelInherit) + (HitNormal * 110) + (Vector3.Random * RandomAdd), 0.125f, "materials/spark.vmat");
 			}
 			Ball.NextSpark = Time.Now + 0.015f;
 		}
@@ -508,7 +508,7 @@ public partial class Pawn : ModelEntity
 			int NumSparks = (int)Math.Min((RelativeComponent / 24), 50);
 			for (int i = 0; i < NumSparks; i++)
 			{
-				CreateSpark(HitPosition + HitNormal, (Vector3.Random * RelativeComponent * 0.5f) + (FinalVel * 0.5f), 0.25f, "materials/spark.vmat");
+				CreateSpark(HitPosition + HitNormal, (Vector3.Random * RelativeComponent * 0.5f) + (FinalVel * 0.5f), 0.125f, "materials/spark.vmat");
 			}
 
 		}
@@ -520,7 +520,7 @@ public partial class Pawn : ModelEntity
 			float RandomAdd = MathX.Lerp(150, 350, SparkSpeedRatio);
 			for (int i = 0; i < (int)((SparkSpeedRatio * 3) + 1); i++)
 			{
-				CreateSpark(HitPosition + HitNormal, (LastGroundVel * VelInherit) + (HitNormal * 110) + (Vector3.Random * RandomAdd), 0.25f, "materials/spark.vmat");
+				CreateSpark(HitPosition + HitNormal, (LastGroundVel * VelInherit) + (HitNormal * 110) + (Vector3.Random * RandomAdd), 0.125f, "materials/spark.vmat");
 			}
 			NextSpark = Time.Now + 0.015f;
 		}
@@ -863,6 +863,10 @@ public partial class Pawn : ModelEntity
 			ClientsideModelGeneric.SetMaterialOverride(Material.Load("materials/screenoverlay.vmat"));
 			ClientsideModelGeneric.EnableShadowCasting = false;
 		}
+		BallRestitution = ConsoleSystem.GetValue( "smb_ball_restitution" ).ToFloat();
+		BallFriction = ConsoleSystem.GetValue( "smb_ball_friction" ).ToFloat();
+		BallGravity = ConsoleSystem.GetValue( "smb_ball_gravity" ).ToFloat();
+		BallMaxTilt = ConsoleSystem.GetValue( "smb_ball_gravity_tilt" ).ToFloat();
 	}
 
 	public void GetStageBounds()
@@ -1259,7 +1263,7 @@ public partial class Pawn : ModelEntity
 					}
 				}
 			}
-			if (WantToEnableCollision && NoCollide)
+			if (WantToEnableCollision && NoCollide && ConsoleSystem.GetValue( "smb_playercollision" ).ToBool())
 			{
 				NoCollide = false;
 			}
@@ -1282,7 +1286,7 @@ public partial class Pawn : ModelEntity
 		}
 		if ( cl.IsListenServerHost)
 		{
-			if ( Input.Pressed( InputButton.Run ))
+			if ( Input.Pressed( InputButton.Slot0 ))
 			{
 				GameEnt.NextGameState = Time.Now;
 			}
