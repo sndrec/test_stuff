@@ -1,8 +1,9 @@
 {
-  "Title": "Super Funny Ball",
+  "Title": "Rolled Out: Source 2",
   "Type": "game",
   "Org": "freakorg",
   "Ident": "test_stuff",
+  "Tags": "",
   "Schema": 1,
   "HasAssets": true,
   "AssetsPath": "",
@@ -14,7 +15,7 @@
     "MaxPlayers": 64,
     "MinPlayers": 1,
     "GameNetworkType": "Multiplayer",
-    "MapSelect": "Unrestricted",
+    "MapSelect": "Tagged",
     "MapList": [
       "freakorg.smbtest"
     ],
@@ -27,6 +28,7 @@
     "ControlModes": {
       "Keyboard": true,
       "Gamepad": true
-    }
+    },
+    "ParentPackage": ""
   }
 }

@@ -116,6 +116,23 @@ public partial class SMBStage
 		NewObject.Rotation = InRotation;
 		NewObject.EnableAllCollisions = true;
 		NewObject.EnableDrawing = true;
+		NewObject.UninterpolatedTransform = new Transform(InPosition, InRotation, 1);
+		NewObject.OldTransform = new Transform(InPosition, InRotation, 1);
+		StageObjects.Add(NewObject);
+		return NewObject;
+	}
+
+	public SMBBumper AddBumper(Vector3 InPosition, Rotation InRotation)
+	{
+		SMBBumper NewObject = new SMBBumper();
+		NewObject.SetModel("models/bumper.vmdl");
+		NewObject.SetupPhysicsFromModel(PhysicsMotionType.Keyframed);
+		NewObject.Position = InPosition;
+		NewObject.Rotation = InRotation;
+		NewObject.EnableAllCollisions = true;
+		NewObject.EnableDrawing = true;
+		NewObject.UninterpolatedTransform = new Transform(InPosition, InRotation, 1);
+		NewObject.OldTransform = new Transform(InPosition, InRotation, 1);
 		StageObjects.Add(NewObject);
 		return NewObject;
 	}
@@ -129,6 +146,8 @@ public partial class SMBStage
 		NewObject.Rotation = InRotation;
 		NewObject.EnableAllCollisions = true;
 		NewObject.EnableDrawing = true;
+		NewObject.UninterpolatedTransform = new Transform(InPosition, InRotation, 1);
+		NewObject.OldTransform = new Transform(InPosition, InRotation, 1);
 		StageObjects.Add(NewObject);
 		return NewObject;
 	}
@@ -139,6 +158,8 @@ public partial class SMBStage
 		NewBanana.Position = InPosition;
 		NewBanana.EnableAllCollisions = true;
 		NewBanana.EnableDrawing = true;
+		NewBanana.UninterpolatedTransform = new Transform(InPosition, Rotation.Identity, 1);
+		NewBanana.OldTransform = new Transform(InPosition, Rotation.Identity, 1);
 		StageObjects.Add(NewBanana);
 		return NewBanana;
 	}
@@ -149,6 +170,8 @@ public partial class SMBStage
 		NewBanana.Position = InPosition;
 		NewBanana.EnableAllCollisions = true;
 		NewBanana.EnableDrawing = true;
+		NewBanana.UninterpolatedTransform = new Transform(InPosition, Rotation.Identity, 1);
+		NewBanana.OldTransform = new Transform(InPosition, Rotation.Identity, 1);
 		StageObjects.Add(NewBanana);
 		return NewBanana;
 	}
@@ -170,6 +193,8 @@ public partial class SMBStage
 		NewObject.Rotation = InRotation;
 		NewObject.EnableAllCollisions = true;
 		NewObject.EnableDrawing = true;
+		NewObject.UninterpolatedTransform = new Transform(InPosition, InRotation, 1);
+		NewObject.OldTransform = new Transform(InPosition, InRotation, 1);
 		BGObjects.Add(NewObject);
 		NewObject.Tags.Add("BGObject");
 		return NewObject;
@@ -181,6 +206,8 @@ public partial class SMBStage
 		NewGoal.Position = InPosition;
 		NewGoal.Rotation = InRotation;
 		NewGoal.SetPostAndTriggerModel(PostModel, TriggerModel);
+		NewGoal.UninterpolatedTransform = new Transform(InPosition, InRotation, 1);
+		NewGoal.OldTransform = new Transform(InPosition, InRotation, 1);
 		StageObjects.Add(NewGoal);
 		return NewGoal;
 	}

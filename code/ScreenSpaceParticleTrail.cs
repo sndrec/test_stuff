@@ -26,6 +26,8 @@ public partial class ScreenSpaceParticleTrail : Entity
 
 	public bool Instantiated {get;set;}
 
+	private List<SimpleVertex> vertices {get;set;}
+
 	public static Vector3 RotateVector(Vector3 InPoint, Rotation rotation)
 	{
 		Vector3 Q = new Vector3(rotation.x, rotation.y, rotation.z);
@@ -63,6 +65,7 @@ public partial class ScreenSpaceParticleTrail : Entity
 		ParticleMesh.CreateVertexBuffer<SimpleVertex>( SimpleVertex.Layout );
 		ParticleModel = Model.Builder.AddMesh(ParticleMesh).Create();
 		ParticleSceneObject = new SceneObject(Map.Scene, ParticleModel, new Transform(Vector3.Zero));
+		vertices = new List<SimpleVertex>();
 
 		ColorHsv SparkColorHsv = new ColorHsv(Rand.Float(0f, 48f), 1, Rand.Float(1f, 1f), 1);
 		Color SparkColor = SparkColorHsv.ToColor();
@@ -80,6 +83,7 @@ public partial class ScreenSpaceParticleTrail : Entity
 		ParticleLight.LinearAttenuation = -1;
 		ParticleLight.QuadraticAttenuation = 1;
 		ParticleLight.Falloff = 1000;
+		ParticleLight.DynamicShadows = false;
 		OldRelativePositions = new List<OldRelativePositionData>();
 		Instantiated = true;
 	}
@@ -88,7 +92,6 @@ public partial class ScreenSpaceParticleTrail : Entity
 	{
 		Vector3 LocalRight = CurrentView.Rotation.Right;
 		Vector3 LocalForward = CurrentView.Rotation.Forward;
-		var vertices = new List<SimpleVertex>();
 		float PositionCount = OldRelativePositions.Count;
 		if (PositionCount == 0)
 		{
@@ -124,6 +127,7 @@ public partial class ScreenSpaceParticleTrail : Entity
 		
 		float DistToStart = (OldPosition - CurrentView.Position).Length;
 		float DistToEnd = (NewPosition - CurrentView.Position).Length;
+		vertices.Clear();
 		{
 			//bottom left
 			vertices.Add( new SimpleVertex( CurrentView.Position + (DistToStart * DirToBottomLeft), LocalForward, LocalRight, new Vector2(0, 0) ));

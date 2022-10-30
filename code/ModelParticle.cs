@@ -42,6 +42,7 @@ public partial class SMBModelParticle : ModelEntity
 		ParticleLight.LinearAttenuation = 1;
 		ParticleLight.QuadraticAttenuation = 1;
 		ParticleLight.Falloff = 1000;
+		ParticleLight.DynamicShadows = false;
 		Rotation = Rotation.Random;
 		AngleVelocity = Rotation.Random;
 		Instantiated = true;

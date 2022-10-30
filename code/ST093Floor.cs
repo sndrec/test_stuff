@@ -21,6 +21,10 @@ public partial class ST093Floor : SMBObject
 
 	public float SpawnTime {get;set;}
 
+	private List<SimpleVertex> vertices {get;set;}
+	private List<int> indices {get;set;}
+	private List<Vector3> verticesPos {get;set;}
+
 	public override void Spawn()
 	{
 		base.Spawn();
@@ -35,6 +39,9 @@ public partial class ST093Floor : SMBObject
 		FloorMesh.CreateVertexBuffer<SimpleVertex>( SimpleVertex.Layout );
 		FloorModel = Model.Builder.AddMesh(FloorMesh).Create();
 		FloorSceneObject = new SceneObject(Map.Scene, FloorModel, new Transform(Vector3.Zero));
+		vertices = new List<SimpleVertex>();
+		indices = new List<int>();
+		verticesPos = new List<Vector3>();
 		int GridX = 31;
 		int GridY = 31;
 		FloorPoints = new Vector3[GridX, GridY];
@@ -81,8 +88,9 @@ public partial class ST093Floor : SMBObject
 	[Event.Frame]
 	public virtual void UpdateFloorMesh()
 	{
-		var vertices = new List<SimpleVertex>();
-		var indices = new List<int>();
+		vertices.Clear();
+		indices.Clear();
+		verticesPos.Clear();
 		int GridX = 31;
 		int GridY = 31;
 		for (int itX = 0; itX < GridX; itX++)
@@ -95,16 +103,19 @@ public partial class ST093Floor : SMBObject
 					Vector3 OurNormal = FloorNormals[itX, itY];
 					vertices.Add( new SimpleVertex( OurPoint, OurNormal, Vector3.Right, new Vector2(0, 0) ));
 					indices.Add(indices.Count);
+					verticesPos.Add(OurPoint);
 
 					OurPoint = FloorPoints[itX + 1, itY];
 					OurNormal = FloorNormals[itX + 1, itY];
 					vertices.Add( new SimpleVertex( OurPoint, OurNormal, Vector3.Right, new Vector2(0.5f, 0) ));
 					indices.Add(indices.Count);
+					verticesPos.Add(OurPoint);
 
 					OurPoint = FloorPoints[itX, itY + 1];
 					OurNormal = FloorNormals[itX, itY + 1];
 					vertices.Add( new SimpleVertex( OurPoint, OurNormal, Vector3.Right, new Vector2(0, 0.5f) ));
 					indices.Add(indices.Count);
+					verticesPos.Add(OurPoint);
 				}
 				if (itX - 1 >= 0 && itY - 1 >= 0 )
 				{
@@ -112,16 +123,19 @@ public partial class ST093Floor : SMBObject
 					Vector3 OurNormal = FloorNormals[itX - 1, itY];
 					vertices.Add( new SimpleVertex( OurPoint, OurNormal, Vector3.Right, new Vector2(0, 0.5f) ));
 					indices.Add(indices.Count);
+					verticesPos.Add(OurPoint);
 
 					OurPoint = FloorPoints[itX, itY - 1];
 					OurNormal = FloorNormals[itX, itY - 1];
 					vertices.Add( new SimpleVertex( OurPoint, OurNormal, Vector3.Right, new Vector2(0.5f, 0) ));
 					indices.Add(indices.Count);
+					verticesPos.Add(OurPoint);
 
 					OurPoint = FloorPoints[itX, itY];
 					OurNormal = FloorNormals[itX, itY];
 					vertices.Add( new SimpleVertex( OurPoint, OurNormal, Vector3.Right, new Vector2(0.5f, 0.5f) ));
 					indices.Add(indices.Count);
+					verticesPos.Add(OurPoint);
 				}
 			}
 		}
@@ -133,11 +147,6 @@ public partial class ST093Floor : SMBObject
 		}
 		FloorMesh.SetVertexBufferData(vertices);
 		PhysicsBody.ClearShapes();
-		var verticesPos = new List<Vector3>();
-		foreach (SimpleVertex Vertex in vertices)
-		{
-			verticesPos.Add(Vertex.position);
-		}
 		PhysicsBody.AddMeshShape(verticesPos, indices);
 	}
 

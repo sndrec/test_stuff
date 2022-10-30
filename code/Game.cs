@@ -57,6 +57,8 @@ public partial class MyGame : Sandbox.Game
 	[ConVar.ClientData( "smb_manualcamera" )]
 	public bool ManualCamera {get;set;} = false;
 
+	public bool AllPlayersReady {get;set;} = false;
+
 	public bool HasFirstHit {get;set;}
 
 	public float FirstHitTime {get;set;}
@@ -214,33 +216,6 @@ public partial class MyGame : Sandbox.Game
 		return (BallPosition, BallVelocity);
 	}
 
-	[Event.Frame]
-	public void CreateLightEnvironment()
-	{
-		if (!HasLightEnvironment)
-		{
-			foreach (Entity element in Entity.All)
-			{
-				if (element is EnvironmentLightEntity)
-				{
-					element.Delete();
-				}
-			}
-			EnvironmentLightEntity LightEnvironment = new EnvironmentLightEntity();
-			LightEnvironment.DynamicShadows = true;
-			HasLightEnvironment = true;
-		}
-		//Map.Scene.GradientFog.Enabled = true;
-		//Map.Scene.GradientFog.Color = new Color(0.05f, 0.1f, 0.15f);
-		//Map.Scene.GradientFog.StartDistance = 0;
-		//Map.Scene.GradientFog.EndDistance = 1500000;
-		//Map.Scene.GradientFog.MaximumOpacity = 1;
-		//Map.Scene.GradientFog.StartHeight = 4999999;
-		//Map.Scene.GradientFog.EndHeight = 5000000;
-		//Map.Scene.GradientFog.DistanceFalloffExponent = 0.35f;
-		//Map.Scene.GradientFog.VerticalFalloffExponent = 0.35f;
-	}
-
 	//states:
 	//0 = just loaded the map.
 	//1 = waiting for players...
@@ -396,6 +371,7 @@ public partial class MyGame : Sandbox.Game
 			DestroyCurrentSMBStage();
 			stwfp.CreateStage();
 			SkyGenerator.CreateBackground(CurrentSky);
+			AllPlayersReady = false;
 			NextGameState = Time.Now + 6000;
 			SpawnAllBalls();
 		}else
@@ -480,6 +456,24 @@ public partial class MyGame : Sandbox.Game
 			if (CurrentGameState == 4)
 			{
 				ChangeGameState(1);
+			}
+		}
+
+		if (CurrentGameState == 0 && Client.All.Count > 0 && !AllPlayersReady && Time.Now > 10)
+		{
+			bool AllReady = true;
+			foreach (Client pl in Client.All)
+			{
+				Pawn Ball = pl.Pawn as Pawn;
+				if (Ball != null && Ball.Ready == false)
+				{
+					AllReady = false;
+				}
+			}
+			if (AllReady)
+			{
+				NextGameState = Time.Now + 5;
+				AllPlayersReady = true;
 			}
 		}
 
@@ -575,6 +569,8 @@ public partial class MyGame : Sandbox.Game
 			pawn.GetPlayerStateManager();
 			client.Pawn = pawn;
 		}
+
+		SkyGenerator.CreateBackground(To.Single(client), CurrentSky);
 
 	}
 

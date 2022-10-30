@@ -3,7 +3,7 @@
 	data = 
 	{
 		UI = true
-		Volume = 0.25
+		Volume = 0.5
 		VolumeRandom = 0
 		Pitch = 1
 		PitchRandom = 0
@@ -11,6 +11,7 @@
 		Sounds = 
 		[
 			resource:"sounds/announcer/an_goal.vsnd",
+			resource:"sounds/announcer/an_goal2.vsnd",
 		]
 		SelectionMode = "Random"
 		MaximumDistance = 1143.9335

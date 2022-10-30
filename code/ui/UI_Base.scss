@@ -42,7 +42,7 @@ UI_Base {
     height: 0px;
     //background-color: #ff0000;
     position: relative;
-    transform: scale(0.6);
+    transform: scale(1);
   }
   .hud-time-layout {
     width: 300px;
@@ -113,7 +113,7 @@ UI_Base {
     //justify-content: flex-start;
     //display: flex;
     //flex-direction: column;
-    transform: scale(0.6);
+    transform: scale(1);
   }
   .hud-score-justbox {
     height: 200px;
@@ -160,13 +160,13 @@ UI_Base {
     height: 0px;
     //justify-content: flex-end;
     //background-color: #000000;
-    //transform: scale(0.6);
+    //transform: scale(1);
     //background-color: #ffffff;
     position: absolute;
     right: 0;
   }
   .hud-timefeed-layout-scalable {
-    transform: scale(0.6);
+    transform: scale(1);
   }
   .hud-timefeed-justbox {
     height: 800px;
@@ -223,14 +223,14 @@ UI_Base {
     width: 20%;
     height: 100%;
     justify-content: center;
-    transform: scale(0.6);
+    transform: scale(1);
   }
 
   //level display elements
   .hud-level-layout {
     width: 0px;
     height: 0px;
-    //transform: scale(0.6);
+    //transform: scale(1);
     //background-color: #0000ff;
     position: absolute;
     bottom: 20;
@@ -239,7 +239,7 @@ UI_Base {
     flex-direction: column;
   }
   .hud-level-layout-scalable {
-    transform: scale(0.6);
+    transform: scale(1);
   }
   .hud-level-justbox {
     height: 200px;
@@ -273,12 +273,12 @@ UI_Base {
   }
   .hud-level-leveltext {
     width: 100%;
-    font-size: 90px;
+    font-size: 72px;
     color: white;
     text-stroke: 0.5px black;
     text-align: left;
-    left: 200px;
-    top: 20px;
+    left: 160px;
+    top: 36px;
     font-family: Poppins;
     font-weight: semibold;
     letter-spacing: -3px;
@@ -294,18 +294,18 @@ UI_Base {
     width: 100%;
     height: 100%;
     //justify-content: right;
-    transform: scale(0.6);
+    transform: scale(1);
   }
 
   .canwescalethesucker {
-    //transform: scale(0.6);
+    //transform: scale(1);
     //background-color: #000000;
     position: absolute;
     left: 0px;
     bottom: 134px;
   }
   .canwescaletheothersucker {
-    //transform: scale(0.6);
+    //transform: scale(1);
     //background-color: #000000;
     //position: absolute;
     //left: 0px;

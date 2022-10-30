@@ -83,5 +83,13 @@ public class UI_Base : RootPanel
 		UI_TimeMili = MiliString;
 		UI_LevelName = GameEnt.StageName;
 		UI_LevelNumber = GameEnt.StageInCourse.ToString();
+		if (GameEnt.CurrentGameState == 0)
+		{
+			UI_ScoreDigits = "0";
+			UI_TimeSecond = "XX";
+			UI_TimeMili = ".XXX";
+			UI_LevelName = "Waiting for players! Press JUMP to ready up.";
+			UI_LevelNumber = "X";
+		}
 	}
 }

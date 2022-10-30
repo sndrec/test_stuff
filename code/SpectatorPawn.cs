@@ -92,6 +92,12 @@ partial class SpectatorPawn : ModelEntity
 		InputBuilderStruct.Position = SpecPosition;
 		InputBuilderStruct.ViewAngles += InputBuilderStruct.AnalogLook;
 
+		if (SpecPlayerIndex >= Client.All.Count)
+		{
+			SpectatingPlayer = false;
+			SpecPlayerIndex = 0;
+			SpecPosition = SpecPosition + (InputBuilderStruct.ViewAngles.ToRotation().Forward * -60);
+		}
 		if (SpectatingPlayer)
 		{
 			Pawn SpecBall = Client.All[SpecPlayerIndex].Pawn as Pawn;

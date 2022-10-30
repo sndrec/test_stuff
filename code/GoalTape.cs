@@ -42,6 +42,8 @@ public partial class GoalTapeEntity : Entity
 
 	public SceneObject TapeSceneObject {get;set;}
 
+	private List<SimpleVertex> vertices {get;set;}
+
 	public override void Spawn()
 	{
 		base.Spawn();
@@ -51,6 +53,7 @@ public partial class GoalTapeEntity : Entity
 		TapeMesh.CreateVertexBuffer<SimpleVertex>( SimpleVertex.Layout );
 		TapeModel = Model.Builder.AddMesh(TapeMesh).Create();
 		TapeSceneObject = new SceneObject(Map.Scene, TapeModel, new Transform(Vector3.Zero));
+		vertices = new List<SimpleVertex>();
 	}
 
 	public virtual void CreateRope(List<TapePoint> InPoints)
@@ -76,7 +79,7 @@ public partial class GoalTapeEntity : Entity
 
 	public virtual void UpdateRopeMesh(bool first)
 	{
-		var vertices = new List<SimpleVertex>();
+		vertices.Clear();
 		Vector3 Forward = Owner.Rotation.Forward;
 		Vector3 Right = Owner.Rotation.Right;
 		Vector3 Up = Owner.Rotation.Up;

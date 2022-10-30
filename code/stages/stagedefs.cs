@@ -20,7 +20,7 @@ public class stwfp
 	public static void CreateStage()
 	{
 		//SMBObject.SimulateSMBObjectDelegate PlatformAnimation = new SMBObject.SimulateSMBObjectDelegate(RotatePlatform);
-		SMBStage NewStage = new SMBStage("Waiting for Players...", 60, new Vector3(0, 0, 30), new Angles(0, 180, 0), "sky_field", "waitingforplayers", 1);
+		SMBStage NewStage = new SMBStage("Waiting for Players...", 60, new Vector3(0, 0, 30), new Angles(0, 180, 0), "sky_default", "waitingforplayers", 1);
 		SMBObject MainPlat = NewStage.AddStageObject("models/stages/waitingforplayers/waitingforplayers_1.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		MainPlat.SimulateSMBObjectCustom = RotatePlatform;
 
@@ -1216,7 +1216,6 @@ public class stw1bonus
 	{
 		MyGame GameEnt = Game.Current as MyGame;
 		GameEnt.CurrentStage.UserInt1 -= InBananaValue;
-		Log.Info("Bananas remaining: " + GameEnt.CurrentStage.UserInt1);
 		if (GameEnt.CurrentStage.UserInt1 <= 0)
 		{
 			GameEnt.NextGameState = Time.Now + 4;
@@ -1243,14 +1242,12 @@ public class stw1bonus
 		{
 			float CircleX = (float)Math.Sin(((float)i / 20) * 3.14159 * 2) * 80;
 			float CircleY = (float)Math.Cos(((float)i / 20) * 3.14159 * 2) * 80;
-			Log.Info(CircleX + " | " + CircleY);
 			NewStage.AddBanana(new Vector3(CircleX, CircleY, 15));
 		}
 		for (int i = 0; i < 30; i++)
 		{
 			float CircleX = (float)Math.Sin(((float)i / 30) * 3.14159 * 2) * 160;
 			float CircleY = (float)Math.Cos(((float)i / 30) * 3.14159 * 2) * 160;
-			Log.Info(CircleX + " | " + CircleY);
 			NewStage.AddBanana(new Vector3(CircleX, CircleY, 15));
 		};
 		NewStage.AddStageObject("models/stages/test_world/st093.vmdl", new Vector3(0,0,0), Rotation.Identity);
@@ -1266,7 +1263,6 @@ public class stw1bonus2
 	{
 		MyGame GameEnt = Game.Current as MyGame;
 		GameEnt.CurrentStage.UserInt1 -= InBananaValue;
-		Log.Info("Bananas remaining: " + GameEnt.CurrentStage.UserInt1);
 		if (GameEnt.CurrentStage.UserInt1 <= 0)
 		{
 			GameEnt.NextGameState = Time.Now + 4;
@@ -1293,35 +1289,30 @@ public class stw1bonus2
 		{
 			float CircleX = (float)Math.Sin(((float)i / 12) * 3.14159 * 2) * 80;
 			float CircleY = (float)Math.Cos(((float)i / 12) * 3.14159 * 2) * 80;
-			Log.Info(CircleX + " | " + CircleY);
 			NewStage.AddBanana(new Vector3(CircleX, CircleY, 15) + GameEnt.BlenderPos(8, 8, 0));
 		}
 		for (int i = 0; i < 12; i++)
 		{
 			float CircleX = (float)Math.Sin(((float)i / 12) * 3.14159 * 2) * 80;
 			float CircleY = (float)Math.Cos(((float)i / 12) * 3.14159 * 2) * 80;
-			Log.Info(CircleX + " | " + CircleY);
 			NewStage.AddBanana(new Vector3(CircleX, CircleY, 15) + GameEnt.BlenderPos(8, -8, 0));
 		}
 		for (int i = 0; i < 12; i++)
 		{
 			float CircleX = (float)Math.Sin(((float)i / 12) * 3.14159 * 2) * 80;
 			float CircleY = (float)Math.Cos(((float)i / 12) * 3.14159 * 2) * 80;
-			Log.Info(CircleX + " | " + CircleY);
 			NewStage.AddBanana(new Vector3(CircleX, CircleY, 15) + GameEnt.BlenderPos(-8, -8, 0));
 		}
 		for (int i = 0; i < 12; i++)
 		{
 			float CircleX = (float)Math.Sin(((float)i / 12) * 3.14159 * 2) * 80;
 			float CircleY = (float)Math.Cos(((float)i / 12) * 3.14159 * 2) * 80;
-			Log.Info(CircleX + " | " + CircleY);
 			NewStage.AddBanana(new Vector3(CircleX, CircleY, 15) + GameEnt.BlenderPos(-8, 8, 0));
 		}
 		for (int i = 0; i < 12; i++)
 		{
 			float CircleX = (float)Math.Sin(((float)i / 12) * 3.14159 * 2) * 110;
 			float CircleY = (float)Math.Cos(((float)i / 12) * 3.14159 * 2) * 110;
-			Log.Info(CircleX + " | " + CircleY);
 			NewStage.AddBanana(new Vector3(CircleX, CircleY, 15));
 		}
 		NewStage.AddStageObject("models/stages/test_world/st095.vmdl", new Vector3(0,0,0), Rotation.Identity);

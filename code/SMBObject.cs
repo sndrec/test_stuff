@@ -52,7 +52,7 @@ public partial class SMBObject : ModelEntity
 
 	public delegate void SimulateSMBObjectDelegate(SMBObject InObject);
 	public SimulateSMBObjectDelegate SimulateSMBObjectCustom;
-	public delegate void OnCollide(SMBObject InObject);
+	public delegate void OnCollide(SMBObject InObject, Pawn InBall, Vector3 VelAtPos, Vector3 InVelocity, Vector3 HitNormal, Vector3 HitPosition, float RealDelta);
 	public OnCollide OnCollideMember;
 	public delegate Vector3 CustomVelocityAtPoint(SMBObject InObject, Vector3 InPoint, float DeltaTime);
 	public CustomVelocityAtPoint CustomVelocityAtPointMember;
@@ -131,7 +131,6 @@ public partial class SMBObject : ModelEntity
 	public override void Spawn()
 	{
 		base.Spawn();
-		UninterpolatedTransform = Transform;
 		CollisionTag = "SMBObject" + Guid.NewGuid();
 		Tags.Add(CollisionTag);
 		Tags.Add("solid");
@@ -177,6 +176,16 @@ public partial class SMBObject : ModelEntity
 		//Log.Info(VelAtPoint);
 		return VelAtPoint;
 	}
+
+	public virtual bool OnCollideMaster(Pawn InBall, Vector3 VelAtPos, Vector3 InVelocity, Vector3 HitNormal, Vector3 HitPosition, float RealDelta)
+	{
+		if (OnCollideMember != null)
+		{
+			OnCollideMember(this, InBall, VelAtPos, InVelocity, HitNormal, HitPosition, RealDelta);
+		}
+		return true;
+	}
+
 	public virtual void SimulateSMBObject()
 	{
 		//Rotation = Rotation.FromYaw(Time.Now * 10);

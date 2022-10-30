@@ -120,7 +120,7 @@ public class course_test
 		switch (CurrentStage)
 		{
 			default:
-				st015.CreateStage();
+				stw1bonus.CreateStage();
 				break;
 		}
 	}
