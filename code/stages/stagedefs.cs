@@ -353,9 +353,71 @@ public class st005
 	public static void CreateStage()
 	{
 		MyGame GameEnt = Game.Current as MyGame;
-		SMBStage NewStage = new SMBStage("Jump", 60, GameEnt.BlenderPos(-59, 6, 0.5f), new Angles(0, 90, 0), "sky_sky", "mus_desertruins_intro", 1.5f);
+		SMBStage NewStage = new SMBStage("Jump", 60, GameEnt.BlenderPos(-25, 25, 0.5f), new Angles(0, 45, 0), "sky_christmas", "mus_desertruins_intro", 1.5f);
 		NewStage.AddStageObject("models/stages/test_world/st005.vmdl", new Vector3(0,0,0), Rotation.Identity);
-		NewStage.AddGoal(GameEnt.BlenderPos(70.0f, -3.5f, -37.0f), Rotation.FromYaw(-90));
+		List<SMBObject> TiltPlats1 = new List<SMBObject>();
+		List<SMBObject> TiltPlats2 = new List<SMBObject>();
+		List<SMBObject> TiltPlats3 = new List<SMBObject>();
+		TiltPlats1.Add( NewStage.AddStageObject( "models/stages/test_world/st005_tiltingplatform.vmdl", GameEnt.BlenderPos( -16, 16, 0 ), Rotation.Identity ));
+		TiltPlats1.Add( NewStage.AddStageObject( "models/stages/test_world/st005_tiltingplatform.vmdl", GameEnt.BlenderPos( 0, 16, 0 ), Rotation.Identity ));
+		TiltPlats1.Add( NewStage.AddStageObject( "models/stages/test_world/st005_tiltingplatform.vmdl", GameEnt.BlenderPos( -16, 0, 0 ), Rotation.Identity ));
+		TiltPlats1.Add( NewStage.AddStageObject( "models/stages/test_world/st005_tiltingplatform.vmdl", GameEnt.BlenderPos( 0, 0, 0 ), Rotation.Identity ));
+		TiltPlats1.Add( NewStage.AddStageObject( "models/stages/test_world/st005_tiltingplatform.vmdl", GameEnt.BlenderPos( 0, -16, 0 ), Rotation.Identity ));
+		TiltPlats1.Add( NewStage.AddStageObject( "models/stages/test_world/st005_tiltingplatform.vmdl", GameEnt.BlenderPos( 16, 0, 0 ), Rotation.Identity ));
+		TiltPlats1.Add( NewStage.AddStageObject( "models/stages/test_world/st005_tiltingplatform.vmdl", GameEnt.BlenderPos( 16, -16, 0 ), Rotation.Identity ));
+		TiltPlats2.Add( NewStage.AddStageObject( "models/stages/test_world/st005_tiltingplatform.vmdl", GameEnt.BlenderPos( -8, 16, 0 ), Rotation.Identity ));
+		TiltPlats2.Add( NewStage.AddStageObject( "models/stages/test_world/st005_tiltingplatform.vmdl", GameEnt.BlenderPos( -8, 0, 0 ), Rotation.Identity ));
+		TiltPlats2.Add( NewStage.AddStageObject( "models/stages/test_world/st005_tiltingplatform.vmdl", GameEnt.BlenderPos( 8, 0, 0 ), Rotation.Identity ));
+		TiltPlats2.Add( NewStage.AddStageObject( "models/stages/test_world/st005_tiltingplatform.vmdl", GameEnt.BlenderPos( 8, -16, 0 ), Rotation.Identity ));
+		TiltPlats3.Add( NewStage.AddStageObject( "models/stages/test_world/st005_tiltingplatform.vmdl", GameEnt.BlenderPos( -16, 8, 0 ), Rotation.Identity ));
+		TiltPlats3.Add( NewStage.AddStageObject( "models/stages/test_world/st005_tiltingplatform.vmdl", GameEnt.BlenderPos( 0, 8, 0 ), Rotation.Identity ));
+		TiltPlats3.Add( NewStage.AddStageObject( "models/stages/test_world/st005_tiltingplatform.vmdl", GameEnt.BlenderPos( 0, -8, 0 ), Rotation.Identity ));
+		TiltPlats3.Add( NewStage.AddStageObject( "models/stages/test_world/st005_tiltingplatform.vmdl", GameEnt.BlenderPos( 16, -8, 0 ), Rotation.Identity ));
+
+		List<RotAnimKeyFrame> TiltKeyFrames1 = new List<RotAnimKeyFrame>
+		{
+			new RotAnimKeyFrame(0, 1, Rotation.From(new Angles(0, 0, 0))),
+			new RotAnimKeyFrame(2, 2, Rotation.From(new Angles(35, 0, 0))),
+			new RotAnimKeyFrame(4, 1, Rotation.From(new Angles(0, 0, 0))),
+			new RotAnimKeyFrame(6, 2, Rotation.From(new Angles(0, 0, 35))),
+			new RotAnimKeyFrame(8, 1, Rotation.From(new Angles(0, 0, 0)))
+		};
+		List<RotAnimKeyFrame> TiltKeyFrames2 = new List<RotAnimKeyFrame>
+		{
+			new RotAnimKeyFrame(0, 1, Rotation.From(new Angles(0, 0, 0))),
+			new RotAnimKeyFrame(2, 2, Rotation.From(new Angles(-35, 0, 0))),
+			new RotAnimKeyFrame(4, 1, Rotation.From(new Angles(0, 0, 0))),
+			new RotAnimKeyFrame(6, 2, Rotation.From(new Angles(0, 0, 35))),
+			new RotAnimKeyFrame(8f, 1, Rotation.From(new Angles(0, 0, 0)))
+		};
+		List<RotAnimKeyFrame> TiltKeyFrames3 = new List<RotAnimKeyFrame>
+		{
+			new RotAnimKeyFrame(0, 1, Rotation.From(new Angles(0, 0, 0))),
+			new RotAnimKeyFrame(2, 2, Rotation.From(new Angles(-35, 0, 0))),
+			new RotAnimKeyFrame(4, 1, Rotation.From(new Angles(0, 0, 0))),
+			new RotAnimKeyFrame(6, 2, Rotation.From(new Angles(0, 0, -35))),
+			new RotAnimKeyFrame(8, 1, Rotation.From(new Angles(0, 0, 0)))
+		};
+
+		foreach (SMBObject Obj in TiltPlats1)
+		{
+			Obj.AddRotKeyFrames( TiltKeyFrames2 );
+			Obj.EnableKeyFrameAnimation( false, true );
+			Obj.RotAnimPlaybackRate = 2f;
+		}
+		foreach ( SMBObject Obj in TiltPlats2 )
+		{
+			Obj.AddRotKeyFrames( TiltKeyFrames3 );
+			Obj.EnableKeyFrameAnimation( false, true );
+			Obj.RotAnimPlaybackRate = 2f;
+		}
+		foreach ( SMBObject Obj in TiltPlats3 )
+		{
+			Obj.AddRotKeyFrames( TiltKeyFrames1 );
+			Obj.EnableKeyFrameAnimation( false, true );
+			Obj.RotAnimPlaybackRate = 2f;
+		}
+		NewStage.AddGoal(GameEnt.BlenderPos(25f, -25f, 0f), Rotation.FromYaw(-135));
 	}
 }
 
@@ -1057,9 +1119,31 @@ public class st020
 	public static void CreateStage()
 	{
 		MyGame GameEnt = Game.Current as MyGame;
-		SMBStage NewStage = new SMBStage("Manygolf", 90, GameEnt.BlenderPos(0f, 72f, 40.5f), new Angles(0, 0, 0), "sky_sky", "mus_desertruins_intro", 2);
+		SMBStage NewStage = new SMBStage("Crankthrough", 60, GameEnt.BlenderPos(0f, 45f, 12.5f), new Angles(0, 0, 0), "sky_christmas", "mus_desertruins_intro", 2);
 		NewStage.AddStageObject("models/stages/test_world/st020.vmdl", new Vector3(0,0,0), Rotation.Identity);
-		NewStage.AddGoal(GameEnt.BlenderPos(0f, -32f, -16f), Rotation.From(new Angles(0f, 180f, 0)));
+		SMBObject Pipe = NewStage.AddStageObject( "models/stages/test_world/st020_pipe.vmdl", GameEnt.BlenderPos(0, 24f, 14f ), Rotation.Identity );
+		NewStage.AddGoal(GameEnt.BlenderPos(0f, -46.0f, -2.67958f ), Rotation.From(new Angles(0f, -135, 0)));
+		List<RotAnimKeyFrame> PipeKeyFrames = new List<RotAnimKeyFrame>
+		{
+			new RotAnimKeyFrame(0, 3, Rotation.From(new Angles(0, 0, 89))),
+			new RotAnimKeyFrame(6, 3, Rotation.From(new Angles(0, 0, -89))),
+			new RotAnimKeyFrame(12, 3, Rotation.From(new Angles(0, 0, 89)))
+		};
+
+		Pipe.AddRotKeyFrames( PipeKeyFrames );
+		Pipe.EnableKeyFrameAnimation( false, true );
+		NewStage.SetFalloutPlane( -600 );
+
+	}
+}
+public class st021
+{
+	public static void CreateStage()
+	{
+		MyGame GameEnt = Game.Current as MyGame;
+		SMBStage NewStage = new SMBStage( "On Your Way", 60, GameEnt.BlenderPos( 5.55f, 26f, 0.5f ), new Angles( 0, 90, 0 ), "sky_christmas", "mus_desertruins_intro", 2 );
+		NewStage.AddStageObject( "models/stages/test_world/st021.vmdl", new Vector3( 0, 0, 0 ), Rotation.Identity );
+		NewStage.AddGoal( GameEnt.BlenderPos( -5.55f, 26, 0 ), Rotation.From( new Angles( 0f, -90f, 0 ) ) );
 	}
 }
 

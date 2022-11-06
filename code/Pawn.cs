@@ -420,10 +420,10 @@ public partial class Pawn : ModelEntity
 		float RestitutionMult = 1f;
 		if (HitEntity is PartyBall)
 		{
-			PartyBall DaBall = HitEntity as PartyBall;
-			Vector3 HitAxis = Vector3.Cross((HitPosition - DaBall.Position).Normal, HitNormal).Normal;
-			DaBall.AngVel = Rotation.FromAxis(HitAxis, InVelocity.Length * -0.05f);
+			GoalPost Post = HitEntity.Owner as GoalPost;
 			HitNormal = (HitNormal + (InVelocity.Normal * 0.5f)).Normal;
+			float RelativeComponentPB = Vector3.Dot( ClientVelocity, HitNormal );
+			Post.PartyBallSimVelocity += HitNormal * RelativeComponentPB * -0.12f;
 			RestitutionMult = 0f;
 		}
 		Pawn Ball = HitEntity as Pawn;
@@ -827,6 +827,9 @@ public partial class Pawn : ModelEntity
 		{
 			SpawnTime = Time.Now;
 			FirstPlay = true;
+			GameEnt.HasFirstHit = false;
+			GameEnt.FirstHitTime = 0;
+			FirstHit = 0;
 		}
 		TrueSpawnTime = Time.Now;
 		AboutToGainControl = false;
@@ -1049,6 +1052,7 @@ public partial class Pawn : ModelEntity
 								if (TriggerHit.Entity.Tags.Has("goaltrigger") && BallState != 2)
 								{
 									GoalPost GoalEnt = TriggerHit.Entity.Owner as GoalPost;
+									GoalEnt.PartyBallSimVelocity = ClientVelocity * 0.33f;
 									ChangeBallState(2);
 									//Particles ImpactParticle = Particles.Create("particles/goalconfetti.vpcf");
 									//ImpactParticle.SetPosition(0, GoalEnt.PartyBall.Position - (GoalEnt.PartyBall.Rotation.Up * 15));
@@ -1150,20 +1154,31 @@ public partial class Pawn : ModelEntity
 			LastGroundVel += -LastGroundVel * Time.Delta * 2;
 		}
 
-		if ( ClientPosition.z < StageBounds.Mins.z - 50 && BallState == 0)
+		float FalloutHeight = StageBounds.Mins.z - 50;
+		if (GameEnt.FalloutHeight != 0)
+		{
+			FalloutHeight = GameEnt.FalloutHeight;
+		}
+		if ( ClientPosition.z < FalloutHeight && BallState == 0)
 		{
 			ChangeBallState(1);
 		}
 
 		if ( ControlEnabled && BallState != 2 && Input.Pressed( InputButton.Reload ) )
 		{
-			RespawnBall(false);
+			if (Client.All.Count == 1)
+			{
+			}
+			else
+			{
+				RespawnBall( false );
+			}
 			Sound.FromEntity("fx_select", this);
 		}
 
 		if (Local.Client.PlayerId == 76561197997644728L)
 		{
-			if (Input.Down( InputButton.Jump ))
+			if (ControlEnabled && Input.Down( InputButton.Jump ))
 			{
 				ClientVelocity += new Vector3(0, 0, 1000 * RealDelta) * TrueGravityOrientation;
 			}
@@ -1284,22 +1299,50 @@ public partial class Pawn : ModelEntity
 			Rotation HelperRot2 = Rotation.FromAxis(SpinAxis, LastGroundVelServer.Length * Time.Delta * AmountToSpin);
 			ServerCitizenRotation = (HelperRot2 * ServerCitizenRotation).Normal;
 		}
-		if ( cl.IsListenServerHost)
+		using ( Prediction.Off() )
 		{
-			if ( Input.Pressed( InputButton.Slot0 ))
+			if ( cl.IsListenServerHost )
 			{
-				GameEnt.NextGameState = Time.Now;
-			}
-			if ( Input.Pressed( InputButton.Flashlight))
-			{
-				GameEnt.NextGameState += 60;
-				GameEnt.StageMaxTime += 60;
-			}
-			if (cl.PlayerId == 76561197997644728L && Local.Client == null)
-			{
-				if (Input.Pressed( InputButton.Duck ))
+				if ( Input.Pressed( InputButton.Slot0 ) )
 				{
-					GameEnt.CurrentStage.AddBumper(Position + (new Angles(0, BallCamAng.yaw, 0).ToRotation().Forward * 100) - new Vector3(0, 0, 10), Rotation.Identity);
+					GameEnt.NextGameState = Time.Now;
+				}
+				if ( Input.Pressed( InputButton.Flashlight ) )
+				{
+					GameEnt.NextGameState += 60;
+					GameEnt.StageMaxTime += 60;
+				}
+				if ( Local.Client == null )
+				{
+					if ( cl.PlayerId == 76561197997644728L ) // cheats for Twilight!
+					{
+						if ( Input.Pressed( InputButton.Duck ) )
+						{
+							GameEnt.CurrentStage.AddBumper( Position + (new Angles( 0, BallCamAng.yaw, 0 ).ToRotation().Forward * 100) - new Vector3( 0, 0, 10 ), Rotation.Identity );
+						}
+					}
+					if ( Client.All.Count == 1 )
+					{
+						if ( Input.Down( InputButton.Jump ) && Time.Now < GameEnt.LastGameStateChange + 3.5f )
+						{
+							GameEnt.SetTimescale( 2.5f );
+						}
+						if ( Input.Released( InputButton.Jump ) && Time.Now < GameEnt.LastGameStateChange + 3.5f )
+						{
+							GameEnt.SetTimescale( 1f );
+						}
+						if ( Input.Pressed( InputButton.Reload ) ) // singleplayer full retry
+						{
+							GameEnt.PlaySpecificStageInCourse( GameEnt.CurrentCourse, GameEnt.StageInCourse );
+							GameEnt.SetTimescale( 4 );
+							GameEnt.SpawnAllBalls();
+							Sound.FromEntity( "fx_select", this );
+						}
+					}
+					if ( Time.Now > GameEnt.LastGameStateChange + 3.5f )
+					{
+						GameEnt.SetTimescale( 1 );
+					}
 				}
 			}
 		}
@@ -1709,7 +1752,7 @@ public partial class Pawn : ModelEntity
 			Color OurColor = new Color(1, 1, 1, 1);
 			if (TimeSinceSpawn < 5)
 			{
-				OurColor = new Color(0.12f, 0.09f, 0.04f, 0.75f);
+				OurColor = new Color(0.12f, 0.09f, 0.04f, 0.91f);
 			}else
 			{
 				float Flash = 0;

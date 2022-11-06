@@ -62,6 +62,13 @@ public partial class SMBStage
 		GameEnt.BGScale = InBGScale;
 		GameEnt.StageName = InName;
 		GameEnt.StageBounds = StageBounds;
+		GameEnt.FalloutHeight = 0;
+	}
+
+	public void SetFalloutPlane(float InHeight)
+	{
+		MyGame GameEnt = Game.Current as MyGame;
+		GameEnt.FalloutHeight = InHeight;
 	}
 
 	public void OnFalloutManager(Pawn InBall)

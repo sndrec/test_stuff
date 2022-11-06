@@ -11,7 +11,17 @@
 				[
 					{
 						_class = "DefaultMaterialGroup"
-						remaps = [  ]
+						remaps = 
+						[
+							{
+								from = "materials/stagemat/desertruins/sandtilesimple.vmat"
+								to = "materials/stagemat/christmas/check1.vmat"
+							},
+							{
+								from = "materials/stagemat/desertruins/sandstonesimple.vmat"
+								to = "materials/stagemat/christmas/trim.vmat"
+							},
+						]
 						use_global_default = false
 						global_default_material = ""
 					},
@@ -40,7 +50,10 @@
 						import_filter = 
 						{
 							exclude_by_default = false
-							exception_list = [  ]
+							exception_list = 
+							[
+								"Cube_000",
+							]
 						}
 					},
 				]
@@ -64,7 +77,7 @@
 							exclude_by_default = true
 							exception_list = 
 							[
-								"Cube_000",
+								"Cube_015",
 							]
 						}
 					},

@@ -14,24 +14,16 @@
 						remaps = 
 						[
 							{
-								from = "material.001.vmat"
-								to = "materials/goalpost.vmat"
-							},
-							{
-								from = "material.002.vmat"
+								from = "goalglass.vmat"
 								to = "materials/goalglass.vmat"
 							},
 							{
-								from = "material.005.vmat"
+								from = "goalpost.vmat"
+								to = "materials/goalpost.vmat"
+							},
+							{
+								from = "star.vmat"
 								to = "materials/goalpoststarcenter.vmat"
-							},
-							{
-								from = "material.vmat"
-								to = "materials/timerback.vmat"
-							},
-							{
-								from = "material.006.vmat"
-								to = "materials/partyball_2.vmat"
 							},
 						]
 						use_global_default = false

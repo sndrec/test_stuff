@@ -54,43 +54,52 @@ public class course_w1
 				stw1bonus.CreateStage();
 				break;
 			case 11:
-				st005.CreateStage();
-				break;
-			case 12:
 				st013.CreateStage();
 				break;
-			case 13:
+			case 12:
 				st010.CreateStage();
 				break;
-			case 14:
+			case 13:
 				st019.CreateStage();
 				break;
-			case 15:
+			case 14:
 				st015.CreateStage();
 				break;
-			case 16:
+			case 15:
 				st016.CreateStage();
 				break;
-			case 17:
+			case 16:
 				st017.CreateStage();
 				break;
-			case 18:
+			case 17:
 				st018.CreateStage();
 				break;
-			case 19:
+			case 18:
 				st014.CreateStage();
 				break;
-			case 20:
+			case 19:
 				st009.CreateStage();
 				break;
+			case 20:
+				stw1bonus2.CreateStage();
+				break;
 			case 21:
-				staward.CreateStage();
+				st020.CreateStage();
 				break;
 			case 22:
+				st005.CreateStage();
+				break;
+			case 23:
+				st021.CreateStage();
+				break;
+			case 24:
+				staward.CreateStage();
+				break;
+			case 25:
 				GameEnt.EndCourse();
 				CurrentStage = 0;
 				break;
-			case 23:
+			case 26:
 				break;
 		}
 	}
@@ -120,7 +129,7 @@ public class course_test
 		switch (CurrentStage)
 		{
 			default:
-				stw1bonus.CreateStage();
+				st021.CreateStage();
 				break;
 		}
 	}

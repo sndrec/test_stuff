@@ -51,6 +51,9 @@ public partial class MyGame : Sandbox.Game
 	[Net]
 	public BBox StageBounds {get;set;}
 
+	[Net]
+	public float FalloutHeight { get; set; } = 0;
+
 	[ConVar.ClientData( "smb_stagetilteffect_maxangle" )]
 	public float BallMaxVisualTilt {get;set;} = 13.2f;
 
@@ -84,6 +87,7 @@ public partial class MyGame : Sandbox.Game
 
 	public List<Sound> GameMusic {get;set;}
 
+	[Net]
 	public int CurrentCourse {get;set;}
 
 	public SceneWorld BGWorld {get;set;}
@@ -96,6 +100,7 @@ public partial class MyGame : Sandbox.Game
 
 	public bool HasLightEnvironment {get;set;} = false;
 
+
 	public MyGame()
 	{
 		Global.TickRate = 60;
@@ -106,8 +111,20 @@ public partial class MyGame : Sandbox.Game
 		StageBounds = new BBox(Vector3.Zero, Vector3.Zero);
 		if ( IsClient )
     	{
-			_ = new UI_Base();
-    	}
+			UI_Base UIBase = new UI_Base();
+			//UIBase.AddChild<VoiceList>();
+			//UIBase.AddChild<VoiceSpeaker>();
+		}
+	}
+
+	public void SetTimescale(float InTimescale)
+	{
+		Global.TimeScale = InTimescale;
+	}
+	public async void SetTimescaleDelayed(float InDelay, float InTimescale )
+	{
+		await Task.DelaySeconds( InDelay );
+		Global.TimeScale = InTimescale;
 	}
 
 	public Vector3 ApplyCollisionResponseGeneric(Vector3 InVelocity, Vector3 HitNormal, Entity HitEntity, Vector3 HitPosition, float RealDelta, bool DoParticlesAndSounds)
@@ -288,6 +305,7 @@ public partial class MyGame : Sandbox.Game
 
 	public virtual void PlayNextStageInCourse(int InCourse)
 	{
+		SetTimescale( 1 );
 		switch (InCourse)
 		{
 			case 1:
@@ -301,6 +319,10 @@ public partial class MyGame : Sandbox.Game
 
 	public virtual void PlaySpecificStageInCourse(int InCourse, int InIndex)
 	{
+		Log.Info( "Playing specific stage!" );
+		Log.Info( "Course: " + InCourse );
+		Log.Info( "Stage: " + InIndex );
+		DestroyCurrentSMBStage();
 		switch (InCourse)
 		{
 			case 1:
@@ -310,6 +332,9 @@ public partial class MyGame : Sandbox.Game
 				course_test.PlayNextStage();
 				break;
 		}
+		NextGameState = Time.Now + (StageMaxTime + 5.6f);
+		SkyGenerator.CreateBackground( CurrentSky );
+		LastGameStateChange = Time.Now;
 	}
 
 	public async void PlayGlobalSoundDelayed(string InLine, float InDelay)
@@ -398,7 +423,7 @@ public partial class MyGame : Sandbox.Game
 		if (inState == 2)
 		{
 			DestroyCurrentSMBStage();
-			PlayNextStageInCourse(1);
+			PlayNextStageInCourse( CurrentCourse );
 			NextGameState = Time.Now + (StageMaxTime + 5.6f);
 			SkyGenerator.CreateBackground(CurrentSky);
 			SpawnAllBalls();
@@ -588,6 +613,8 @@ public partial class MyGame : Sandbox.Game
 		SkyGenerator.CreateBackground(To.Single(client), CurrentSky);
 
 	}
+
+	public override bool CanHearPlayerVoice( Client source, Client dest ) => true;
 
 	public Transform StageTiltTransform(Transform InTransform)
 	{

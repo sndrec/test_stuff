@@ -8,13 +8,16 @@ namespace Sandbox;
 
 public class TapePoint
 {
-	public TapePoint(Vector3 InPosition, bool InAnchored)
+	public TapePoint( Vector3 InPosition, bool InAnchored )
 	{
 		Position = InPosition;
+		OldPosition = InPosition;
 		Velocity = Vector3.Zero;
 		Anchored = InAnchored;
+		Twist = 0;
 	}
-	public Vector3 Position, Velocity;
+	public Vector3 Position, OldPosition, Velocity;
+	public float Twist;
 	public bool Anchored;
 }
 
@@ -88,15 +91,88 @@ public partial class GoalTapeEntity : Entity
 			TapeStick CurStick = Sticks[i];
 			Vector3 StickCentre = (CurStick.PointA.Position + CurStick.PointB.Position) / 2;
 			Vector3 StickDir = (CurStick.PointA.Position - CurStick.PointB.Position).Normal;
-			Vector3 StickNormal = Vector3.Cross(Vector3.Up, StickDir).Normal;
+			Vector3 StartNormal = -Forward;
+			Vector3 EndNormal = -Forward;
+			Vector3 StartUp = Up;
+			Vector3 EndUp = Up;
+			if (i > 0) // true if this is not the first stick
+			{
+				TapeStick PrevStick = Sticks[i - 1];
+				if (CurStick.PointA == PrevStick.PointB) //true if point A is connected to the previous stick
+				{
+					Vector3 PrevStickDir = (PrevStick.PointA.Position - PrevStick.PointB.Position).Normal;
+					Vector3 AvgDir = (StickDir + PrevStickDir).Normal;
+					StartUp = Vector3.Cross( Owner.Rotation.Forward, AvgDir ).Normal;
+					StartNormal = Vector3.Cross( StartUp, AvgDir ).Normal;
+					StartUp *= Rotation.FromAxis( AvgDir, CurStick.PointA.Twist );
+					StartNormal *= Rotation.FromAxis( AvgDir, CurStick.PointA.Twist );
+					CurStick.PointA.Twist = MathX.Lerp( CurStick.PointA.Twist, PrevStick.PointB.Twist, Time.Delta );
+					CurStick.PointA.Twist = MathX.Lerp( CurStick.PointA.Twist, CurStick.PointB.Twist, Time.Delta );
+				}
+				else // true if point A is NOT connected to the previous stick
+				{
+					StartUp = Vector3.Cross( Owner.Rotation.Forward, StickDir ).Normal;
+					StartNormal = Vector3.Cross( StartUp, StickDir ).Normal;
+					StartUp *= Rotation.FromAxis( StickDir, CurStick.PointA.Twist );
+					StartNormal *= Rotation.FromAxis( StickDir, CurStick.PointA.Twist );
+					CurStick.PointA.Twist = MathX.Lerp( CurStick.PointA.Twist, 45, Time.Delta * 3 );
+				}
+			}else // if this IS the first stick...
+			{
+				if ( CurStick.PointA.Anchored )
+				{
+					CurStick.PointA.Twist = 0;
+					CurStick.PointB.Twist = MathX.Lerp( CurStick.PointB.Twist, CurStick.PointA.Twist, Time.Delta );
+				}
+				else
+				{
+					CurStick.PointA.Twist = MathX.Lerp( CurStick.PointA.Twist, 45, Time.Delta * 3 );
+					CurStick.PointB.Twist = MathX.Lerp( CurStick.PointB.Twist, CurStick.PointA.Twist, Time.Delta );
+				}
+			}
+			if ( i+1 < Sticks.Count ) // true if this is not the last stick
+			{
+				TapeStick NextStick = Sticks[i + 1];
+				if ( CurStick.PointB == NextStick.PointA ) // true if point B is connected to the next stick
+				{
+					Vector3 NextStickDir = (NextStick.PointA.Position - NextStick.PointB.Position).Normal;
+					Vector3 AvgDir = (StickDir + NextStickDir).Normal;
+					EndUp = Vector3.Cross( Owner.Rotation.Forward, AvgDir ).Normal;
+					EndNormal = Vector3.Cross( EndUp, AvgDir ).Normal;
+					EndUp *= Rotation.FromAxis( AvgDir, CurStick.PointB.Twist );
+					EndNormal *= Rotation.FromAxis( AvgDir, CurStick.PointB.Twist );
+					CurStick.PointB.Twist = MathX.Lerp( CurStick.PointB.Twist, NextStick.PointA.Twist, Time.Delta );
+					CurStick.PointB.Twist = MathX.Lerp( CurStick.PointB.Twist, CurStick.PointA.Twist, Time.Delta );
+				}
+				else // true if point B is NOT connected to the next stick
+				{
+					EndUp = Vector3.Cross( Owner.Rotation.Forward, StickDir ).Normal;
+					EndNormal = Vector3.Cross( EndUp, StickDir ).Normal;
+					EndUp *= Rotation.FromAxis( StickDir, CurStick.PointB.Twist );
+					EndNormal *= Rotation.FromAxis( StickDir, CurStick.PointB.Twist );
+					CurStick.PointB.Twist = MathX.Lerp( CurStick.PointB.Twist, -45, Time.Delta * 3 );
+				}
+			}else // if this IS the last stick...
+			{
+				if ( CurStick.PointB.Anchored )
+				{
+					CurStick.PointB.Twist = 0;
+					CurStick.PointA.Twist = MathX.Lerp( CurStick.PointB.Twist, CurStick.PointA.Twist, Time.Delta );
+				}
+				else
+				{
+					CurStick.PointB.Twist = MathX.Lerp( CurStick.PointA.Twist, -45, Time.Delta * 3 );
+					CurStick.PointA.Twist = MathX.Lerp( CurStick.PointB.Twist, CurStick.PointA.Twist, Time.Delta );
+				}
+			}
 			float UVXStart = 1 - (float)i / (float)Sticks.Count;
 			float UVXEnd = 1 - (float)(i + 1) / (float)Sticks.Count;
-			vertices.Add( new SimpleVertex( CurStick.PointA.Position + (Up * 3), StickNormal, Right, new Vector2(UVXStart, 0) ));
-			vertices.Add( new SimpleVertex( CurStick.PointA.Position - (Up * 3), StickNormal, Right, new Vector2(UVXStart, 1) ));
-			vertices.Add( new SimpleVertex( CurStick.PointB.Position - (Up * 3), StickNormal, Right, new Vector2(UVXEnd, 1) ));
-			vertices.Add( new SimpleVertex( CurStick.PointB.Position + (Up * 3), StickNormal, Right, new Vector2(UVXEnd, 0) ));
-			vertices.Add( new SimpleVertex( CurStick.PointA.Position + (Up * 3), StickNormal, Right, new Vector2(UVXStart, 0) ));
-			vertices.Add( new SimpleVertex( CurStick.PointB.Position - (Up * 3), StickNormal, Right, new Vector2(UVXEnd, 1) ));
+			vertices.Add( new SimpleVertex( CurStick.PointA.Position + (StartUp * 3), StartNormal, Right, new Vector2(UVXStart, 0) ));
+			vertices.Add( new SimpleVertex( CurStick.PointA.Position - (StartUp * 3), StartNormal, Right, new Vector2(UVXStart, 1) ));
+			vertices.Add( new SimpleVertex( CurStick.PointB.Position - (EndUp * 3), EndNormal, Right, new Vector2(UVXEnd, 1) ));
+			vertices.Add( new SimpleVertex( CurStick.PointB.Position + (EndUp * 3), EndNormal, Right, new Vector2(UVXEnd, 0) ));
+			vertices.Add( new SimpleVertex( CurStick.PointA.Position + (StartUp * 3), StartNormal, Right, new Vector2(UVXStart, 0) ));
+			vertices.Add( new SimpleVertex( CurStick.PointB.Position - (EndUp * 3), EndNormal, Right, new Vector2(UVXEnd, 1) ));
 		}
 		if (first)
 		{
@@ -112,6 +188,7 @@ public partial class GoalTapeEntity : Entity
 		MyGame GameEnt = Game.Current as MyGame;
 		foreach (TapePoint p in Points)
 		{
+			p.OldPosition = p.Position;
 			if (!p.Anchored)
 			{
 				Vector3 PositionBeforeUpdate = p.Position;
@@ -157,7 +234,17 @@ public partial class GoalTapeEntity : Entity
 					Ball.ClientVelocity -= (NewNormal * 10f * Time.Delta);
 				}
 			}
-			//DebugOverlay.Sphere(p.Position, 0.5f, new Color(255, 0, 0), Time.Delta, false);
+			if ( !p.Anchored )
+			{
+				TraceResult ParticleTrace = Trace.Sphere( 1f, p.OldPosition, p.Position ).WithTag( "solid" ).WithoutTags( "smbtrigger" ).IncludeClientside( true ).Run();
+				if ( ParticleTrace.Hit )
+				{
+					TraceResult DepenPoint = Trace.Ray( p.Position, ParticleTrace.HitPosition ).WithTag( "solid" ).WithoutTags( "smbtrigger" ).IncludeClientside( true ).Run();
+					p.Position = DepenPoint.HitPosition + (ParticleTrace.Normal * 1.01f);
+					p.Velocity += ParticleTrace.Normal * Vector3.Dot( Velocity, ParticleTrace.Normal ) * -1.1f;
+					p.Twist = MathX.Lerp( p.Twist, 90 * Math.Sign(p.Twist), Time.Delta * 12 );
+				}
+			}
 		}
 		UpdateRopeMesh(false);
 	}

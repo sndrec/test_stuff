@@ -11,8 +11,8 @@ Layer0
 
 	//---- Color ----
 	g_flModelTintAmount "1.000"
-	g_vColorTint "[0.211765 0.423529 1.000000 1.000000]"
-	TextureColor "[1.000000 1.000000 1.000000 0.000000]"
+	g_vColorTint "[1.000000 1.000000 1.000000 1.000000]"
+	TextureColor "materials/goalpost_color.png"
 
 	//---- Fade ----
 	g_flFadeExponent "1.000"

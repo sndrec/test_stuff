@@ -56,6 +56,9 @@ public static partial class SkyGenerator
 			case "sky_bonus":
 				sky_bonus.GenerateBG();
 				break;
+			case "sky_christmas":
+				sky_christmas.GenerateBG();
+				break;
 			default:
 				sky_default.GenerateBG();
 				break;
@@ -165,7 +168,38 @@ public static partial class sky_sky
 		}
 	}
 }
-
+public static partial class sky_christmas
+{
+	[ClientRpc]
+	public static void GenerateBG()
+	{
+		ModelEntity SkyModel = new ModelEntity( "models/bg/christmas/sky_christmas.vmdl" );
+		SkyModel.Tags.Add( "BGObject" );
+		MyGame GameEnt = Game.Current as MyGame;
+		Map.Scene.GradientFog.Enabled = true;
+		Map.Scene.GradientFog.Color = new Color( 0.3f, 0.5f, 0.85f );
+		Map.Scene.GradientFog.StartDistance = 0;
+		Map.Scene.GradientFog.EndDistance = 60000;
+		Map.Scene.GradientFog.MaximumOpacity = 0.75f;
+		Map.Scene.GradientFog.StartHeight = 4999999;
+		Map.Scene.GradientFog.EndHeight = 5000000;
+		Map.Scene.GradientFog.DistanceFalloffExponent = 1f;
+		Map.Scene.GradientFog.VerticalFalloffExponent = 1f;
+		foreach ( Entity element in Entity.All )
+		{
+			if ( element is EnvironmentLightEntity )
+			{
+				EnvironmentLightEntity Light = element as EnvironmentLightEntity;
+				Light.Brightness = 2;
+				Light.Color = new Color( 0.9f, 0.95f, 1f );
+				Light.SkyColor = new Color( 0.7f, 0.85f, 1 );
+				Light.SkyIntensity = 0.5f;
+				Light.Rotation = Rotation.From( new Angles( 35, 10, 0 ) );
+				GameEnt.LightAngles = Light.Rotation;
+			}
+		}
+	}
+}
 public static partial class sky_bonus
 {
 	[ClientRpc]

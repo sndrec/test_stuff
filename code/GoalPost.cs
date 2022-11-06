@@ -20,7 +20,9 @@ public partial class GoalPost : SMBObject
 
 	public PartyBall PartyBall {get;set;}
 
-	public Rotation PartyBallRotation {get;set;}
+	public Vector3 PartyBallSimPosition { get; set; }
+
+	public Vector3 PartyBallSimVelocity { get; set; }
 
 	public GoalTapeEntity GoalTape {get;set;}
 
@@ -70,8 +72,8 @@ public partial class GoalPost : SMBObject
 		PartyBall.UseAnimGraph = false;
 		PartyBall.AnimateOnServer = false;
 		PartyBall.PlaybackRate = 0;
-		PartyBallRotation = Rotation.FromYaw(90) * Rotation.FromYaw(Rotation.Yaw());
-		PartyBall.AngVel = Rotation.Identity;
+		PartyBallSimPosition = Position;
+		PartyBallSimVelocity = Vector3.Zero;
 		PartyBall.EnableTraceAndQueries = true;
 		PartyBall.EnableSolidCollisions = true;
 		PartyBall.EnableAllCollisions = true;
@@ -125,34 +127,24 @@ public partial class GoalPost : SMBObject
 	[Event.Frame]
 	public void SimulatePartyBall()
 	{
-		PartyBall.Position = Position + (Rotation.Up * 60);
-		Rotation BasePartyBallRot = Rotation.FromYaw(Rotation.Yaw());
 		MyGame GameEnt = Game.Current as MyGame;
-		BasePartyBallRot = GameEnt.StageTilt * BasePartyBallRot;
-		PartyBall.AngVel = Rotation.Slerp(PartyBall.AngVel, (BasePartyBallRot * PartyBallRotation.Inverse).Normal, Time.Delta * 2);
-		//PartyBall.AngVel	= Rotation.Slerp(PartyBall.AngVel, Rotation.Identity, Time.Delta);
-		//Rotation GoalRotInfluence = Rotation.Slerp(Rotation.Identity, OldTransform.Rotation.Inverse * Rotation, Time.Delta * 2);
-		//float GoalPosInfluencePower = (Position - OldTransform.Position).Length * (1 - Vector3.Dot((Position - OldTransform.Position).Normal, -Rotation.Up)) * 0.06725f;
-		//Rotation GoalPosInfluence = Rotation.FromAxis(Vector3.Cross((Position - OldTransform.Position).Normal, -PartyBallRotation.Up), GoalPosInfluencePower);
+		PartyBall.Position = Position + (Rotation.Up * 60);
+		PartyBallSimVelocity += (new Vector3( 0, 0, -588 ) * Time.Delta) * GameEnt.StageTilt;
+		PartyBallSimPosition += PartyBallSimVelocity * Time.Delta;
 
-		//PartyBall.AngVel = (GoalRotInfluence * PartyBall.AngVel).Normal;
-		//PartyBall.AngVel = (GoalPosInfluence * PartyBall.AngVel).Normal;
-		Rotation TrueAngVel = Rotation.Slerp(Rotation.Identity, PartyBall.AngVel, Time.Delta * 30);
-		PartyBallRotation = (TrueAngVel * PartyBallRotation).Normal;
-		float DegreesOffset = Vector3.GetAngle(-PartyBallRotation.Up, -Rotation.Up);
-		if (DegreesOffset > 60)
-		{
-			Vector3 Axis = Vector3.Cross(-PartyBallRotation.Up, -Rotation.Up).Normal;
-			PartyBallRotation = Rotation.FromAxis(Axis, DegreesOffset - 60) * PartyBallRotation;
-			PartyBall.AngVel = Rotation.FromAxis(Axis, DegreesOffset * Time.Delta * 1.5f).Normal;
+		Vector3 DirFromPartyBallMount = (PartyBallSimPosition - PartyBall.Position).Normal;
+		PartyBallSimPosition = PartyBall.Position + (DirFromPartyBallMount * 20);
+		PartyBallSimVelocity -= Vector3.Dot( PartyBallSimVelocity, DirFromPartyBallMount ) * DirFromPartyBallMount;
+		PartyBallSimVelocity += -PartyBallSimVelocity * Time.Delta;
+		DirFromPartyBallMount = (PartyBallSimPosition - PartyBall.Position).Normal;
 
-		}
-		PartyBall.Rotation = PartyBallRotation;
-		var glow = Components.GetOrCreate<Glow>();
-        glow.Color = new Color(0.25f, 0.25f, 1f);
-        glow.ObscuredColor = new Color(0.25f, 0.25f, 1f);
-        glow.Width = 0.25f;
-        if (Local.Client.Pawn is Pawn)
+		PartyBall.Rotation = Rotation.LookAt( DirFromPartyBallMount, Rotation.Forward ) * Rotation.FromPitch( -90 );
+
+		//DebugOverlay.Sphere( PartyBallSimPosition, 2, new Color( 0, 255, 0 ), Time.Delta, false );
+		//DebugOverlay.Line( PartyBallSimPosition, PartyBallSimPosition + (PartyBallSimVelocity), new Color( 255, 255, 255 ), Time.Delta, false );
+
+
+		if (Local.Client.Pawn is Pawn)
         {
         	Pawn Ball = Local.Client.Pawn as Pawn;
       		if (Ball.BallState == 2 && GoalCrossed == false)
