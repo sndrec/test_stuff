@@ -295,6 +295,15 @@ public partial class MyGame : Sandbox.Game
 		KillFeed.Current?.AddEntry(lsteamid, left, right, method);
 	}
 
+	[ConCmd.Server]
+	public static void RetryCurrentStage()
+	{
+		MyGame GameEnt = Game.Current as MyGame;
+		GameEnt.PlaySpecificStageInCourse( GameEnt.CurrentCourse, GameEnt.StageInCourse );
+		GameEnt.SetTimescale( 4 );
+		GameEnt.SpawnAllBalls();
+	}
+
 	public void DestroyCurrentSMBStage()
 	{
 		if (CurrentStage != null)

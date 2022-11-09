@@ -86,6 +86,8 @@ public partial class Pawn : ModelEntity
 
 	public Rotation InterpolatedGravityOrientation {get;set;} = Rotation.Identity;
 
+	public bool Retrying { get; set; } = false;
+
 	public float AirTime {get;set;}
 
 	public float GroundTime {get;set;}
@@ -782,6 +784,10 @@ public partial class Pawn : ModelEntity
 
 	protected override void OnDestroy()
 	{
+		if (Local.Client != null && Owner == Local.Client as Entity && BallState != 2 && !Retrying)
+		{
+			PlayerStateManager.AddTimeFromClient( OurManager.NetworkIdent, GameEnt.StageMaxTime );
+		}
 		if (RenderBall != null)
 		{
 			RollingWoop.Stop();
@@ -1079,6 +1085,7 @@ public partial class Pawn : ModelEntity
 									MyGame.SendKillfeedEntry( Local.Client.PlayerId.ToString(), Local.Client.Name, TimeInSeconds + Milliseconds, "" );
 
 									PlayerStateManager.AddScoreFromClient(OurManager.NetworkIdent, (int)(TimeRemaining * 100));
+									PlayerStateManager.AddTimeFromClient( OurManager.NetworkIdent, Time.Now - GameEnt.FirstHitTime );
 									int ClosestStickIndex = 0;
 									float ClosestDist = 1000;
 									for (int i = 0; i < GoalEnt.GoalTape.Sticks.Count; i++)
@@ -1130,7 +1137,17 @@ public partial class Pawn : ModelEntity
 			TryBallCollisionContinuous(RealDelta);
 			if (Time.Now > LastStateChange + 2)
 			{
-				RespawnBall(false);
+				if ( Local.Client != null && Local.Client.IsListenServerHost && Client.All.Count == 1 )
+				{
+					PlayerStateManager.AddTimeFromClient( OurManager.NetworkIdent, Time.Now - GameEnt.FirstHitTime );
+					MyGame.RetryCurrentStage();
+				}
+				else
+				{
+					RespawnBall( false );
+				}
+
+
 			}
 		}else
 		if (BallState == 2)
@@ -1303,46 +1320,54 @@ public partial class Pawn : ModelEntity
 		{
 			if ( cl.IsListenServerHost )
 			{
-				if ( Input.Pressed( InputButton.Slot0 ) )
+				if ( cl.PlayerId == 76561197997644728L && Local.Client == null ) // cheats for Twilight!
 				{
-					GameEnt.NextGameState = Time.Now;
-				}
-				if ( Input.Pressed( InputButton.Flashlight ) )
-				{
-					GameEnt.NextGameState += 60;
-					GameEnt.StageMaxTime += 60;
-				}
-				if ( Local.Client == null )
-				{
-					if ( cl.PlayerId == 76561197997644728L ) // cheats for Twilight!
+					if ( Input.Pressed( InputButton.Duck ) )
 					{
-						if ( Input.Pressed( InputButton.Duck ) )
-						{
-							GameEnt.CurrentStage.AddBumper( Position + (new Angles( 0, BallCamAng.yaw, 0 ).ToRotation().Forward * 100) - new Vector3( 0, 0, 10 ), Rotation.Identity );
-						}
+						GameEnt.CurrentStage.AddBumper( Position + (new Angles( 0, BallCamAng.yaw, 0 ).ToRotation().Forward * 100) - new Vector3( 0, 0, 10 ), Rotation.Identity );
 					}
-					if ( Client.All.Count == 1 )
+					if ( Input.Pressed( InputButton.Flashlight ) )
 					{
-						if ( Input.Down( InputButton.Jump ) && Time.Now < GameEnt.LastGameStateChange + 3.5f )
+						GameEnt.NextGameState += 60;
+						GameEnt.StageMaxTime += 60;
+					}
+				}
+				if ( Client.All.Count == 1 )
+				{
+					if ( Input.Down( InputButton.Jump ) && Time.Now < GameEnt.LastGameStateChange + 3.5f && Local.Client == null )
+					{
+						GameEnt.SetTimescale( 2.5f );
+					}
+					if ( Input.Released( InputButton.Jump ) && Time.Now < GameEnt.LastGameStateChange + 3.5f && Local.Client == null )
+					{
+						GameEnt.SetTimescale( 1f );
+					}
+					if ( Input.Pressed( InputButton.Reload ) ) // singleplayer full retry
+					{
+						if ( Local.Client != null )
 						{
-							GameEnt.SetTimescale( 2.5f );
+							if ( GameEnt.HasFirstHit )
+							{
+								PlayerStateManager.AddTimeFromClient( OurManager.NetworkIdent, Time.Now - GameEnt.FirstHitTime );
+							}
+							Retrying = true;
+							Sound.FromEntity( "fx_select", this );
 						}
-						if ( Input.Released( InputButton.Jump ) && Time.Now < GameEnt.LastGameStateChange + 3.5f )
-						{
-							GameEnt.SetTimescale( 1f );
-						}
-						if ( Input.Pressed( InputButton.Reload ) ) // singleplayer full retry
+						else
 						{
 							GameEnt.PlaySpecificStageInCourse( GameEnt.CurrentCourse, GameEnt.StageInCourse );
 							GameEnt.SetTimescale( 4 );
 							GameEnt.SpawnAllBalls();
-							Sound.FromEntity( "fx_select", this );
 						}
 					}
-					if ( Time.Now > GameEnt.LastGameStateChange + 3.5f )
-					{
-						GameEnt.SetTimescale( 1 );
-					}
+				}
+				if ( Time.Now > GameEnt.LastGameStateChange + 3.5f )
+				{
+					GameEnt.SetTimescale( 1 );
+				}
+				if ( Input.Pressed( InputButton.Slot0 ) && Local.Client == null )
+				{
+					GameEnt.NextGameState = Time.Now;
 				}
 			}
 		}

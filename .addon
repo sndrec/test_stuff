@@ -24,7 +24,10 @@
     "LeaderboardType": "None",
     "ProjectTemplate": null,
     "GameCategory": "Parkour",
-    "DefaultLeaderboards": [],
+    "DefaultLeaderboards": [
+      "Advanced_Time",
+      "Advanced_Score"
+    ],
     "ControlModes": {
       "Keyboard": true,
       "Gamepad": true
@@ -82,6 +85,12 @@
         "Minimum": 1,
         "Maximum": 90
       }
-    ]
+    ],
+    "Compiler": {
+      "RootNamespace": "Sandbox",
+      "DefineConstants": "SANDBOX;ADDON;DEBUG",
+      "NoWarn": "1701;1702;1591;",
+      "ReleaseMode": "Release"
+    }
   }
 }

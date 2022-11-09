@@ -30,6 +30,7 @@ public class stwfp
 			{
 				PlayerStateManager PSM = element as PlayerStateManager;
 				PSM.SetScore(0);
+				PSM.SetTime( 0 );
 			}
 		}
 	}
@@ -1122,7 +1123,7 @@ public class st020
 		SMBStage NewStage = new SMBStage("Crankthrough", 60, GameEnt.BlenderPos(0f, 45f, 12.5f), new Angles(0, 0, 0), "sky_christmas", "mus_desertruins_intro", 2);
 		NewStage.AddStageObject("models/stages/test_world/st020.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		SMBObject Pipe = NewStage.AddStageObject( "models/stages/test_world/st020_pipe.vmdl", GameEnt.BlenderPos(0, 24f, 14f ), Rotation.Identity );
-		NewStage.AddGoal(GameEnt.BlenderPos(0f, -46.0f, -2.67958f ), Rotation.From(new Angles(0f, -135, 0)));
+		NewStage.AddGoal(GameEnt.BlenderPos(0f, -46.0f, -2.67958f ), Rotation.From(new Angles(0f, -90, 0)));
 		List<RotAnimKeyFrame> PipeKeyFrames = new List<RotAnimKeyFrame>
 		{
 			new RotAnimKeyFrame(0, 3, Rotation.From(new Angles(0, 0, 89))),
@@ -1146,6 +1147,143 @@ public class st021
 		NewStage.AddGoal( GameEnt.BlenderPos( -5.55f, 26, 0 ), Rotation.From( new Angles( 0f, -90f, 0 ) ) );
 	}
 }
+public class st022
+{
+	public static void CreateStage()
+	{
+		MyGame GameEnt = Game.Current as MyGame;
+		SMBStage NewStage = new SMBStage( "Around the Bend", 60, GameEnt.BlenderPos( 0f, -12.7271f, 2.54059f + 0.5f ), new Angles( 0, 180, 0 ), "sky_christmas", "mus_desertruins_intro", 2 );
+		NewStage.AddStageObject( "models/stages/test_world/st022.vmdl", new Vector3( 0, 0, 0 ), Rotation.Identity );
+		NewStage.AddGoal( GameEnt.BlenderPos( 0f, 12.7271f, 2.54059f ), Rotation.From( new Angles( 0f, 0f, 0 ) ) );
+	}
+}
+public class st023
+{
+	public static void CreateStage()
+	{
+		MyGame GameEnt = Game.Current as MyGame;
+		SMBStage NewStage = new SMBStage( "Down to Business", 60, GameEnt.BlenderPos( 0, -40f, 40.5f ), new Angles( 0, 180, 0 ), "sky_christmas", "mus_desertruins_intro", 2 );
+		NewStage.AddStageObject( "models/stages/test_world/st023.vmdl", new Vector3( 0, 0, 0 ), Rotation.Identity );
+		NewStage.AddGoal( GameEnt.BlenderPos( 0f, 13.497f, -26.0f ), Rotation.From( new Angles( 0f, 90f, 39 ) ) );
+		NewStage.SetStageBounds( new BBox( GameEnt.BlenderPos( -20.0f, -20.0f, -35.0f ), GameEnt.BlenderPos( 20, 20, 56 ) ) );
+	}
+}
+public class st024
+{
+	public static void CreateStage()
+	{
+		MyGame GameEnt = Game.Current as MyGame;
+		SMBStage NewStage = new SMBStage( "Unpacked", 60, GameEnt.BlenderPos( 12f, -12f, 0.5f ), new Angles( 0, 180, 0 ), "sky_christmas", "mus_desertruins_intro", 2 );
+		NewStage.AddStageObject( "models/stages/test_world/st024.vmdl", new Vector3( 0, 0, 0 ), Rotation.Identity );
+		NewStage.AddGoal( GameEnt.BlenderPos( 12f, 13.5f, 0f ), Rotation.From( new Angles( 0f, 0, 0 ) ) );
+	}
+}
+public class st025
+{
+	public static void CreateStage()
+	{
+		MyGame GameEnt = Game.Current as MyGame;
+		SMBStage NewStage = new SMBStage( "Swerve", 60, GameEnt.BlenderPos( 4f, 20f, 0.5f ), new Angles( 0, -45, 0 ), "sky_christmas", "mus_desertruins_intro", 2 );
+		NewStage.AddStageObject( "models/stages/test_world/st025.vmdl", new Vector3( 0, 0, 0 ), Rotation.Identity );
+		NewStage.AddGoal( GameEnt.BlenderPos( -4f, -20.0f, -0.375f ), Rotation.From( new Angles( 0f, 135f, 0 ) ) );
+	}
+}
+public class st026
+{
+	public static void CreateStage()
+	{
+		List<RotAnimKeyFrame> Hammer1KeyFrames = new List<RotAnimKeyFrame>
+		{
+			new RotAnimKeyFrame(0, 1, Rotation.From(new Angles(0, 0, -75))),
+			new RotAnimKeyFrame(2, 2, Rotation.From(new Angles(0, 0, 0))),
+			new RotAnimKeyFrame(3, 1, Rotation.From(new Angles(0, 0, -15))),
+			new RotAnimKeyFrame(4, 2, Rotation.From(new Angles(0, 0, 0))),
+			new RotAnimKeyFrame(6, 1, Rotation.From(new Angles(0, 0, -75)))
+		};
+
+		List<RotAnimKeyFrame> Hammer2KeyFrames = new List<RotAnimKeyFrame>
+		{
+			new RotAnimKeyFrame(0, 1, Rotation.From(new Angles(0, 0, 75))),
+			new RotAnimKeyFrame(2, 2, Rotation.From(new Angles(0, 0, 0))),
+			new RotAnimKeyFrame(3, 1, Rotation.From(new Angles(0, 0, 15))),
+			new RotAnimKeyFrame(4, 2, Rotation.From(new Angles(0, 0, 0))),
+			new RotAnimKeyFrame(6, 1, Rotation.From(new Angles(0, 0, 75)))
+		};
+
+		List<RotAnimKeyFrame> Plat1KeyFrames = new List<RotAnimKeyFrame>
+		{
+			new RotAnimKeyFrame(0, 0, Rotation.From(new Angles(0, 180, 0))),
+			new RotAnimKeyFrame(2, 2, Rotation.From(new Angles(0, 180, 0))),
+			new RotAnimKeyFrame(3, 1, Rotation.From(new Angles(0, 180, -30))),
+			new RotAnimKeyFrame(4, 0, Rotation.From(new Angles(0, 180, 0))),
+			new RotAnimKeyFrame(6, 0, Rotation.From(new Angles(0, 180, 0)))
+		};
+
+		List<RotAnimKeyFrame> Plat2KeyFrames = new List<RotAnimKeyFrame>
+		{
+			new RotAnimKeyFrame(0, 0, Rotation.From(new Angles(0, 0, 0))),
+			new RotAnimKeyFrame(2, 2, Rotation.From(new Angles(0, 0, 0))),
+			new RotAnimKeyFrame(3, 1, Rotation.From(new Angles(0, 0, -30))),
+			new RotAnimKeyFrame(4, 0, Rotation.From(new Angles(0, 0, 0))),
+			new RotAnimKeyFrame(6, 0, Rotation.From(new Angles(0, 0, 0)))
+		};
+
+		MyGame GameEnt = Game.Current as MyGame;
+		SMBStage NewStage = new SMBStage( "Incoming Strike", 90, GameEnt.BlenderPos( 0f, 24f, 0.5f ), new Angles( 0, -45, 0 ), "sky_christmas", "mus_desertruins_intro", 2 );
+		NewStage.AddStageObject( "models/stages/test_world/st026_main.vmdl", new Vector3( 0, 0, 0 ), Rotation.Identity );
+		SMBObject Hammer1 = NewStage.AddStageObject( "models/stages/test_world/st026_hammer.vmdl", GameEnt.BlenderPos( 12, -12, 18.375f ), Rotation.From( new Angles( 0f, 180f, 0 )) );
+		SMBObject Hammer2 = NewStage.AddStageObject( "models/stages/test_world/st026_hammer.vmdl", GameEnt.BlenderPos( -12, 12, 18.375f ), Rotation.Identity );
+		SMBObject RoundPlat1 = NewStage.AddStageObject( "models/stages/test_world/st026_roundplatform.vmdl", GameEnt.BlenderPos( 12, -12, 18.375f ), Rotation.From( new Angles( 0f, 180f, 0 )) );
+		SMBObject RoundPlat2 = NewStage.AddStageObject( "models/stages/test_world/st026_roundplatform.vmdl", GameEnt.BlenderPos( -12, 12, 18.375f ), Rotation.Identity );
+		NewStage.AddGoal( GameEnt.BlenderPos( 0f, -24f, 0f ), Rotation.From( new Angles( 0f, 135f, 0 ) ) );
+		Hammer1.AddRotKeyFrames( Hammer1KeyFrames );
+		Hammer1.EnableKeyFrameAnimation( false, true );
+		Hammer2.AddRotKeyFrames( Hammer2KeyFrames );
+		Hammer2.EnableKeyFrameAnimation( false, true );
+		RoundPlat1.AddRotKeyFrames( Plat1KeyFrames );
+		RoundPlat1.EnableKeyFrameAnimation( false, true );
+		RoundPlat2.AddRotKeyFrames( Plat2KeyFrames );
+		RoundPlat2.EnableKeyFrameAnimation( false, true );
+
+		Hammer1.RotAnimTime = 3;
+		RoundPlat1.RotAnimTime = 3;
+	}
+}
+public class st027
+{
+	public static void CreateStage()
+	{
+		MyGame GameEnt = Game.Current as MyGame;
+		SMBStage NewStage = new SMBStage( "Walk the Dog", 90, GameEnt.BlenderPos( -32.0f, 64.0f, 40.5f ), new Angles( 0, 45, 0 ), "sky_christmas", "mus_desertruins_intro", 2 );
+		NewStage.AddStageObject( "models/stages/test_world/st027.vmdl", new Vector3( 0, 0, 0 ), Rotation.Identity );
+		NewStage.AddGoal( GameEnt.BlenderPos( 35.5f, -57.0f, -39.0f ), Rotation.From( new Angles( 0f, 0f, 0 ) ) );
+	}
+}
+public class st028
+{
+	public static void RotateSpinner( SMBObject InObject )
+	{
+		InObject.Rotation *= Rotation.FromYaw( Time.Delta * -75 ).Normal;
+	}
+	public static void RotateGoalSpinner( SMBObject InObject )
+	{
+		InObject.Rotation *= Rotation.FromYaw( Time.Delta * -360 ).Normal;
+	}
+	public static void CreateStage()
+	{
+		MyGame GameEnt = Game.Current as MyGame;
+		SMBStage NewStage = new SMBStage( "Fidget", 90, GameEnt.BlenderPos( 7.06569f, 8.03458f, 0.5f ), new Angles( 0, 205, 0 ), "sky_christmas", "mus_desertruins_intro", 2 );
+		NewStage.AddStageObject( "models/stages/test_world/st028_main.vmdl", new Vector3( 0, 0, 0 ), Rotation.Identity );
+		SMBObject Spinner1 = NewStage.AddStageObject( "models/stages/test_world/st028_badspinner.vmdl", GameEnt.BlenderPos( 0f, 22f, 0f ), Rotation.Identity );
+		SMBObject Spinner2 = NewStage.AddStageObject( "models/stages/test_world/st028_badspinner.vmdl", GameEnt.BlenderPos( -20f, -10f, 0f ), Rotation.Identity );
+		SMBObject GoalSpinner = NewStage.AddStageObject( "models/stages/test_world/st028_goalspinner.vmdl", GameEnt.BlenderPos( 20f, -10f, 0.5f ), Rotation.Identity );
+		GoalPost StageGoal = NewStage.AddGoal( GameEnt.BlenderPos( 11.0f, -10.0f, 0f ), Rotation.From( new Angles( 0f, 0f, 0 ) ) );
+		StageGoal.SetParent( GoalSpinner );
+		Spinner1.SimulateSMBObjectCustom = RotateSpinner;
+		Spinner2.SimulateSMBObjectCustom = RotateSpinner;
+		GoalSpinner.SimulateSMBObjectCustom = RotateGoalSpinner;
+	}
+}
 
 
 public class staward
@@ -1156,6 +1294,16 @@ public class staward
 		SMBStage NewStage = new SMBStage("Award Ceremony", 30, GameEnt.BlenderPos(0f, 13.5f, 0.5f), new Angles(0, 0, 0), "sky_bonus", "waitingforplayers_2", 2);
 		NewStage.AddStageObject("models/stages/award_main.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		int NumPlayers = Client.All.Count;
+		foreach ( Entity element in Entity.All )
+		{
+			if ( element is PlayerStateManager )
+			{
+				PlayerStateManager PSM = element as PlayerStateManager;
+				Log.Info( "Stats for " + PSM.Owner );
+				Log.Info( "Total time taken: " + PSM.TotalTime);
+				Log.Info( "Total score: " + PSM.Score );
+			}
+		}
 		AwardCopter Copter1 = new AwardCopter();
 		AwardCopter Copter2 = new AwardCopter();
 		AwardCopter Copter3 = new AwardCopter();

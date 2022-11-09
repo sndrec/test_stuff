@@ -25,6 +25,16 @@ public class course_w1
 		{
 			case 1:
 				st001.CreateStage();
+				foreach ( Entity element in Entity.All )
+				{
+					if ( element is PlayerStateManager )
+					{
+						PlayerStateManager PSM = element as PlayerStateManager;
+						PSM.SetScore( 0 );
+						PSM.SetTime( 0 );
+						PSM.CanSubmitScore = true;
+					}
+				}
 				break;
 			case 2:
 				st002.CreateStage();
@@ -93,13 +103,35 @@ public class course_w1
 				st021.CreateStage();
 				break;
 			case 24:
-				staward.CreateStage();
+				st022.CreateStage();
 				break;
 			case 25:
+				st023.CreateStage();
+				break;
+			case 26:
+				st024.CreateStage();
+				break;
+			case 27:
+				st025.CreateStage();
+				break;
+			case 28:
+				st026.CreateStage();
+				break;
+			case 29:
+				st027.CreateStage();
+				break;
+			case 30:
+				st028.CreateStage();
+				break;
+			case 31:
+				staward.CreateStage();
+				SMBLeaderboard.SubmitAllTimesToBoard();
+				break;
+			case 32:
 				GameEnt.EndCourse();
 				CurrentStage = 0;
 				break;
-			case 26:
+			case 33:
 				break;
 		}
 	}
@@ -129,7 +161,7 @@ public class course_test
 		switch (CurrentStage)
 		{
 			default:
-				st021.CreateStage();
+				st028.CreateStage();
 				break;
 		}
 	}
