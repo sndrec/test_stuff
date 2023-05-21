@@ -1,5 +1,5 @@
 using Sandbox;
-using SandboxEditor;
+using Editor;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -44,7 +44,7 @@ public class st001
 	}
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		List<PosAnimKeyFrame> Plat1KeyFrames = new List<PosAnimKeyFrame>
 		{
 			new PosAnimKeyFrame(0, 3, new Vector3(0, 0, 0)),
@@ -165,7 +165,7 @@ public class st002
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage("Hollow", 60, GameEnt.BlenderPos(0, 70, 0.5f), new Angles(0, 0, 0), "sky_field", "mus_field", 1);
 		NewStage.AddStageObject("models/stages/test_world/st002.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		NewStage.AddGoal(GameEnt.BlenderPos(0, -86, 0), Rotation.FromYaw(180));
@@ -219,7 +219,7 @@ public class st003
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		List<PosAnimKeyFrame> Plat1KeyFrames = new List<PosAnimKeyFrame>
 		{
 			new PosAnimKeyFrame(0, 3, new Vector3(0, 0, 0)),
@@ -290,7 +290,7 @@ public class st004
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage("Downhill", 60, GameEnt.BlenderPos(-54.25f, 50.75f, 80.5f), new Angles(0, 90, 0), "sky_field", "mus_field", 2);
 		NewStage.AddStageObject("models/stages/test_world/st004.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		NewStage.AddGoal(GameEnt.BlenderPos(60.0f, -49.25f, -57.5f), Rotation.FromYaw(-90));
@@ -353,7 +353,7 @@ public class st005
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage("Jump", 60, GameEnt.BlenderPos(-25, 25, 0.5f), new Angles(0, 45, 0), "sky_christmas", "mus_desertruins_intro", 1.5f);
 		NewStage.AddStageObject("models/stages/test_world/st005.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		List<SMBObject> TiltPlats1 = new List<SMBObject>();
@@ -426,7 +426,7 @@ public class st006
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage("Concentric", 60, GameEnt.BlenderPos(-20f, 0, 0.5f), new Angles(0, 90, 0), "sky_field", "mus_field", 1);
 		NewStage.AddStageObject("models/stages/test_world/st006.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		NewStage.AddGoal(GameEnt.BlenderPos(72, 0, -3.12992f), Rotation.FromYaw(-90));
@@ -513,7 +513,7 @@ public class st007
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage("Cut Corners", 90, GameEnt.BlenderPos(40, -4, 224.5f), new Angles(0, 180, 0), "sky_field", "mus_field", 2);
 		NewStage.AddStageObject("models/stages/test_world/st007.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		NewStage.AddGoal(GameEnt.BlenderPos(70.8796f, -36.0482f, -15.2052f), Rotation.From(new Angles(-29.5f, -70, 0)));
@@ -582,7 +582,7 @@ public class st008
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage("Loops for Days", 60, GameEnt.BlenderPos(-152, -24, 48.5f), new Angles(0, 90, 0), "sky_field", "mus_field", 2);
 		NewStage.AddStageObject("models/stages/test_world/st008.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		NewStage.AddGoal(GameEnt.BlenderPos(104f, 86f, -39.0237f), Rotation.From(new Angles(0, 0, 0)));
@@ -626,7 +626,7 @@ public class st009
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage("Assessment I", 120, GameEnt.BlenderPos(27.0f, -33.0f, 16.125f), new Angles(0, -90, 0), "sky_sky", "mus_desertruins_intro", 2);
 		NewStage.AddStageObject("models/stages/test_world/st009.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		NewStage.AddGoal(GameEnt.BlenderPos(-64.0f, -0.5f, 1.75f), Rotation.From(new Angles(0, 90, 0)));
@@ -668,7 +668,7 @@ public class st010
 			new RotAnimKeyFrame(3.5f, 3, Rotation.From(new Angles(0, 0, 0))),
 			new RotAnimKeyFrame(5, 3, Rotation.From(new Angles(0, 0, 0)))
 		};
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage("Snakeway", 60, GameEnt.BlenderPos(-16.0f, 12f, 0.5f), new Angles(0, -45, 0), "sky_sky", "mus_desertruins_intro", 2);
 		NewStage.AddStageObject("models/stages/test_world/st010_main.vmdl", GameEnt.BlenderPos(0f, 0f, 0f), Rotation.Identity);
 		SMBObject Flipper1 = NewStage.AddStageObject("models/stages/test_world/st010_flipper1.vmdl", GameEnt.BlenderPos(0f, -10.0f, -0.18f), Rotation.From(new Angles(0, 0, 0)));
@@ -692,7 +692,7 @@ public class st011
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage("The Tower", 60, GameEnt.BlenderPos(0, 6, 0.5f), new Angles(0, 0, 0), "sky_field", "mus_field", 1);
 		NewStage.AddStageObject("models/stages/test_world/st011.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		NewStage.AddGoal(GameEnt.BlenderPos(-0, -38f, -36f), Rotation.From(new Angles(0f, 90f, 0)));
@@ -768,7 +768,7 @@ public class st012
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage("Slots", 120, GameEnt.BlenderPos(0f, 24.0f, 0.5f), new Angles(0, 0, 0), "sky_field", "mus_field", 1);
 		NewStage.AddStageObject("models/stages/test_world/st012_main.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		List<PosAnimKeyFrame> PistonKeyFrames = new List<PosAnimKeyFrame>
@@ -872,7 +872,7 @@ public class st013
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage("Tilted Tiles", 60, GameEnt.BlenderPos(-69.0f, -13.0f, 32.5f), new Angles(0, 135, 0), "sky_sky", "mus_desertruins_intro", 2);
 		NewStage.AddStageObject("models/stages/test_world/st013.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		NewStage.AddGoal(GameEnt.BlenderPos(68.0f, 24.0f, -28.0f), Rotation.From(new Angles(0f, -45f, 0)));
@@ -883,7 +883,7 @@ public class st014
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage("Manygolf", 60, GameEnt.BlenderPos(0f, 72f, 40.5f), new Angles(0, 0, 0), "sky_sky", "mus_desertruins_intro", 2);
 		NewStage.AddStageObject("models/stages/test_world/st014.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		NewStage.AddGoal(GameEnt.BlenderPos(0f, -87.0f, -43.752f), Rotation.From(new Angles(0f, 0f, 0)));
@@ -916,7 +916,7 @@ public class st015
 			new RotAnimKeyFrame(2, 3, Rotation.From(new Angles(-75, 0, 0))),
 			new RotAnimKeyFrame(4f, 3, Rotation.From(new Angles(75, 0, 0)))
 		};
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage("Crash Course", 120, GameEnt.BlenderPos(-2f, 0f, 0.5f), new Angles(0, 90, 0), "sky_sky", "mus_desertruins_intro", 2);
 		NewStage.AddStageObject("models/stages/test_world/st015_main.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		SMBObject Spinner = NewStage.AddStageObject("models/stages/test_world/st015_cylinder.vmdl", GameEnt.BlenderPos(8f, 0f, -4f), Rotation.FromPitch(100));
@@ -955,7 +955,7 @@ public class st016
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 
 		List<PosAnimKeyFrame> Block1KeyFrames = new List<PosAnimKeyFrame>
 		{
@@ -1063,7 +1063,7 @@ public class st017
 	}
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage("Sea Sickness", 60, GameEnt.BlenderPos(0f, 50f, 0f), new Angles(0, 0, 0), "sky_sky", "mus_desertruins_intro", 2);
 		NewStage.AddStageObject("models/stages/test_world/st017_outer.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		SMBObject Platter = NewStage.AddStageObject("models/stages/test_world/st017_intermediary.vmdl", new Vector3(0,0,0), Rotation.Identity);
@@ -1092,7 +1092,7 @@ public class st018
 
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage("Gecko", 120, GameEnt.BlenderPos(-1.95044f, 64.0012f, -5f), new Angles(0, 90, 0), "sky_sky", "mus_desertruins_intro", 2);
 		NewStage.AddStageObject("models/stages/test_world/st018.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		SMBObject Spinner1 = NewStage.AddStageObject("models/stages/test_world/st018_spinner.vmdl", GameEnt.BlenderPos(0, 8, 0), Rotation.Identity);
@@ -1108,7 +1108,7 @@ public class st019
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage("Folded Paper", 60, GameEnt.BlenderPos(0f, 32f, 0.5f), new Angles(0, 0, 0), "sky_sky", "mus_desertruins_intro", 2);
 		NewStage.AddStageObject("models/stages/test_world/st019.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		NewStage.AddGoal(GameEnt.BlenderPos(0f, -32f, -16f), Rotation.From(new Angles(0f, 180f, 0)));
@@ -1119,7 +1119,7 @@ public class st020
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage("Crankthrough", 60, GameEnt.BlenderPos(0f, 45f, 12.5f), new Angles(0, 0, 0), "sky_christmas", "mus_desertruins_intro", 2);
 		NewStage.AddStageObject("models/stages/test_world/st020.vmdl", new Vector3(0,0,0), Rotation.Identity);
 		SMBObject Pipe = NewStage.AddStageObject( "models/stages/test_world/st020_pipe.vmdl", GameEnt.BlenderPos(0, 24f, 14f ), Rotation.Identity );
@@ -1141,7 +1141,7 @@ public class st021
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage( "On Your Way", 60, GameEnt.BlenderPos( 5.55f, 26f, 0.5f ), new Angles( 0, 90, 0 ), "sky_christmas", "mus_desertruins_intro", 2 );
 		NewStage.AddStageObject( "models/stages/test_world/st021.vmdl", new Vector3( 0, 0, 0 ), Rotation.Identity );
 		NewStage.AddGoal( GameEnt.BlenderPos( -5.55f, 26, 0 ), Rotation.From( new Angles( 0f, -90f, 0 ) ) );
@@ -1151,7 +1151,7 @@ public class st022
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage( "Around the Bend", 60, GameEnt.BlenderPos( 0f, -12.7271f, 2.54059f + 0.5f ), new Angles( 0, 180, 0 ), "sky_christmas", "mus_desertruins_intro", 2 );
 		NewStage.AddStageObject( "models/stages/test_world/st022.vmdl", new Vector3( 0, 0, 0 ), Rotation.Identity );
 		NewStage.AddGoal( GameEnt.BlenderPos( 0f, 12.7271f, 2.54059f ), Rotation.From( new Angles( 0f, 0f, 0 ) ) );
@@ -1161,7 +1161,7 @@ public class st023
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage( "Down to Business", 60, GameEnt.BlenderPos( 0, -40f, 40.5f ), new Angles( 0, 180, 0 ), "sky_christmas", "mus_desertruins_intro", 2 );
 		NewStage.AddStageObject( "models/stages/test_world/st023.vmdl", new Vector3( 0, 0, 0 ), Rotation.Identity );
 		NewStage.AddGoal( GameEnt.BlenderPos( 0f, 13.497f, -26.0f ), Rotation.From( new Angles( 0f, 90f, 39 ) ) );
@@ -1172,7 +1172,7 @@ public class st024
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage( "Unpacked", 60, GameEnt.BlenderPos( 12f, -12f, 0.5f ), new Angles( 0, 180, 0 ), "sky_christmas", "mus_desertruins_intro", 2 );
 		NewStage.AddStageObject( "models/stages/test_world/st024.vmdl", new Vector3( 0, 0, 0 ), Rotation.Identity );
 		NewStage.AddGoal( GameEnt.BlenderPos( 12f, 13.5f, 0f ), Rotation.From( new Angles( 0f, 0, 0 ) ) );
@@ -1182,7 +1182,7 @@ public class st025
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage( "Swerve", 60, GameEnt.BlenderPos( 4f, 20f, 0.5f ), new Angles( 0, -45, 0 ), "sky_christmas", "mus_desertruins_intro", 2 );
 		NewStage.AddStageObject( "models/stages/test_world/st025.vmdl", new Vector3( 0, 0, 0 ), Rotation.Identity );
 		NewStage.AddGoal( GameEnt.BlenderPos( -4f, -20.0f, -0.375f ), Rotation.From( new Angles( 0f, 135f, 0 ) ) );
@@ -1228,7 +1228,7 @@ public class st026
 			new RotAnimKeyFrame(6, 0, Rotation.From(new Angles(0, 0, 0)))
 		};
 
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage( "Incoming Strike", 90, GameEnt.BlenderPos( 0f, 24f, 0.5f ), new Angles( 0, -45, 0 ), "sky_christmas", "mus_desertruins_intro", 2 );
 		NewStage.AddStageObject( "models/stages/test_world/st026_main.vmdl", new Vector3( 0, 0, 0 ), Rotation.Identity );
 		SMBObject Hammer1 = NewStage.AddStageObject( "models/stages/test_world/st026_hammer.vmdl", GameEnt.BlenderPos( 12, -12, 18.375f ), Rotation.From( new Angles( 0f, 180f, 0 )) );
@@ -1253,7 +1253,7 @@ public class st027
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage( "Walk the Dog", 90, GameEnt.BlenderPos( -32.0f, 64.0f, 40.5f ), new Angles( 0, 45, 0 ), "sky_christmas", "mus_desertruins_intro", 2 );
 		NewStage.AddStageObject( "models/stages/test_world/st027.vmdl", new Vector3( 0, 0, 0 ), Rotation.Identity );
 		NewStage.AddGoal( GameEnt.BlenderPos( 35.5f, -57.0f, -39.0f ), Rotation.From( new Angles( 0f, 0f, 0 ) ) );
@@ -1271,7 +1271,7 @@ public class st028
 	}
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage( "Fidget", 90, GameEnt.BlenderPos( 7.06569f, 8.03458f, 0.5f ), new Angles( 0, 205, 0 ), "sky_christmas", "mus_desertruins_intro", 2 );
 		NewStage.AddStageObject( "models/stages/test_world/st028_main.vmdl", new Vector3( 0, 0, 0 ), Rotation.Identity );
 		SMBObject Spinner1 = NewStage.AddStageObject( "models/stages/test_world/st028_badspinner.vmdl", GameEnt.BlenderPos( 0f, 22f, 0f ), Rotation.Identity );
@@ -1290,10 +1290,10 @@ public class staward
 {
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage("Award Ceremony", 30, GameEnt.BlenderPos(0f, 13.5f, 0.5f), new Angles(0, 0, 0), "sky_bonus", "waitingforplayers_2", 2);
 		NewStage.AddStageObject("models/stages/award_main.vmdl", new Vector3(0,0,0), Rotation.Identity);
-		int NumPlayers = Client.All.Count;
+		int NumPlayers = Game.Clients.Count;
 		foreach ( Entity element in Entity.All )
 		{
 			if ( element is PlayerStateManager )
@@ -1349,7 +1349,7 @@ public class staward
 		//	Log.Info("No managers!");
 		//	return;
 		//}
-		foreach (Client pl in Client.All)
+		foreach (IClient pl in Game.Clients)
 		{
 			PlayerStateManager OurManager = null;
 			foreach (Entity element in Entity.All)
@@ -1446,12 +1446,12 @@ public class stw1bonus
 {
 	public static void BonusBananaCollected(Pawn InBall, int InBananaValue)
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		GameEnt.CurrentStage.UserInt1 -= InBananaValue;
 		if (GameEnt.CurrentStage.UserInt1 <= 0)
 		{
 			GameEnt.NextGameState = Time.Now + 4;
-			foreach (Client pl in Client.All)
+			foreach (IClient pl in Game.Clients)
 			{
 				Pawn Ball = pl.Pawn as Pawn;
 				Ball.ServerChangeBallState(2);
@@ -1460,7 +1460,7 @@ public class stw1bonus
 	}
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage(
 			"Bonus Wave",
 			30,
@@ -1493,12 +1493,12 @@ public class stw1bonus2
 {
 	public static void BonusBananaCollected(Pawn InBall, int InBananaValue)
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		GameEnt.CurrentStage.UserInt1 -= InBananaValue;
 		if (GameEnt.CurrentStage.UserInt1 <= 0)
 		{
 			GameEnt.NextGameState = Time.Now + 4;
-			foreach (Client pl in Client.All)
+			foreach (IClient pl in Game.Clients)
 			{
 				Pawn Ball = pl.Pawn as Pawn;
 				Ball.ServerChangeBallState(2);
@@ -1507,7 +1507,7 @@ public class stw1bonus2
 	}
 	public static void CreateStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		SMBStage NewStage = new SMBStage(
 			"Bonus Clover",
 			30,

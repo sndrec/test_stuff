@@ -1,5 +1,5 @@
 using Sandbox;
-using SandboxEditor;
+using Editor;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -20,7 +20,7 @@ public class course_w1
 
 	public static void PlayDesiredStage(int StageIndex)
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		switch (StageIndex)
 		{
 			case 1:
@@ -125,7 +125,7 @@ public class course_w1
 				break;
 			case 31:
 				staward.CreateStage();
-				SMBLeaderboard.SubmitAllTimesToBoard();
+				//SMBLeaderboard.SubmitAllTimesToBoard();
 				break;
 			case 32:
 				GameEnt.EndCourse();
@@ -139,7 +139,7 @@ public class course_w1
 	public static void PlayNextStage()
 	{
 		CurrentStage++;
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		GameEnt.StageInCourse = CurrentStage;
 		PlayDesiredStage(CurrentStage);
 	}
@@ -156,7 +156,7 @@ public class course_test
 	public static void PlayNextStage()
 	{
 		CurrentStage++;
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		GameEnt.StageInCourse = CurrentStage;
 		switch (CurrentStage)
 		{

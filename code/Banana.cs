@@ -1,5 +1,5 @@
 ﻿using Sandbox;
-using SandboxEditor;
+using Editor;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -49,7 +49,7 @@ public partial class Banana : SMBTrigger
 		base.OnEnterTrigger(InBall);
 		if (!IsCollected)
 		{
-			Pawn Ball = Local.Client.Pawn as Pawn;
+			Pawn Ball = Game.LocalClient.Pawn as Pawn;
 			if (Ball != null)
 			{
 				OffsetToBall = ClientsideBananaPos - Ball.ClientPosition;
@@ -63,7 +63,7 @@ public partial class Banana : SMBTrigger
 		base.OnExitTrigger(InBall);
 		if (!IsCollected)
 		{
-			Pawn Ball = Local.Client.Pawn as Pawn;
+			Pawn Ball = Game.LocalClient.Pawn as Pawn;
 			if (Ball != null)
 			{
 				OffsetToBall = ClientsideBananaPos - Ball.ClientPosition;
@@ -89,7 +89,7 @@ public partial class Banana : SMBTrigger
 		Pawn Ball = Entity.FindByIndex(InNetworkIdent2) as Pawn;
 		Ball.OurManager.AddScore(100);
 		Sound.FromEntity("fx_banana", OurBanana);
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		GameEnt.CurrentStage.OnBananaCollectedManager(Ball, 1);
 		//Event.Run( "mygame.bananacollected", Ball, 1 );
 		OurBanana.Owner = Ball;
@@ -98,7 +98,7 @@ public partial class Banana : SMBTrigger
 		OurBanana.PosWhenCollected = OurBanana.Position;
 	}
 
-	[Event.Tick.Server]
+	[GameEvent.Tick.Server]
 	public virtual void DestroyAfterCollected()
 	{
 		
@@ -131,10 +131,10 @@ public partial class Banana : SMBTrigger
 		Predictable = true;
 	}
 
-	[Event.PreRender]
+	[GameEvent.PreRender]
 	public virtual void BananaFrame()
 	{
-		Pawn Ball = Local.Client.Pawn as Pawn;
+		Pawn Ball = Game.LocalClient.Pawn as Pawn;
 		if (!ServerKnowsCollected)
 		{
 			ClientsideBananaPos = Position;
@@ -150,8 +150,8 @@ public partial class Banana : SMBTrigger
 			{
 				float Ratio1 = Math.Min((Time.Now - CollectTime) * 2, 1);
 				float Ratio2 = Math.Min(((Time.Now - CollectTime) - 0.5f) * 2, 1);
-				Vector3 TargetPos1 = Ball.ClientPosition + (CurrentView.Rotation.Up * 32) + (CurrentView.Rotation.Forward * 12);
-				Vector3 TargetPos2 = Ball.ClientPosition + (CurrentView.Rotation.Up * 42) + (CurrentView.Rotation.Right * -56);
+				Vector3 TargetPos1 = Ball.ClientPosition + (Camera.Rotation.Up * 32) + (Camera.Rotation.Forward * 12);
+				Vector3 TargetPos2 = Ball.ClientPosition + (Camera.Rotation.Up * 42) + (Camera.Rotation.Right * -56);
 				if (Ratio2 > 0)
 				{
 					ClientsideBananaPos = Vector3.Lerp(TargetPos1, TargetPos2, Ratio2, true);

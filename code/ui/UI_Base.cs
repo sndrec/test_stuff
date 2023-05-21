@@ -29,11 +29,11 @@ public class UI_Base : RootPanel
     public Panel UIE_HudScalableSix {get;set;}
     public string ScaleString {get;set;}
 
-	[Event.Frame]
+	[GameEvent.Client.Frame]
 	public void GetVars()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
-		Pawn Ball = Local.Client.Pawn as Pawn;
+		MyGame GameEnt = GameManager.Current as MyGame;
+		Pawn Ball = Game.LocalClient.Pawn as Pawn;
 
     	UI_ScaleFactor = 2.0/3; //REPLACE 2.0 WITH CONSOLE VARIABLE
     	ScaleString = "scale(" + UI_ScaleFactor.ToString() + ")";
@@ -45,7 +45,7 @@ public class UI_Base : RootPanel
     	UIE_HudScalableFiv.Style.Set("transform",ScaleString);
     	UIE_HudScalableSix.Style.Set("transform",ScaleString);
     	//Log.Info(ScaleString);
-    	Local.Client.SetInt("FakeScore", Local.Client.GetInt("FakeScore", 0) + 1);
+    	Game.LocalClient.SetInt("FakeScore", Game.LocalClient.GetInt("FakeScore", 0) + 1);
 
 		if (GameEnt.CurrentGameState != 2)
 		{

@@ -1,5 +1,5 @@
 using Sandbox;
-using SandboxEditor;
+using Editor;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -52,7 +52,7 @@ public partial class SMBStage
 		SpawnRotation = InSpawnRot;
 		StageSky = InSkyName;
 		StageBounds = new BBox(Vector3.Zero, Vector3.Zero);
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		GameEnt.CurrentSpawnPos = InSpawnPos;
 		GameEnt.CurrentSpawnRot = InSpawnRot;
 		GameEnt.StageMaxTime = InMaxTime;
@@ -67,7 +67,7 @@ public partial class SMBStage
 
 	public void SetFalloutPlane(float InHeight)
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		GameEnt.FalloutHeight = InHeight;
 	}
 
@@ -222,7 +222,7 @@ public partial class SMBStage
 	public void SetStageBounds(BBox InBounds)
 	{
 		StageBounds = InBounds;
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		GameEnt.StageBounds = StageBounds;
 	}
 

@@ -1,5 +1,5 @@
 ﻿using Sandbox;
-using SandboxEditor;
+using Editor;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -55,7 +55,7 @@ public partial class GoalTapeEntity : Entity
 		TapeMesh = new Mesh(Material.Load("materials/tw_goaltape.vmat"));
 		TapeMesh.CreateVertexBuffer<SimpleVertex>( SimpleVertex.Layout );
 		TapeModel = Model.Builder.AddMesh(TapeMesh).Create();
-		TapeSceneObject = new SceneObject(Map.Scene, TapeModel, new Transform(Vector3.Zero));
+		TapeSceneObject = new SceneObject(Game.SceneWorld, TapeModel, new Transform(Vector3.Zero));
 		vertices = new List<SimpleVertex>();
 	}
 
@@ -182,10 +182,10 @@ public partial class GoalTapeEntity : Entity
 		TapeMesh.SetVertexBufferData(vertices);
 	}
 
-	[Event.Frame]
+	[GameEvent.Client.Frame]
 	public virtual void SimulateTape()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		foreach (TapePoint p in Points)
 		{
 			p.OldPosition = p.Position;
@@ -221,9 +221,9 @@ public partial class GoalTapeEntity : Entity
 		}
 		foreach (TapePoint p in Points)
 		{
-			if (!p.Anchored && Local.Client.Pawn is Pawn)
+			if (!p.Anchored && Game.LocalClient.Pawn is Pawn)
 			{
-				Pawn Ball = Local.Client.Pawn as Pawn;
+				Pawn Ball = Game.LocalClient.Pawn as Pawn;
 				if ((p.Position - Ball.ClientPosition).Length < 10)
 				{
 					Vector3 NewNormal = (p.Position - Ball.ClientPosition).Normal;

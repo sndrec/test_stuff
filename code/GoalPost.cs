@@ -1,5 +1,5 @@
 ﻿using Sandbox;
-using SandboxEditor;
+using Editor;
 using Sandbox.Component;
 using System;
 using System.Linq;
@@ -113,7 +113,7 @@ public partial class GoalPost : SMBObject
 		//PartyBallRotation = Rotation.FromPitch(90);
 	}
 
-	[Event.Frame]
+	[GameEvent.Client.Frame]
 	public void AnchorTapeEnds()
 	{
 		Vector3 TapeStart = Position + (Rotation.Up * 14) + (Rotation.Right * -18);
@@ -124,10 +124,10 @@ public partial class GoalPost : SMBObject
 
 
 	//todo: make this based off of gravity and not the visual stage tilt
-	[Event.Frame]
+	[GameEvent.Client.Frame]
 	public void SimulatePartyBall()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		PartyBall.Position = Position + (Rotation.Up * 60);
 		PartyBallSimVelocity += (new Vector3( 0, 0, -588 ) * Time.Delta) * GameEnt.StageTilt;
 		PartyBallSimPosition += PartyBallSimVelocity * Time.Delta;
@@ -144,9 +144,9 @@ public partial class GoalPost : SMBObject
 		//DebugOverlay.Line( PartyBallSimPosition, PartyBallSimPosition + (PartyBallSimVelocity), new Color( 255, 255, 255 ), Time.Delta, false );
 
 
-		if (Local.Client.Pawn is Pawn)
+		if (Game.LocalClient.Pawn is Pawn)
         {
-        	Pawn Ball = Local.Client.Pawn as Pawn;
+        	Pawn Ball = Game.LocalClient.Pawn as Pawn;
       		if (Ball.BallState == 2 && GoalCrossed == false)
       		{
 				PartyBall.PlaybackRate = 1;
@@ -154,7 +154,7 @@ public partial class GoalPost : SMBObject
 				{
 					ConfettiParticle Confetti = new ConfettiParticle();
 					Confetti.Instantiate(PartyBall.Position + (Vector3.Random * 10) + (Vector3.Up * -10), (Vector3.Random * (250 + (Ball.ClientVelocity.Length * 0.1f))) + (Ball.ClientVelocity * 2), 0.2f);
-					//CreateStar(ClientPosition + (CurrentView.Rotation.Forward * 50) + (Vector3.Random * 20) + (Vector3.Up * 20), new Vector3(0, 0, 50), 0.1f);
+					//CreateStar(ClientPosition + (Camera.Rotation.Forward * 50) + (Vector3.Random * 20) + (Vector3.Up * 20), new Vector3(0, 0, 50), 0.1f);
 				}
 				GoalCrossed = true;
       		}

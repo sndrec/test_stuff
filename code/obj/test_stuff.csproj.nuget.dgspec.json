@@ -4,29 +4,33 @@
     "c:\\users\\loser\\documents\\s&box projects\\test_stuff\\code\\test_stuff.csproj": {}
   },
   "projects": {
-    "A:\\SteamLibrary\\steamapps\\common\\sbox\\addons\\base\\code\\base.csproj": {
+    "A:\\SteamLibrary\\steamapps\\common\\sbox\\addons\\base\\code\\Base Library.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "A:\\SteamLibrary\\steamapps\\common\\sbox\\addons\\base\\code\\base.csproj",
-        "projectName": "base",
-        "projectPath": "A:\\SteamLibrary\\steamapps\\common\\sbox\\addons\\base\\code\\base.csproj",
+        "projectUniqueName": "A:\\SteamLibrary\\steamapps\\common\\sbox\\addons\\base\\code\\Base Library.csproj",
+        "projectName": "Base Library",
+        "projectPath": "A:\\SteamLibrary\\steamapps\\common\\sbox\\addons\\base\\code\\Base Library.csproj",
         "packagesPath": "C:\\Users\\loser\\.nuget\\packages\\",
         "outputPath": "A:\\SteamLibrary\\steamapps\\common\\sbox\\addons\\base\\code\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Users\\loser\\AppData\\Roaming\\Godot\\mono\\GodotNuGetFallbackFolder"
+        ],
         "configFilePaths": [
           "C:\\Users\\loser\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\loser\\AppData\\Roaming\\NuGet\\config\\Godot.Offline.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net6.0"
+          "net7.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net6.0": {
-            "targetAlias": "net6.0",
+          "net7.0": {
+            "targetAlias": "net7.0",
             "projectReferences": {}
           }
         },
@@ -37,8 +41,8 @@
         }
       },
       "frameworks": {
-        "net6.0": {
-          "targetAlias": "net6.0",
+        "net7.0": {
+          "targetAlias": "net7.0",
           "imports": [
             "net461",
             "net462",
@@ -50,12 +54,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "frameworkReferences": {
-            "Microsoft.NETCore.App": {
-              "privateAssets": "all"
-            }
-          },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.401\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.406\\RuntimeIdentifierGraph.json"
         }
       }
     },
@@ -68,23 +67,27 @@
         "packagesPath": "C:\\Users\\loser\\.nuget\\packages\\",
         "outputPath": "c:\\users\\loser\\documents\\s&box projects\\test_stuff\\code\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Users\\loser\\AppData\\Roaming\\Godot\\mono\\GodotNuGetFallbackFolder"
+        ],
         "configFilePaths": [
           "C:\\Users\\loser\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\loser\\AppData\\Roaming\\NuGet\\config\\Godot.Offline.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net6.0"
+          "net7.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net6.0": {
-            "targetAlias": "net6.0",
+          "net7.0": {
+            "targetAlias": "net7.0",
             "projectReferences": {
-              "A:\\SteamLibrary\\steamapps\\common\\sbox\\addons\\base\\code\\base.csproj": {
-                "projectPath": "A:\\SteamLibrary\\steamapps\\common\\sbox\\addons\\base\\code\\base.csproj"
+              "A:\\SteamLibrary\\steamapps\\common\\sbox\\addons\\base\\code\\Base Library.csproj": {
+                "projectPath": "A:\\SteamLibrary\\steamapps\\common\\sbox\\addons\\base\\code\\Base Library.csproj"
               }
             }
           }
@@ -96,8 +99,8 @@
         }
       },
       "frameworks": {
-        "net6.0": {
-          "targetAlias": "net6.0",
+        "net7.0": {
+          "targetAlias": "net7.0",
           "imports": [
             "net461",
             "net462",
@@ -109,12 +112,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "frameworkReferences": {
-            "Microsoft.NETCore.App": {
-              "privateAssets": "all"
-            }
-          },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.401\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.406\\RuntimeIdentifierGraph.json"
         }
       }
     }

@@ -1,5 +1,5 @@
 ﻿using Sandbox;
-using SandboxEditor;
+using Editor;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -64,15 +64,15 @@ public partial class ScreenSpaceParticleTrail : Entity
 		ParticleMesh = new Mesh(Material.Load(InTexture));
 		ParticleMesh.CreateVertexBuffer<SimpleVertex>( SimpleVertex.Layout );
 		ParticleModel = Model.Builder.AddMesh(ParticleMesh).Create();
-		ParticleSceneObject = new SceneObject(Map.Scene, ParticleModel, new Transform(Vector3.Zero));
+		ParticleSceneObject = new SceneObject(Game.SceneWorld, ParticleModel, new Transform(Vector3.Zero));
 		vertices = new List<SimpleVertex>();
 
-		ColorHsv SparkColorHsv = new ColorHsv(Rand.Float(0f, 48f), 1, Rand.Float(1f, 1f), 1);
+		ColorHsv SparkColorHsv = new ColorHsv(Game.Random.Float(0f, 48f), 1, Game.Random.Float(1f, 1f), 1);
 		Color SparkColor = SparkColorHsv.ToColor();
 
 		ParticleSceneObject.Attributes.Set("SparkTint", new Vector4(SparkColor.r, SparkColor.g, SparkColor.b, 1));
 		ParticleSpawnTime = Time.Now;
-		ParticleLife = Rand.Float(0.5f, 1.5f);
+		ParticleLife = Game.Random.Float(0.5f, 1.5f);
 		ParticleWidth = InSize;
 		Position = InPosition;
 		Velocity = InVelocity;
@@ -90,8 +90,8 @@ public partial class ScreenSpaceParticleTrail : Entity
 
 	public virtual void UpdateParticleMesh()
 	{
-		Vector3 LocalRight = CurrentView.Rotation.Right;
-		Vector3 LocalForward = CurrentView.Rotation.Forward;
+		Vector3 LocalRight = Camera.Rotation.Right;
+		Vector3 LocalForward = Camera.Rotation.Forward;
 		float PositionCount = OldRelativePositions.Count;
 		if (PositionCount == 0)
 		{
@@ -103,7 +103,7 @@ public partial class ScreenSpaceParticleTrail : Entity
 		//Probably most of the perf loss is from having to write a new vertex buffer at all
 		//If this is going to be noticeably more performant we need to lock the buffer once we create the spark
 
-		Vector3 OldPosition = TransformPosition(new Transform(CurrentView.Position, CurrentView.Rotation, 1), OldRelativePositions[0].Position);
+		Vector3 OldPosition = TransformPosition(new Transform(Camera.Position, Camera.Rotation, 1), OldRelativePositions[0].Position);
 		Vector3 NewPosition = Position;
 		Vector2 OldScreenPos = new Vector2(OldPosition.ToScreen());
 		Vector2 ScreenPos = new Vector2(NewPosition.ToScreen());
@@ -125,24 +125,24 @@ public partial class ScreenSpaceParticleTrail : Entity
 		Vector3 DirToTopRight = Screen.GetDirection((ScreenPos + (ParticleScreenDirRight * 0.01 * ParticleWidth * LifeRemainingRatio)) * Screen.Size);
 		Vector3 DirToBottomRight = Screen.GetDirection((ScreenPos + (ParticleScreenDirRight * -0.01 * ParticleWidth * LifeRemainingRatio)) * Screen.Size);
 		
-		float DistToStart = (OldPosition - CurrentView.Position).Length;
-		float DistToEnd = (NewPosition - CurrentView.Position).Length;
+		float DistToStart = (OldPosition - Camera.Position).Length;
+		float DistToEnd = (NewPosition - Camera.Position).Length;
 		vertices.Clear();
 		{
 			//bottom left
-			vertices.Add( new SimpleVertex( CurrentView.Position + (DistToStart * DirToBottomLeft), LocalForward, LocalRight, new Vector2(0, 0) ));
+			vertices.Add( new SimpleVertex( Camera.Position + (DistToStart * DirToBottomLeft), LocalForward, LocalRight, new Vector2(0, 0) ));
 			//top left
-			vertices.Add( new SimpleVertex( CurrentView.Position + (DistToStart * DirToTopLeft), LocalForward, LocalRight, new Vector2(0, 1) ));
+			vertices.Add( new SimpleVertex( Camera.Position + (DistToStart * DirToTopLeft), LocalForward, LocalRight, new Vector2(0, 1) ));
 		
 			//top right
-			vertices.Add( new SimpleVertex( CurrentView.Position + (DistToEnd * DirToTopRight), LocalForward, LocalRight, new Vector2(1, 1) ));
+			vertices.Add( new SimpleVertex( Camera.Position + (DistToEnd * DirToTopRight), LocalForward, LocalRight, new Vector2(1, 1) ));
 		
 			//top right
-			vertices.Add( new SimpleVertex( CurrentView.Position + (DistToEnd * DirToTopRight), LocalForward, LocalRight, new Vector2(1, 1) ));
+			vertices.Add( new SimpleVertex( Camera.Position + (DistToEnd * DirToTopRight), LocalForward, LocalRight, new Vector2(1, 1) ));
 			//bottom right
-			vertices.Add( new SimpleVertex( CurrentView.Position + (DistToEnd * DirToBottomRight), LocalForward, LocalRight, new Vector2(1, 0) ));
+			vertices.Add( new SimpleVertex( Camera.Position + (DistToEnd * DirToBottomRight), LocalForward, LocalRight, new Vector2(1, 0) ));
 			//bottom left
-			vertices.Add( new SimpleVertex( CurrentView.Position + (DistToStart * DirToBottomLeft), LocalForward, LocalRight, new Vector2(0, 0) ));
+			vertices.Add( new SimpleVertex( Camera.Position + (DistToStart * DirToBottomLeft), LocalForward, LocalRight, new Vector2(0, 0) ));
 		}
 
 		//Generate a more detailed spark trail
@@ -151,7 +151,7 @@ public partial class ScreenSpaceParticleTrail : Entity
 		//{
 		//	//Log.Info(OldRelativePositions);
 		//	//Log.Info(OldRelativePositions[i].Position);
-		//	Vector3 OldPosition = TransformPosition(new Transform(CurrentView.Position, CurrentView.Rotation, 1), OldRelativePositions[i].Position);
+		//	Vector3 OldPosition = TransformPosition(new Transform(Camera.Position, Camera.Rotation, 1), OldRelativePositions[i].Position);
 		//	Vector3 NewPosition = Position;
 		//	Vector2 OldScreenPos = new Vector2(OldPosition.ToScreen());
 		//	Vector2 ScreenPos = new Vector2(NewPosition.ToScreen());
@@ -162,7 +162,7 @@ public partial class ScreenSpaceParticleTrail : Entity
 		//	}
 		//	if (i + 1 < OldRelativePositions.Count)
 		//	{
-		//		NewPosition = TransformPosition(new Transform(CurrentView.Position, CurrentView.Rotation, 1), OldRelativePositions[i + 1].Position);
+		//		NewPosition = TransformPosition(new Transform(Camera.Position, Camera.Rotation, 1), OldRelativePositions[i + 1].Position);
 		//		ScreenPos = new Vector2(NewPosition.ToScreen());
 		//	}
 		//	Vector2 ParticleScreenDir = (ScreenPos - OldScreenPos).Normal;
@@ -175,26 +175,26 @@ public partial class ScreenSpaceParticleTrail : Entity
 		//	Vector3 DirToTopRight = Screen.GetDirection((ScreenPos + (ParticleScreenDirRight * 0.01 * ParticleWidth * LifeRemainingRatio)) * Screen.Size);
 		//	Vector3 DirToBottomRight = Screen.GetDirection((ScreenPos + (ParticleScreenDirRight * -0.01 * ParticleWidth * LifeRemainingRatio)) * Screen.Size);
 		//
-		//	float DistToStart = (OldPosition - CurrentView.Position).Length;
-		//	float DistToEnd = (NewPosition - CurrentView.Position).Length;
+		//	float DistToStart = (OldPosition - Camera.Position).Length;
+		//	float DistToEnd = (NewPosition - Camera.Position).Length;
 		//	
 		//	float UVXStart = i / OldRelativePositions.Count;
 		//	float UVXEnd = (i + 1) / OldRelativePositions.Count;
 		//	{
 		//		//bottom left
-		//		vertices.Add( new SimpleVertex( CurrentView.Position + (DistToStart * DirToBottomLeft), LocalForward, LocalRight, new Vector2(UVXStart, 0) ));
+		//		vertices.Add( new SimpleVertex( Camera.Position + (DistToStart * DirToBottomLeft), LocalForward, LocalRight, new Vector2(UVXStart, 0) ));
 		//		//top left
-		//		vertices.Add( new SimpleVertex( CurrentView.Position + (DistToStart * DirToTopLeft), LocalForward, LocalRight, new Vector2(UVXStart, 1) ));
+		//		vertices.Add( new SimpleVertex( Camera.Position + (DistToStart * DirToTopLeft), LocalForward, LocalRight, new Vector2(UVXStart, 1) ));
 		//
 		//		//top right
-		//		vertices.Add( new SimpleVertex( CurrentView.Position + (DistToEnd * DirToTopRight), LocalForward, LocalRight, new Vector2(UVXEnd, 1) ));
+		//		vertices.Add( new SimpleVertex( Camera.Position + (DistToEnd * DirToTopRight), LocalForward, LocalRight, new Vector2(UVXEnd, 1) ));
 		//
 		//		//top right
-		//		vertices.Add( new SimpleVertex( CurrentView.Position + (DistToEnd * DirToTopRight), LocalForward, LocalRight, new Vector2(UVXEnd, 1) ));
+		//		vertices.Add( new SimpleVertex( Camera.Position + (DistToEnd * DirToTopRight), LocalForward, LocalRight, new Vector2(UVXEnd, 1) ));
 		//		//bottom right
-		//		vertices.Add( new SimpleVertex( CurrentView.Position + (DistToEnd * DirToBottomRight), LocalForward, LocalRight, new Vector2(UVXEnd, 0) ));
+		//		vertices.Add( new SimpleVertex( Camera.Position + (DistToEnd * DirToBottomRight), LocalForward, LocalRight, new Vector2(UVXEnd, 0) ));
 		//		//bottom left
-		//		vertices.Add( new SimpleVertex( CurrentView.Position + (DistToStart * DirToBottomLeft), LocalForward, LocalRight, new Vector2(UVXStart, 0) ));
+		//		vertices.Add( new SimpleVertex( Camera.Position + (DistToStart * DirToBottomLeft), LocalForward, LocalRight, new Vector2(UVXStart, 0) ));
 		//	}
 		//}
 		ParticleMesh.SetVertexBufferSize(vertices.Count);
@@ -224,13 +224,13 @@ public partial class ScreenSpaceParticleTrail : Entity
 		{
 			Delete();
 		}
-		if (Vector3.Dot(Position - CurrentView.Position, CurrentView.Rotation.Forward) < 0)
+		if (Vector3.Dot(Position - Camera.Position, Camera.Rotation.Forward) < 0)
 		{
 			Delete();
 		}
 	}
 
-	[Event.Frame]
+	[GameEvent.Client.Frame]
 	public virtual void ManageParticle()
 	{
 		if (!Instantiated)
@@ -240,7 +240,7 @@ public partial class ScreenSpaceParticleTrail : Entity
 		UpdateParticle();
 		UpdateParticleMesh();
 
-		OldRelativePositionData OldRelativePositionCurrent = new OldRelativePositionData(InverseTransformPosition(new Transform(CurrentView.Position, CurrentView.Rotation, 1), Position), Time.Now);
+		OldRelativePositionData OldRelativePositionCurrent = new OldRelativePositionData(InverseTransformPosition(new Transform(Camera.Position, Camera.Rotation, 1), Position), Time.Now);
 		OldRelativePositions.Add(OldRelativePositionCurrent);
 
 		for (int i = 0; i < OldRelativePositions.Count; i++)

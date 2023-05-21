@@ -42,7 +42,7 @@ partial class SpectatorPawn : ModelEntity
 
 	public BBox GetStageBounds()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		if (GameEnt.StageBounds.Volume == 0)
 		{
 			BBox StageBounds = new BBox(new Vector3(0, 0, 0), new Vector3(0, 0, 0));
@@ -61,19 +61,21 @@ partial class SpectatorPawn : ModelEntity
 		}
 	}
 
-	public override void BuildInput( InputBuilder InputBuilderStruct)
+	[ClientInput] public Angles ViewAngles { get; set; }
+	[ClientInput] public Vector3 InputPosition { get; set; }
+	public override void BuildInput()
 	{
-		float RealDelta = Math.Min(Global.TickInterval, Time.Delta);
+		float RealDelta = Math.Min(Game.TickInterval, Time.Delta);
 		if (JustSpawned)
 		{
 			BBox StageBounds = GetStageBounds();
 			SpecPosition = StageBounds.Center + (Rotation.From(new Angles(-45, 45, 0)).Forward * Math.Max(Math.Max(StageBounds.Size.x, StageBounds.Size.y), StageBounds.Size.z) * 0.75f);
-			InputBuilderStruct.ViewAngles = new Angles(45, -135, 0);
+			ViewAngles = new Angles(45, -135, 0);
 			JustSpawned = false;
 		}
 		float speedMult = 2;
 
-		if (Input.Down( InputButton.Run ))
+		if (Input.Down( "Run" ))
 		{
 			speedMult = 5;
 		}
@@ -81,24 +83,24 @@ partial class SpectatorPawn : ModelEntity
 		{
 			speedMult = 0;
 		}
-		Vector3 FDir = InputBuilderStruct.ViewAngles.ToRotation().Forward;
-		float FStr = InputBuilderStruct.AnalogMove.x * 5000 * speedMult * RealDelta;
-		Vector3 SDir = InputBuilderStruct.ViewAngles.ToRotation().Right;
-		float SStr = InputBuilderStruct.AnalogMove.y * -5000 * speedMult * RealDelta;
+		Vector3 FDir = ViewAngles.ToRotation().Forward;
+		float FStr = Input.AnalogMove.x * 5000 * speedMult * RealDelta;
+		Vector3 SDir = ViewAngles.ToRotation().Right;
+		float SStr = Input.AnalogMove.y * -5000 * speedMult * RealDelta;
 		SpecVelocity += (FDir * FStr) + (SDir * SStr);
 		SpecVelocity += -SpecVelocity * RealDelta * 10;
 		SpecPosition += SpecVelocity * RealDelta;
 		//Rotation MouseLookDiff = (OldLookRotation.Inverse * Input.Rotation).Normal;
 
-		if (SpecPlayerIndex >= Client.All.Count)
+		if (SpecPlayerIndex >= Game.Clients.Count)
 		{
 			SpectatingPlayer = false;
 			SpecPlayerIndex = 0;
-			SpecPosition = SpecPosition + (InputBuilderStruct.ViewAngles.ToRotation().Forward * -60);
+			SpecPosition = SpecPosition + (ViewAngles.ToRotation().Forward * -60);
 		}
 		if (SpectatingPlayer)
 		{
-			Pawn SpecBall = Client.All[SpecPlayerIndex].Pawn as Pawn;
+			Pawn SpecBall = Game.Clients.ElementAt(SpecPlayerIndex).Pawn as Pawn;
 			if (SpecBall != null)
 			{
 				SpecPosition = SpecBall.SRBPos;
@@ -109,9 +111,9 @@ partial class SpectatorPawn : ModelEntity
 				Log.Info(DesiredSpecPlayer);
 				while (true)
 				{
-					if (DesiredSpecPlayer < Client.All.Count)
+					if (DesiredSpecPlayer < Game.Clients.Count)
 					{
-						if (Client.All[DesiredSpecPlayer] != null && Client.All[DesiredSpecPlayer].Pawn != null && Client.All[DesiredSpecPlayer].Pawn is Pawn)
+						if ( Game.Clients.ElementAt( DesiredSpecPlayer) != null && Game.Clients.ElementAt(DesiredSpecPlayer).Pawn != null && Game.Clients.ElementAt(DesiredSpecPlayer).Pawn is Pawn)
 						{
 							CanSpecPlayer = true;
 							break;
@@ -132,16 +134,16 @@ partial class SpectatorPawn : ModelEntity
 				{
 					SpectatingPlayer = false;
 					SpecPlayerIndex = 0;
-					SpecPosition = SpecPosition + (InputBuilderStruct.ViewAngles.ToRotation().Forward * -60);
+					SpecPosition = SpecPosition + (ViewAngles.ToRotation().Forward * -60);
 				}
 			}
 		}
 
-		if (Input.Pressed(InputButton.Jump))
+		if (Input.Pressed( "Jump" ))
 		{
 			if (!SpectatingPlayer)
 			{
-				if (Client.All[SpecPlayerIndex] != null && Client.All[SpecPlayerIndex].Pawn != null && Client.All[SpecPlayerIndex].Pawn is Pawn)
+				if ( Game.Clients.ElementAt( SpecPlayerIndex) != null && Game.Clients.ElementAt(SpecPlayerIndex).Pawn != null && Game.Clients.ElementAt(SpecPlayerIndex).Pawn is Pawn)
 				{
 					SpectatingPlayer = true;
 				}else
@@ -151,9 +153,9 @@ partial class SpectatorPawn : ModelEntity
 					Log.Info(DesiredSpecPlayer);
 					while (true)
 					{
-						if (DesiredSpecPlayer < Client.All.Count)
+						if (DesiredSpecPlayer < Game.Clients.Count)
 						{
-							if (Client.All[DesiredSpecPlayer] != null && Client.All[DesiredSpecPlayer].Pawn != null && Client.All[DesiredSpecPlayer].Pawn is Pawn)
+							if ( Game.Clients.ElementAt( DesiredSpecPlayer) != null && Game.Clients.ElementAt(DesiredSpecPlayer).Pawn != null && Game.Clients.ElementAt(DesiredSpecPlayer).Pawn is Pawn)
 							{
 								CanSpecPlayer = true;
 								break;
@@ -175,13 +177,13 @@ partial class SpectatorPawn : ModelEntity
 			}else
 			{
 				SpectatingPlayer = false;
-				SpecPosition = SpecPosition + (InputBuilderStruct.ViewAngles.ToRotation().Forward * -60);
+				SpecPosition = SpecPosition + (ViewAngles.ToRotation().Forward * -60);
 			}
 		}
 
-		if (Input.Pressed(InputButton.PrimaryAttack))
+		if (Input.Pressed( "attack1" ))
 		{
-			if (Client.All.Count == 1)
+			if (Game.Clients.Count == 1)
 			{
 				return;
 			}
@@ -192,9 +194,9 @@ partial class SpectatorPawn : ModelEntity
 				Log.Info(DesiredSpecPlayer);
 				while (true)
 				{
-					if (DesiredSpecPlayer < Client.All.Count)
+					if (DesiredSpecPlayer < Game.Clients.Count)
 					{
-						if (Client.All[DesiredSpecPlayer] != null && Client.All[DesiredSpecPlayer].Pawn != null && Client.All[DesiredSpecPlayer].Pawn is Pawn)
+						if ( Game.Clients.ElementAt( DesiredSpecPlayer) != null && Game.Clients.ElementAt(DesiredSpecPlayer).Pawn != null && Game.Clients.ElementAt(DesiredSpecPlayer).Pawn is Pawn)
 						{
 							CanSpecPlayer = true;
 							break;
@@ -219,9 +221,9 @@ partial class SpectatorPawn : ModelEntity
 				Log.Info(DesiredSpecPlayer);
 				while (true)
 				{
-					if (DesiredSpecPlayer < Client.All.Count)
+					if (DesiredSpecPlayer < Game.Clients.Count)
 					{
-						if (Client.All[DesiredSpecPlayer] != null && Client.All[DesiredSpecPlayer].Pawn != null && Client.All[DesiredSpecPlayer].Pawn is Pawn)
+						if ( Game.Clients.ElementAt( DesiredSpecPlayer) != null && Game.Clients.ElementAt(DesiredSpecPlayer).Pawn != null && Game.Clients.ElementAt(DesiredSpecPlayer).Pawn is Pawn)
 						{
 							CanSpecPlayer = true;
 							break;
@@ -242,26 +244,26 @@ partial class SpectatorPawn : ModelEntity
 				{
 					SpectatingPlayer = false;
 					SpecPlayerIndex = 0;
-					SpecPosition = SpecPosition + (InputBuilderStruct.ViewAngles.ToRotation().Forward * -60);
+					SpecPosition = SpecPosition + (ViewAngles.ToRotation().Forward * -60);
 				}
 			}
 		}
-		if (Input.Pressed(InputButton.SecondaryAttack))
+		if (Input.Pressed( "attack2" ))
 		{
-			if (Client.All.Count == 1)
+			if (Game.Clients.Count == 1)
 			{
 				return;
 			}
 			if (!SpectatingPlayer)
 			{
 				bool CanSpecPlayer = false;
-				int DesiredSpecPlayer = Client.All.Count - 1;
+				int DesiredSpecPlayer = Game.Clients.Count - 1;
 				Log.Info(DesiredSpecPlayer);
 				while (true)
 				{
-					if (DesiredSpecPlayer < Client.All.Count && DesiredSpecPlayer >= 0)
+					if (DesiredSpecPlayer < Game.Clients.Count && DesiredSpecPlayer >= 0)
 					{
-						if (Client.All[DesiredSpecPlayer] != null && Client.All[DesiredSpecPlayer].Pawn != null && Client.All[DesiredSpecPlayer].Pawn is Pawn)
+						if ( Game.Clients.ElementAt( DesiredSpecPlayer) != null && Game.Clients.ElementAt(DesiredSpecPlayer).Pawn != null && Game.Clients.ElementAt(DesiredSpecPlayer).Pawn is Pawn)
 						{
 							CanSpecPlayer = true;
 							break;
@@ -286,9 +288,9 @@ partial class SpectatorPawn : ModelEntity
 				Log.Info(DesiredSpecPlayer);
 				while (true)
 				{
-					if (DesiredSpecPlayer < Client.All.Count && DesiredSpecPlayer >= 0)
+					if (DesiredSpecPlayer < Game.Clients.Count && DesiredSpecPlayer >= 0)
 					{
-						if (Client.All[DesiredSpecPlayer] != null && Client.All[DesiredSpecPlayer].Pawn != null && Client.All[DesiredSpecPlayer].Pawn is Pawn)
+						if (Game.Clients.ElementAt(DesiredSpecPlayer) != null && Game.Clients.ElementAt(DesiredSpecPlayer).Pawn != null && Game.Clients.ElementAt(DesiredSpecPlayer).Pawn is Pawn)
 						{
 							CanSpecPlayer = true;
 							break;
@@ -309,34 +311,34 @@ partial class SpectatorPawn : ModelEntity
 				{
 					SpectatingPlayer = false;
 					SpecPlayerIndex = 0;
-					SpecPosition = SpecPosition + (InputBuilderStruct.ViewAngles.ToRotation().Forward * -60);
+					SpecPosition = SpecPosition + (ViewAngles.ToRotation().Forward * -60);
 				}
 			}
 		}
-		InputBuilderStruct.Position = SpecPosition;
-		InputBuilderStruct.ViewAngles += InputBuilderStruct.AnalogLook;
+		InputPosition = SpecPosition;
+		ViewAngles += Input.AnalogLook;
 		if (SpectatingPlayer)
 		{
-			Pawn SpecBall = Client.All[SpecPlayerIndex].Pawn as Pawn;
+			Pawn SpecBall = Game.Clients.ElementAt( SpecPlayerIndex).Pawn as Pawn;
 			if (SpecBall != null)
 			{
 				SpecPosition = SpecBall.SRBPos;
-				InputBuilderStruct.Position = SpecPosition + (InputBuilderStruct.ViewAngles.ToRotation().Forward * -60);
+				InputPosition = SpecPosition + (ViewAngles.ToRotation().Forward * -60);
 			}
 		}
 	}
 
-	public override void Simulate( Client cl )
+	public override void Simulate( IClient cl )
 	{
 		base.Simulate( cl );
-		Position = Input.Position;
-		EyeRotation = Input.Rotation;
+		Camera.Position = InputPosition;
+		Camera.Rotation = ViewAngles.ToRotation();
 	}
 
-	public override void FrameSimulate( Client cl )
+	public override void FrameSimulate( IClient cl )
 	{
 		base.FrameSimulate( cl );
-		Position = Input.Position;
-		EyeRotation = Input.Rotation;
+		Camera.Position = InputPosition;
+		Camera.Rotation = ViewAngles.ToRotation();
 	}
 }

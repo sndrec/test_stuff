@@ -1,5 +1,5 @@
 ﻿using Sandbox;
-using SandboxEditor;
+using Editor;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -19,7 +19,7 @@ public partial class ST093Floor : SMBObject
 
 	public Vector3[,] FloorNormals {get;set;}
 
-	public float SpawnTime {get;set;}
+	//public float SpawnTime {get;set;}
 
 	private List<SimpleVertex> vertices {get;set;}
 	private List<int> indices {get;set;}
@@ -38,7 +38,7 @@ public partial class ST093Floor : SMBObject
 		FloorMesh = new Mesh(Material.Load("materials/stagemat/bonus/bonus_5.vmat"));
 		FloorMesh.CreateVertexBuffer<SimpleVertex>( SimpleVertex.Layout );
 		FloorModel = Model.Builder.AddMesh(FloorMesh).Create();
-		FloorSceneObject = new SceneObject(Map.Scene, FloorModel, new Transform(Vector3.Zero));
+		FloorSceneObject = new SceneObject(Game.SceneWorld, FloorModel, new Transform(Vector3.Zero));
 		vertices = new List<SimpleVertex>();
 		indices = new List<int>();
 		verticesPos = new List<Vector3>();
@@ -58,7 +58,7 @@ public partial class ST093Floor : SMBObject
 		SpawnTime = Time.Now;
 	}
 
-	[Event.Frame]
+	[GameEvent.Client.Frame]
 	public virtual void UpdateFloorPoints()
 	{
 		int GridX = 31;
@@ -85,7 +85,7 @@ public partial class ST093Floor : SMBObject
 		}
 	}
 
-	[Event.Frame]
+	[GameEvent.Client.Frame]
 	public virtual void UpdateFloorMesh()
 	{
 		vertices.Clear();

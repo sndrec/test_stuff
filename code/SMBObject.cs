@@ -1,5 +1,5 @@
 ﻿using Sandbox;
-using SandboxEditor;
+using Editor;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -131,7 +131,8 @@ public partial class SMBObject : ModelEntity
 	public override void Spawn()
 	{
 		base.Spawn();
-		CollisionTag = "SMBObject" + Guid.NewGuid();
+		CollisionTag = Guid.NewGuid().ToString().Substring(25);
+		Log.Info( CollisionTag );
 		Tags.Add(CollisionTag);
 		Tags.Add("solid");
 		Tags.Add("regularfloor");
@@ -281,7 +282,7 @@ public partial class SMBObject : ModelEntity
 		//Log.Info(CurrentKeyFrameIndex);
 		//Log.Info(NextKeyFrameIndex);
 	}
-	[Event.Tick.Server]
+	[GameEvent.Tick.Server]
 	public void SMBTickMaster()
 	{
 		OldTransform = UninterpolatedTransform;

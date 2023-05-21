@@ -1,5 +1,5 @@
 ﻿using Sandbox;
-using SandboxEditor;
+using Editor;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ namespace Sandbox;
 public partial class AwardCopter : SMBObject
 {
 
-	public float SpawnTime {get;set;}
+	//public float SpawnTime {get;set;}
 	public PlayerStateManager TargetPawnManager {get;set;}
 	public Vector3 TargetPosition {get;set;}
 	public SMBObject Blade {get;set;}
@@ -100,7 +100,7 @@ public partial class AwardCopter : SMBObject
 		Velocity += (TargetPosition - Position) * Time.Delta * MovementFactor;
 		Velocity += -Velocity * Time.Delta * MovementDrag;
 		Position += Velocity * Time.Delta;
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 
 		float VelocityLengthNoZ = (Velocity * new Vector3(1, 1, 0)).Length;
 		Rotation TiltFromMotion = Rotation.FromAxis(Vector3.Cross(Velocity, Vector3.Up).Normal, -VelocityLengthNoZ * 0.15f);
@@ -108,7 +108,7 @@ public partial class AwardCopter : SMBObject
 		DesiredRotation = Rotation.Slerp(DesiredRotation, GoalRotation, Time.Delta * Velocity.Length * 0.02f, true).Normal;
 		Rotation = TiltFromMotion * DesiredRotation;
 		//Rotation = Rotation.FromAxis(Vector3.Cross(Velocity, Vector3.Up).Normal, -VelocityLengthNoZ * 0.15f);
-		Client pl = TargetPawnManager.Owner as Client;
+		IClient pl = TargetPawnManager.Owner as IClient;
 		if (pl == null)
 		{
 			return;

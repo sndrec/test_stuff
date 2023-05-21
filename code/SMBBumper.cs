@@ -1,5 +1,5 @@
 ﻿using Sandbox;
-using SandboxEditor;
+using Editor;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -34,7 +34,7 @@ public partial class SMBBumper : SMBObject
 		return false;
 	}
 
-	[Event.PreRender]
+	[GameEvent.PreRender]
 	public void BumperRender()
 	{
 		float Ratio = 1 - MathX.Clamp((Time.Now - LastHit) * 2, 0, 1);

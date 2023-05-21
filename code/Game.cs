@@ -13,7 +13,7 @@ namespace Sandbox;
 
 
 
-public partial class MyGame : Sandbox.Game
+public partial class MyGame : GameManager
 {	
 	[Net]
 	public Vector3 CurrentSpawnPos {get;set;}
@@ -55,10 +55,10 @@ public partial class MyGame : Sandbox.Game
 	public float FalloutHeight { get; set; } = 0;
 
 	[ConVar.ClientData( "smb_stagetilteffect_maxangle" )]
-	public float BallMaxVisualTilt {get;set;} = 13.2f;
+	public static float BallMaxVisualTilt {get;set;} = 13.2f;
 
 	[ConVar.ClientData( "smb_manualcamera" )]
-	public bool ManualCamera {get;set;} = false;
+	public static bool ManualCamera {get;set;} = false;
 
 	[ConVar.Replicated("smb_playercollision")]
 	public bool PlayerCollision {get;set;} = true;
@@ -103,13 +103,13 @@ public partial class MyGame : Sandbox.Game
 
 	public MyGame()
 	{
-		Global.TickRate = 60;
+		Game.TickRate = 60;
 		NextGameState = Time.Now + 30;
 		CurrentCourse = 1;
 		FirstFrame = false;
 		GameMusic = new List<Sound>{};
 		StageBounds = new BBox(Vector3.Zero, Vector3.Zero);
-		if ( IsClient )
+		if ( Game.IsClient )
     	{
 			UI_Base UIBase = new UI_Base();
 			//UIBase.AddChild<VoiceList>();
@@ -119,12 +119,12 @@ public partial class MyGame : Sandbox.Game
 
 	public void SetTimescale(float InTimescale)
 	{
-		Global.TimeScale = InTimescale;
+		Game.TimeScale = InTimescale;
 	}
 	public async void SetTimescaleDelayed(float InDelay, float InTimescale )
 	{
 		await Task.DelaySeconds( InDelay );
-		Global.TimeScale = InTimescale;
+		Game.TimeScale = InTimescale;
 	}
 
 	public Vector3 ApplyCollisionResponseGeneric(Vector3 InVelocity, Vector3 HitNormal, Entity HitEntity, Vector3 HitPosition, float RealDelta, bool DoParticlesAndSounds)
@@ -135,7 +135,7 @@ public partial class MyGame : Sandbox.Game
 		Vector3 VelAtPos = new Vector3(0,0,0);
 		if (HitEntitySMB != null)
 		{
-			VelAtPos = HitEntitySMB.GetVelocityAtPoint(HitPosition, Global.TickInterval);
+			VelAtPos = HitEntitySMB.GetVelocityAtPoint(HitPosition, Game.TickInterval);
 			RelativeVel = InVelocity - VelAtPos;
 		}
 		float RelativeComponent = Vector3.Dot(RelativeVel, HitNormal);
@@ -270,9 +270,9 @@ public partial class MyGame : Sandbox.Game
 		return new Vector3(y * -0.2f, x * -0.2f, z * 0.2f);
 	}
 
-	public void FromEntityToAllBut(Client Avoid, string InSound, Entity InEnt)
+	public void FromEntityToAllBut(IClient Avoid, string InSound, Entity InEnt)
 	{	
-		foreach (Client pl in Client.All)
+		foreach (IClient pl in Game.Clients)
 		{
 			if (pl != Avoid)
 			{
@@ -282,15 +282,15 @@ public partial class MyGame : Sandbox.Game
 		}
 	}
 
-	[ConCmd.Server]
-	public static void SendKillfeedEntry(string lsteamid, string left, string right, string method)
-	{
-		MyGame GameEnt = Game.Current as MyGame;
-		GameEnt.ReceiveKillfeedEntry(Convert.ToInt64(lsteamid), left, right, method);
-	}
+	//[ConCmd.Server]
+	//public static void SendKillfeedEntry(string lsteamid, string left, string right, string method)
+	//{
+	//	MyGame GameEnt = GameManager.Current as MyGame;
+	//	GameEnt.ReceiveKillfeedEntry(Convert.ToInt64(lsteamid), left, right, method);
+	//}
 
 	[ClientRpc]
-	public virtual void ReceiveKillfeedEntry(long lsteamid, string left, string right, string method)
+	public static void ReceiveKillfeedEntry(long lsteamid, string left, string right, string method)
 	{
 		KillFeed.Current?.AddEntry(lsteamid, left, right, method);
 	}
@@ -298,7 +298,7 @@ public partial class MyGame : Sandbox.Game
 	[ConCmd.Server]
 	public static void RetryCurrentStage()
 	{
-		MyGame GameEnt = Game.Current as MyGame;
+		MyGame GameEnt = GameManager.Current as MyGame;
 		GameEnt.PlaySpecificStageInCourse( GameEnt.CurrentCourse, GameEnt.StageInCourse );
 		GameEnt.SetTimescale( 4 );
 		GameEnt.SpawnAllBalls();
@@ -355,7 +355,7 @@ public partial class MyGame : Sandbox.Game
 	public async void SpawnAllBallsDelayed(float InDelayTime)
 	{
 		await Task.DelaySeconds(0.01f);
-		foreach (Client pl in Client.All)
+		foreach (IClient pl in Game.Clients)
 		{
 			if (pl.Pawn != null)
 			{
@@ -370,7 +370,7 @@ public partial class MyGame : Sandbox.Game
 
 	public void SpawnAllBalls()
 	{
-		foreach (Client pl in Client.All)
+		foreach (IClient pl in Game.Clients)
 		{
 			if (pl.Pawn != null)
 			{
@@ -385,7 +385,7 @@ public partial class MyGame : Sandbox.Game
 
 	public void SpawnAllSpectators()
 	{
-		foreach (Client pl in Client.All)
+		foreach (IClient pl in Game.Clients)
 		{
 			if (pl.Pawn is Pawn)
 			{
@@ -411,7 +411,7 @@ public partial class MyGame : Sandbox.Game
 		LastGameStateChange = Time.Now;
 		if (inState == 0)
 		{
-			foreach (Client pl in Client.All)
+			foreach (IClient pl in Game.Clients)
 			{
 				pl.Pawn.Delete();
 				var pawn = new SpectatorPawn();
@@ -444,7 +444,7 @@ public partial class MyGame : Sandbox.Game
 		}else
 		if (inState == 4)
 		{
-			foreach (Client pl in Client.All)
+			foreach (IClient pl in Game.Clients)
 			{
 				pl.Pawn.Delete();
 				var pawn = new SpectatorPawn();
@@ -461,18 +461,18 @@ public partial class MyGame : Sandbox.Game
 		ChangeGameState(4);
 	}
 
-	[Event.Entity.PostSpawn]
+	[GameEvent.Entity.PostSpawn]
 	public void StartGame()
 	{
 		ChangeGameState(0);
-		ToneMappingEntity Tonemapper = new ToneMappingEntity();
-		Tonemapper.Enabled = true;
-		Tonemapper.MaxExposure = 1;
-		Tonemapper.MinExposure = 1;
-		Tonemapper.Enable();
+		//ToneMappingEntity Tonemapper = new ToneMappingEntity();
+		//Tonemapper.Enabled = true;
+		//Tonemapper.MaxExposure = 1;
+		//Tonemapper.MinExposure = 1;
+		//Tonemapper.Enable();
 	}
 
-	[Event.Tick.Server]
+	[GameEvent.Tick.Server]
 	public void ServerTick()
 	{
 
@@ -508,10 +508,10 @@ public partial class MyGame : Sandbox.Game
 			}
 		}
 
-		if (CurrentGameState == 0 && Client.All.Count > 0 && !AllPlayersReady && Time.Now > 10)
+		if (CurrentGameState == 0 && Game.Clients.Count > 0 && !AllPlayersReady && Time.Now > 10)
 		{
 			bool AllReady = true;
-			foreach (Client pl in Client.All)
+			foreach (IClient pl in Game.Clients)
 			{
 				Pawn Ball = pl.Pawn as Pawn;
 				if (Ball != null && Ball.Ready == false)
@@ -529,7 +529,7 @@ public partial class MyGame : Sandbox.Game
 		if (CurrentGameState == 2 && Time.Now > LastGameStateChange + 2)
 		{
 			bool SkipStage = true;
-			foreach ( Client pl in Client.All )
+			foreach ( IClient pl in Game.Clients )
 			{
 				if (pl.Pawn is Pawn)
 				{
@@ -560,7 +560,7 @@ public partial class MyGame : Sandbox.Game
 		GameMusic.Add(NewSong);
 	}
 
-	[Event.Tick.Client]
+	[GameEvent.Tick.Client]
 	public void ManageGameMusic()
 	{
 		if (Time.Delta > 0.02f)
@@ -586,7 +586,7 @@ public partial class MyGame : Sandbox.Game
 		}
 		else
 		{
-			if (GameMusic.Count >= 1 && GameMusic[0].Finished)
+			if (GameMusic.Count >= 1 && !GameMusic[0].IsPlaying)
 			{
 				foreach (Sound Song in GameMusic)
 				{
@@ -599,7 +599,7 @@ public partial class MyGame : Sandbox.Game
 		}
 	}
 
-	public override void ClientJoined( Client client )
+	public override void ClientJoined( IClient client )
 	{
 		base.ClientJoined( client );
 
@@ -623,15 +623,15 @@ public partial class MyGame : Sandbox.Game
 
 	}
 
-	public override bool CanHearPlayerVoice( Client source, Client dest ) => true;
+	public override bool CanHearPlayerVoice( IClient source, IClient dest ) => true;
 
 	public Transform StageTiltTransform(Transform InTransform)
 	{
-		if (!(Local.Pawn is Pawn))
+		if (!(Game.LocalPawn is Pawn))
 		{
 			return InTransform;
 		}
-		Pawn OurBall = Local.Pawn as Pawn;
+		Pawn OurBall = Game.LocalPawn as Pawn;
 		Vector3 Pivot = OurBall.ClientPosition;
 		Vector3 Dir = InTransform.Position - Pivot;
 		Dir = StageTilt * Dir;
@@ -640,7 +640,7 @@ public partial class MyGame : Sandbox.Game
 		return new Transform(NewPosition, NewRotation, InTransform.Scale);
 	}
 
-	[Event.Frame]
+	[GameEvent.Client.Frame]
 	public void HandleStageTilt()
 	{
 		if (!FirstFrame)

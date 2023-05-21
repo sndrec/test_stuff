@@ -273,8 +273,8 @@ public partial class Pawn : ModelEntity
 	[ConCmd.Server]
 	public static void SendServerCollision(Vector3 InVelocity, Vector3 HitNormal, int InNetworkIdent, Vector3 HitPosition, float InNow)
 	{
-		MyGame GameEnt = Game.Current as MyGame;
-		Client pl = ConsoleSystem.Caller;
+		MyGame GameEnt = GameManager.Current as MyGame;
+		IClient pl = ConsoleSystem.Caller;
 		Entity HitEntity = Entity.FindByIndex(InNetworkIdent);
 		Pawn Ball = pl.Pawn as Pawn;
 		if (Ball == null)
@@ -287,7 +287,7 @@ public partial class Pawn : ModelEntity
 		Vector3 VelAtPos = new Vector3(0,0,0);
 		if (HitEntitySMB != null)
 		{
-			VelAtPos = HitEntitySMB.GetVelocityAtPoint(HitPosition, Global.TickInterval);
+			VelAtPos = HitEntitySMB.GetVelocityAtPoint(HitPosition, Game.TickInterval);
 			RelativeVel = InVelocity - VelAtPos;
 		}
 		Pawn BallWeHit = HitEntity as Pawn;
@@ -306,7 +306,7 @@ public partial class Pawn : ModelEntity
 		}
 		if (BallWeHit != null)
 		{
-			BallWeHit.ApplyCollisionResponseFromServer(InVelocity, -HitNormal, Ball, HitPosition, Global.TickInterval, false);
+			BallWeHit.ApplyCollisionResponseFromServer(InVelocity, -HitNormal, Ball, HitPosition, Game.TickInterval, false);
 		}
 		if (RelativeComponent < -240)
 		{
@@ -329,7 +329,7 @@ public partial class Pawn : ModelEntity
 		Ball.LastVelAtPos = VelAtPos;
 		if (RelativeComponent > 150)
 		{
-			foreach (Client player in Client.All)
+			foreach (IClient player in Game.Clients)
 			{
 				if (player != pl)
 				{
@@ -357,8 +357,8 @@ public partial class Pawn : ModelEntity
 	[ConCmd.Server]
 	public static void SendServerBallUpdate(float InNow, Vector3 InVelocity)
 	{
-		MyGame GameEnt = Game.Current as MyGame;
-		Client pl = ConsoleSystem.Caller;
+		MyGame GameEnt = GameManager.Current as MyGame;
+		IClient pl = ConsoleSystem.Caller;
 		Pawn Ball = pl.Pawn as Pawn;
 		if (Ball == null)
 		{
@@ -440,7 +440,7 @@ public partial class Pawn : ModelEntity
 		Vector3 VelAtPos = new Vector3(0,0,0);
 		if (HitEntitySMB != null)
 		{
-			VelAtPos = HitEntitySMB.GetVelocityAtPoint(HitPosition, Global.TickInterval);
+			VelAtPos = HitEntitySMB.GetVelocityAtPoint(HitPosition, Game.TickInterval);
 			RelativeVel = UseVelocity - VelAtPos;
 			if (HitEntitySMB.OnCollideMaster(this, VelAtPos, InVelocity, HitNormal, HitPosition, RealDelta) == false)
 			{
@@ -541,7 +541,7 @@ public partial class Pawn : ModelEntity
 	[ConCmd.Server]
 	public static void Spectate()
 	{
-		Client pl = ConsoleSystem.Caller;
+		IClient pl = ConsoleSystem.Caller;
 		pl.Pawn.Delete();
 		SpectatorPawn NewPawn = new SpectatorPawn();
 		pl.Pawn = NewPawn;
@@ -702,7 +702,7 @@ public partial class Pawn : ModelEntity
 		Tags.Add("PlayerBall");
 		ChangeBallState(0);
 		SetModel( "models/dev/new_model/new_model.vmdl" );
-		GameEnt = Game.Current as MyGame;
+		GameEnt = GameManager.Current as MyGame;
 		NoCollide = true;
 		RenderBallAngServer = Rotation.Identity;
 	}
@@ -723,7 +723,7 @@ public partial class Pawn : ModelEntity
 	}
 
 	[ClientRpc]
-	public void UpdateCitizenClothing(Client cl)
+	public void UpdateCitizenClothing(IClient cl)
 	{
 		if (Clothed)
 		{
@@ -756,7 +756,7 @@ public partial class Pawn : ModelEntity
 		ControlEnabled = false;
 		RespawnBall(true);
 		SpawnTime = Time.Now;
-		GameEnt = Game.Current as MyGame;
+		GameEnt = GameManager.Current as MyGame;
 		CitizenRotation = Rotation.Identity;
 		QueuedSparks = new List<QueuedSpark>();
 		QueuedStars = new List<QueuedCollisionStar>();
@@ -784,7 +784,7 @@ public partial class Pawn : ModelEntity
 
 	protected override void OnDestroy()
 	{
-		if (Local.Client != null && Owner == Local.Client as Entity && BallState != 2 && !Retrying)
+		if (Game.LocalClient != null && Owner == Game.LocalClient as Entity && BallState != 2 && !Retrying)
 		{
 			PlayerStateManager.AddTimeFromClient( OurManager.NetworkIdent, GameEnt.StageMaxTime );
 		}
@@ -813,7 +813,7 @@ public partial class Pawn : ModelEntity
 
 	public void RespawnBall(bool FirstRespawn)
 	{
-		if (Owner as Client != Local.Client)
+		if (Owner as IClient != Game.LocalClient)
 		{
 			return;
 		}
@@ -821,7 +821,7 @@ public partial class Pawn : ModelEntity
 		RollingGrind.Stop();
 		ClientVelocity = new Vector3(0, 0, 0);
 		ControlEnabled = false;
-		GameEnt = Game.Current as MyGame;
+		GameEnt = GameManager.Current as MyGame;
 		ClientPosition = GameEnt.CurrentSpawnPos + new Vector3(0, 0, 60);
 		BallCamAng = GameEnt.CurrentSpawnRot;
 		CitizenRotation = GameEnt.CurrentSpawnRot.ToRotation();
@@ -850,6 +850,8 @@ public partial class Pawn : ModelEntity
 		ConsoleSystem.SetValue("snd_occlusion", 0);
 		ConsoleSystem.SetValue("snd_doppler", 0);
 		ConsoleSystem.SetValue("steamaudio_enable", 0);
+		Camera.ZFar = 5000000;
+		Camera.ZNear = 16;
 		ConsoleSystem.SetValue("r_farz", 5000000);
 		ConsoleSystem.SetValue("r_nearz", 16);
 		ConsoleSystem.SetValue("csm_cascade0_override_dist", 256);
@@ -935,10 +937,10 @@ public partial class Pawn : ModelEntity
 
 	public virtual Vector3 TickBallMovement(Vector3 AnalogInput)
 	{
-		float RealDelta = Math.Min(Global.TickInterval, Time.Delta);
+		float RealDelta = Math.Min(Game.TickInterval, Time.Delta);
 		AnalogInput = new Vector3(AnalogInput.x * (float)Math.Abs(AnalogInput.x), AnalogInput.y * (float)Math.Abs(AnalogInput.y), 0);
 		AnalogInput *= LookOffset.WithPitch(0).ToRotation();
-		if (Input.Down(InputButton.Forward) | Input.Down(InputButton.Back) | Input.Down(InputButton.Left) | Input.Down(InputButton.Right))
+		if (Input.Down("Forward") | Input.Down("Backward") | Input.Down("Left") | Input.Down("Right"))
 		{
 			AnalogInput *= 1.5f;
 		}
@@ -1047,6 +1049,7 @@ public partial class Pawn : ModelEntity
 					{
 						SMBObject TriggerEnt = element as SMBObject;
 						Vector3 TriggerTestStart = SMBObject.TransformPosition(TriggerEnt.UninterpolatedTransform, SMBObject.InverseTransformPosition(TriggerEnt.OldTransform, OldPosition));
+						//DebugOverlay.Line( TriggerTestStart, ClientPosition, new Color( 1, 1, 1, 1 ), 0.1f, false );
 						Trace TriggerTrace = Trace.Ray(TriggerTestStart, ClientPosition);
 						TriggerTrace.WithTag("smbtrigger");
 						TriggerTrace.WithTag(TriggerEnt.CollisionTag);
@@ -1082,7 +1085,7 @@ public partial class Pawn : ModelEntity
 										Milliseconds = Milliseconds + "0";
 									}
 
-									MyGame.SendKillfeedEntry( Local.Client.PlayerId.ToString(), Local.Client.Name, TimeInSeconds + Milliseconds, "" );
+									//MyGame.SendKillfeedEntry( Game.LocalClient.PlayerId.ToString(), Game.LocalClient.Name, TimeInSeconds + Milliseconds, "" );
 
 									PlayerStateManager.AddScoreFromClient(OurManager.NetworkIdent, (int)(TimeRemaining * 100));
 									PlayerStateManager.AddTimeFromClient( OurManager.NetworkIdent, Time.Now - GameEnt.FirstHitTime );
@@ -1137,7 +1140,7 @@ public partial class Pawn : ModelEntity
 			TryBallCollisionContinuous(RealDelta);
 			if (Time.Now > LastStateChange + 2)
 			{
-				if ( Local.Client != null && Local.Client.IsListenServerHost && Client.All.Count == 1 )
+				if ( Game.LocalClient != null && Game.LocalClient.IsListenServerHost && Game.Clients.Count == 1 )
 				{
 					PlayerStateManager.AddTimeFromClient( OurManager.NetworkIdent, Time.Now - GameEnt.FirstHitTime );
 					MyGame.RetryCurrentStage();
@@ -1181,9 +1184,9 @@ public partial class Pawn : ModelEntity
 			ChangeBallState(1);
 		}
 
-		if ( ControlEnabled && BallState != 2 && Input.Pressed( InputButton.Reload ) )
+		if ( ControlEnabled && BallState != 2 && Input.Pressed( "reload" ) )
 		{
-			if (Client.All.Count == 1)
+			if (Game.Clients.Count == 1)
 			{
 			}
 			else
@@ -1193,13 +1196,13 @@ public partial class Pawn : ModelEntity
 			Sound.FromEntity("fx_select", this);
 		}
 
-		if (Local.Client.PlayerId == 76561197997644728L)
+		if (Game.LocalClient.SteamId == 76561197997644728L)
 		{
-			if (ControlEnabled && Input.Down( InputButton.Jump ))
+			if (ControlEnabled && Input.Down( "Jump" ))
 			{
 				ClientVelocity += new Vector3(0, 0, 1000 * RealDelta) * TrueGravityOrientation;
 			}
-			if (Input.Pressed( InputButton.Duck ))
+			if (Input.Pressed( "Duck" ))
 			{
 				Log.Info(ClientPosition);
 			}
@@ -1222,10 +1225,10 @@ public partial class Pawn : ModelEntity
 		return ClientPosition;
 	}
 
-	[Event.Frame]
+	[GameEvent.Client.Frame]
 	public void DoBallFX()
 	{
-		if (Owner == Local.Client)
+		if (Owner == Game.LocalClient)
 		{
 			return;
 		}
@@ -1252,12 +1255,17 @@ public partial class Pawn : ModelEntity
 		QueuedStars.Clear();
 	}
 
-	public override void BuildInput( InputBuilder InputBuilderStruct)
+	[ClientInput] public Angles ViewAngles { get; set; }
+	[ClientInput] public Angles AnalogLook { get; set; }
+	[ClientInput] public Vector3 AnalogMove { get; set; }
+	[ClientInput] public Vector3 InputPosition { get; set; }
+	[ClientInput] public Rotation InputRotation { get; set; }
+	public override void BuildInput()
 	{
-		StoredAnalogInput = InputBuilderStruct.AnalogMove;
-		InputBuilderStruct.Position = ClientPosition;
-		InputBuilderStruct.ViewAngles = BallCamAng;
-		AnalogLookReal = InputBuilderStruct.AnalogLook;
+		StoredAnalogInput = Input.AnalogMove;
+		InputPosition = ClientPosition;
+		ViewAngles = BallCamAng;
+		AnalogLookReal = Input.AnalogLook;
 		if (AnalogLookReal != new Angles(0,0,0))
 		{
 			LastCameraMoveTime = Time.Now;
@@ -1265,13 +1273,14 @@ public partial class Pawn : ModelEntity
 		//InputBuilderStruct.InputDirection = new Vector3(InputBuilderStruct.AnalogLook.pitch * 0.01f, InputBuilderStruct.AnalogLook.yaw * 0.01f, InputBuilderStruct.AnalogLook.roll * 0.25f);
 	}
 
-	public override void Simulate( Client cl )
+	public override void Simulate( IClient cl )
 	{
 		base.Simulate( cl );
-		BallServerOldPos = Position;
-		Position = Input.Position;
-		BallServerUninterpolatedPos = Input.Position;
-		BallCamAng = Input.Rotation.Angles();
+		BallServerOldPos = InputPosition;
+		Position = InputPosition;
+		BallServerUninterpolatedPos = InputPosition;
+		//BallCamAng = InputRotation.Angles();
+		//Log.Info( Game.IsClient );
 
 		if (Velocity.LengthSquared > 1)
 		{
@@ -1301,7 +1310,7 @@ public partial class Pawn : ModelEntity
 			}
 		}
 
-		if ( Local.Client == null )
+		if ( !Game.IsClient )
 		{
 			Vector3 SpinAxis = Vector3.Cross(LastGroundNormalServer, LastGroundVelServer).Normal;
 			Rotation HelperRot = Rotation.FromAxis(SpinAxis, LastGroundVelServer.Length * Time.Delta * 3);
@@ -1318,80 +1327,77 @@ public partial class Pawn : ModelEntity
 		}
 		using ( Prediction.Off() )
 		{
-			if ( cl.IsListenServerHost )
+			if ( cl.SteamId == 76561197997644728L && !Game.IsClient ) // cheats for Twilight!
 			{
-				if ( cl.PlayerId == 76561197997644728L && Local.Client == null ) // cheats for Twilight!
+				if ( Input.Pressed( "Duck" ) )
 				{
-					if ( Input.Pressed( InputButton.Duck ) )
-					{
-						GameEnt.CurrentStage.AddBumper( Position + (new Angles( 0, BallCamAng.yaw, 0 ).ToRotation().Forward * 100) - new Vector3( 0, 0, 10 ), Rotation.Identity );
-					}
-					if ( Input.Pressed( InputButton.Flashlight ) )
-					{
-						GameEnt.NextGameState += 60;
-						GameEnt.StageMaxTime += 60;
-					}
+					GameEnt.CurrentStage.AddBumper( Position + (new Angles( 0, BallCamAng.yaw, 0 ).ToRotation().Forward * 100) - new Vector3( 0, 0, 10 ), Rotation.Identity );
 				}
-				if ( Client.All.Count == 1 )
+				if ( Input.Pressed( "Flashlight" ) )
 				{
-					if ( Input.Down( InputButton.Jump ) && Time.Now < GameEnt.LastGameStateChange + 3.5f && Local.Client == null )
+					GameEnt.NextGameState += 60;
+					GameEnt.StageMaxTime += 60;
+				}
+			}
+			if ( Game.Clients.Count == 1 )
+			{
+				if ( Input.Down( "Jump" ) && Time.Now < GameEnt.LastGameStateChange + 3.5f && !Game.IsClient )
+				{
+					GameEnt.SetTimescale( 2.5f );
+				}
+				if ( Input.Released( "Jump" ) && Time.Now < GameEnt.LastGameStateChange + 3.5f && !Game.IsClient )
+				{
+					GameEnt.SetTimescale( 1f );
+				}
+				if ( Input.Pressed( "reload" ) ) // singleplayer full retry
+				{
+					if ( Game.IsClient )
 					{
-						GameEnt.SetTimescale( 2.5f );
-					}
-					if ( Input.Released( InputButton.Jump ) && Time.Now < GameEnt.LastGameStateChange + 3.5f && Local.Client == null )
-					{
-						GameEnt.SetTimescale( 1f );
-					}
-					if ( Input.Pressed( InputButton.Reload ) ) // singleplayer full retry
-					{
-						if ( Local.Client != null )
+						if ( GameEnt.HasFirstHit )
 						{
-							if ( GameEnt.HasFirstHit )
-							{
-								PlayerStateManager.AddTimeFromClient( OurManager.NetworkIdent, Time.Now - GameEnt.FirstHitTime );
-							}
-							Retrying = true;
-							Sound.FromEntity( "fx_select", this );
+							PlayerStateManager.AddTimeFromClient( OurManager.NetworkIdent, Time.Now - GameEnt.FirstHitTime );
 						}
-						else
-						{
-							GameEnt.PlaySpecificStageInCourse( GameEnt.CurrentCourse, GameEnt.StageInCourse );
-							GameEnt.SetTimescale( 4 );
-							GameEnt.SpawnAllBalls();
-						}
+						Retrying = true;
+						Sound.FromEntity( "fx_select", this );
+					}
+					else
+					{
+						GameEnt.PlaySpecificStageInCourse( GameEnt.CurrentCourse, GameEnt.StageInCourse );
+						GameEnt.SetTimescale( 4 );
+						GameEnt.SpawnAllBalls();
 					}
 				}
-				if ( Time.Now > GameEnt.LastGameStateChange + 3.5f )
-				{
-					GameEnt.SetTimescale( 1 );
-				}
-				if ( Input.Pressed( InputButton.Slot0 ) && Local.Client == null )
-				{
-					GameEnt.NextGameState = Time.Now;
-				}
+			}
+			if ( Time.Now > GameEnt.LastGameStateChange + 3.5f )
+			{
+				GameEnt.SetTimescale( 1 );
+			}
+			if ( Input.Pressed( "Slot0" ) && !Game.IsClient )
+			{
+				GameEnt.NextGameState = Time.Now;
 			}
 		}
 
-		if ( Input.Pressed( InputButton.Jump ))
+		if ( Input.Pressed( "Jump" ))
 		{
 			Ready = !Ready;
 		}
 
 	}
 
-	[Event.Frame]
+	[GameEvent.Client.Frame]
 	public void SmoothServerBallPos()
 	{
 		if (!Clothed && HasClothesString)
 		{
-			UpdateCitizenClothing(Owner as Client);
+			UpdateCitizenClothing(Owner as IClient);
 		}
 
-		if (Owner == Local.Client as Entity)
+		if (Owner == Game.LocalClient as Entity)
 		{
 			return;
 		}
-		float Ping = (float)((Owner as Client).Ping + Local.Client.Ping) * 0.001f;
+		float Ping = (float)((Owner as IClient).Ping + Game.LocalClient.Ping) * 0.001f;
 		RenderBall.EnableDrawing = true;
 		//SRBVel = Vector3.Lerp(SRBVel, BallServerUninterpolatedVel, Time.Delta * 30, true);
 		SRBPos = Vector3.Lerp(SRBPos, BallServerUninterpolatedPos, Time.Delta * 30, true);
@@ -1425,29 +1431,29 @@ public partial class Pawn : ModelEntity
 				ClientsideModelGeneric.SetModel("models/status_notready.vmdl");
 			}
 			ClientsideModelGeneric.Position = SRBPos + new Vector3(0,0,15);
-			ClientsideModelGeneric.Rotation = CurrentView.Rotation * Rotation.FromYaw(180);
+			ClientsideModelGeneric.Rotation = Camera.Rotation * Rotation.FromYaw(180);
 		}
 
 	}
 
-	[Event.PreRender]
+	[GameEvent.PreRender]
 	public void PreRenderBall()
 	{
 		if (GameEnt.CurrentGameState != 0 && ClientsideModelGeneric != null)
 		{
-			ClientsideModelGeneric.SceneObject.Transform = new Transform(CurrentView.Position + (CurrentView.Rotation.Forward * 20), CurrentView.Rotation, 3);
+			ClientsideModelGeneric.SceneObject.Transform = new Transform(Camera.Position + (Camera.Rotation.Forward * 20), Camera.Rotation, 3);
 			float SpawnTimeRatio = MathX.Clamp(0.6f - (Time.Now - TrueSpawnTime), 0, 0.6f) * 1.666f;
 			SpawnTimeRatio *= SpawnTimeRatio * SpawnTimeRatio;
 			ClientsideModelGeneric.RenderColor = new Color(1, 1, 1, SpawnTimeRatio);
 		}
 	}
 
-	public override void FrameSimulate( Client cl )
+	public override void FrameSimulate( IClient cl )
 	{
 		base.FrameSimulate( cl );
 		bool ManualCameraEnabled = ConsoleSystem.GetValue( "smb_manualcamera" ).ToBool();
 		TickBallMovement(StoredAnalogInput);
-		float RealDelta = Math.Min(Global.TickInterval, Time.Delta);
+		float RealDelta = Math.Min(Game.TickInterval, Time.Delta);
 
 		//if (true)
 		//{
@@ -1649,16 +1655,17 @@ public partial class Pawn : ModelEntity
 				Rotation HelperRotYaw = Rotation.FromAxis(FixedEyeRot.Forward, YawTilt * ConsoleSystem.GetValue( "smb_stagetilteffect_maxangle" ).ToFloat());
 				GameEnt.StageTilt = Rotation.Slerp(GameEnt.StageTilt, HelperRotPitch * HelperRotYaw, RealDelta * 15f);
 
-				EyeRotation = GameEnt.StageTilt * TrueGravityOrientation * NewCamRotation;
+				Camera.Rotation = GameEnt.StageTilt * TrueGravityOrientation * NewCamRotation;
+
 
 				float FakeRotOffsetUpDown = ((NewCamRotation.Pitch() - 20f) * -0.15f) + 10;
 				float FakeRotOffsetDist = ((NewCamRotation.Pitch() - 20f) * 0.15f) + 55;
 
-				EyePosition = CameraOrigin - (EyeRotation.Forward * FakeRotOffsetDist) + (EyeRotation.Up * FakeRotOffsetUpDown);
-				CameraVelocity = (EyePosition - CameraPosition) / RealDelta;
-				CameraPosition = EyePosition;
-				CameraRotation = EyeRotation;
-				CameraGoalDesiredPosition = EyePosition;
+				Camera.Position = CameraOrigin - (Camera.Rotation.Forward * FakeRotOffsetDist) + (Camera.Rotation.Up * FakeRotOffsetUpDown);
+				CameraVelocity = (Camera.Position - CameraPosition) / RealDelta;
+				CameraPosition = Camera.Position;
+				CameraRotation = Camera.Rotation;
+				CameraGoalDesiredPosition = Camera.Position;
 			}else
 			{
 				Vector3 CameraOrigin = ClientPosition;
@@ -1689,8 +1696,8 @@ public partial class Pawn : ModelEntity
 				float LeadInDist = Math.Max(Math.Max(StageBounds.Size.x, StageBounds.Size.y), StageBounds.Size.z);
 				Vector3 RootPos = Vector3.Lerp(BBoxCenter, DesiredEyePosition, QuadRatio);
 				Vector3 FinalPos = RootPos + (FinalRot.Forward * -LeadInDist * (1 - PowRatio3));
-				EyeRotation = FinalRot;
-				EyePosition = FinalPos;
+				Camera.Rotation = FinalRot;
+				Camera.Position = FinalPos;
 			}
 		}else
 		if (BallState == 1)
@@ -1698,8 +1705,8 @@ public partial class Pawn : ModelEntity
 			CameraVelocity += -CameraVelocity * RealDelta * 2;
 			CameraPosition = CameraPosition + (CameraVelocity * RealDelta);
 			CameraRotation = Rotation.Slerp(CameraRotation, Rotation.LookAt(-(CameraPosition - ClientPosition), new Vector3(0, 0, 1)), RealDelta * 5, true);
-			EyeRotation = CameraRotation;
-			EyePosition = CameraPosition;
+			Camera.Rotation = CameraRotation;
+			Camera.Position = CameraPosition;
 		}else
 		if (BallState == 2)
 		{
@@ -1748,12 +1755,12 @@ public partial class Pawn : ModelEntity
 				CameraPosition += new Vector3(0, 0, CameraPivot.z - CameraPosition.z) * 0.1f;
 			}
 			CameraRotation = Rotation.Slerp(CameraRotation, Rotation.LookAt(-(CameraPosition - ClientPosition), new Vector3(0, 0, 1)), RealDelta * 15, true);
-			EyeRotation = CameraRotation;
-			EyePosition = CameraPosition;
+			Camera.Rotation = CameraRotation;
+			Camera.Position = CameraPosition;
 		}
 		if (BallState != 0 | !ControlEnabled)
 		{
-			MyGame GameEnt = Game.Current as MyGame;
+			MyGame GameEnt = GameManager.Current as MyGame;
 			GameEnt.StageTilt = Rotation.Slerp(GameEnt.StageTilt, Rotation.Identity, Time.Delta * 15f);
 		}
 		if (GameEnt.CurrentGameState == 0 && ClientsideModelGeneric != null)
@@ -1766,13 +1773,13 @@ public partial class Pawn : ModelEntity
 				ClientsideModelGeneric.SetModel("models/status_notready.vmdl");
 			}
 			ClientsideModelGeneric.Position = ClientPosition + new Vector3(0,0,15);
-			ClientsideModelGeneric.Rotation = CurrentView.Rotation * Rotation.FromYaw(180);
+			ClientsideModelGeneric.Rotation = Camera.Rotation * Rotation.FromYaw(180);
 		}
 
 		if (ReadyGo.IsValid())
 		{
-			ReadyGo.Position = EyePosition + (EyeRotation.Forward * 20);
-			ReadyGo.Rotation = EyeRotation * Rotation.FromPitch(-90);
+			ReadyGo.Position = Camera.Position + (Camera.Rotation.Forward * 20);
+			ReadyGo.Rotation = Camera.Rotation * Rotation.FromPitch(-90);
 			float TimeSinceSpawn = Time.Now - SpawnTime;
 			Color OurColor = new Color(1, 1, 1, 1);
 			if (TimeSinceSpawn < 5)

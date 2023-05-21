@@ -1,5 +1,5 @@
 ﻿using Sandbox;
-using SandboxEditor;
+using Editor;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -23,11 +23,11 @@ public partial class ConfettiParticle : SMBModelParticle
 		ParticleSize = InSize;
 		Scale = InSize;
 		Position = InPosition;
-		Velocity = InVelocity * Rand.Float(0.25f, 1.25f);
+		Velocity = InVelocity * Game.Random.Float( 0.25f, 1.25f);
 		Rotation = Rotation.Random;
 		AngleVelocity = Rotation.Random;
 		Instantiated = true;
-		ColorHsv ConfettiColorHsv = new ColorHsv(Rand.Float(0f, 360f), 1, Rand.Float(1f, 1f), 1);
+		ColorHsv ConfettiColorHsv = new ColorHsv( Game.Random.Float( 0f, 360f), 1, Game.Random.Float(1f, 1f), 1);
 		Color ConfettiColor = ConfettiColorHsv.ToColor();
 		SceneObject.Attributes.Set("ConfettiTint", new Vector4(ConfettiColor.r, ConfettiColor.g, ConfettiColor.b, 1));
 	}

@@ -10,7 +10,8 @@
   "ResourcePaths": [],
   "HasCode": true,
   "CodePath": "/code/",
-  "RootNamespace": null,
+  "PackageReferences": [],
+  "EditorReferences": null,
   "Metadata": {
     "MaxPlayers": 64,
     "MinPlayers": 1,
@@ -91,6 +92,11 @@
       "DefineConstants": "SANDBOX;ADDON;DEBUG",
       "NoWarn": "1701;1702;1591;",
       "ReleaseMode": "Release"
-    }
+    },
+    "CsProjName": "",
+    "HttpAllowList": null,
+    "Summary": "Roll to the goal across a vast array of tricky obstacle courses!",
+    "Description": "Are you ready? Let\u2019s roll!\n\nWelcome to Rolled Out: Source 2, the s\u0026box adaptation of my marble roller of the same name (sans the Source 2!)\n\nFly through courses with speedy reflexes, plot a route through tricky puzzle levels, and keep wary of all kinds of nasty obstacles along the way.\n\nDirect feedback to the #waywo thread in the s\u0026box server on Discord!",
+    "Public": true
   }
 }

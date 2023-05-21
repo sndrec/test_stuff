@@ -1,5 +1,5 @@
 ﻿using Sandbox;
-using SandboxEditor;
+using Editor;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -30,7 +30,7 @@ public partial class SMBModelParticle : ModelEntity
 		SetModel("particles/collision_star.vmdl");
 		EnableAllCollisions = false;
 		ParticleSpawnTime = Time.Now;
-		ParticleLife = Rand.Float(0.5f, 1.5f);
+		ParticleLife = Game.Random.Float( 0.5f, 1.5f);
 		ParticleSize = InSize;
 		Scale = InSize;
 		Position = InPosition;
@@ -79,7 +79,7 @@ public partial class SMBModelParticle : ModelEntity
 		}
 	}
 
-	[Event.Frame]
+	[GameEvent.Client.Frame]
 	public virtual void ManageParticle()
 	{
 		if (!Instantiated)

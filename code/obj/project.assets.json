@@ -1,60 +1,65 @@
 {
   "version": 3,
   "targets": {
-    "net6.0": {
-      "base/1.0.0": {
+    "net7.0": {
+      "Base Library/1.0.0": {
         "type": "project",
-        "framework": ".NETCoreApp,Version=v6.0",
+        "framework": ".NETCoreApp,Version=v7.0",
         "compile": {
-          "bin/placeholder/base.dll": {}
+          "bin/placeholder/Base Library.dll": {}
         },
         "runtime": {
-          "bin/placeholder/base.dll": {}
+          "bin/placeholder/Base Library.dll": {}
         }
       }
     }
   },
   "libraries": {
-    "base/1.0.0": {
+    "Base Library/1.0.0": {
       "type": "project",
-      "path": "A:\\SteamLibrary\\steamapps\\common\\sbox\\addons\\base\\code\\base.csproj",
-      "msbuildProject": "A:\\SteamLibrary\\steamapps\\common\\sbox\\addons\\base\\code\\base.csproj"
+      "path": "A:\\SteamLibrary\\steamapps\\common\\sbox\\addons\\base\\code\\Base Library.csproj",
+      "msbuildProject": "A:\\SteamLibrary\\steamapps\\common\\sbox\\addons\\base\\code\\Base Library.csproj"
     }
   },
   "projectFileDependencyGroups": {
-    "net6.0": [
-      "base >= 1.0.0"
+    "net7.0": [
+      "Base Library >= 1.0.0"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\loser\\.nuget\\packages\\": {}
+    "C:\\Users\\loser\\.nuget\\packages\\": {},
+    "C:\\Users\\loser\\AppData\\Roaming\\Godot\\mono\\GodotNuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\loser\\Documents\\s&box projects\\test_stuff\\code\\test_stuff.csproj",
+      "projectUniqueName": "c:\\users\\loser\\documents\\s&box projects\\test_stuff\\code\\test_stuff.csproj",
       "projectName": "test_stuff",
-      "projectPath": "C:\\Users\\loser\\Documents\\s&box projects\\test_stuff\\code\\test_stuff.csproj",
+      "projectPath": "c:\\users\\loser\\documents\\s&box projects\\test_stuff\\code\\test_stuff.csproj",
       "packagesPath": "C:\\Users\\loser\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\loser\\Documents\\s&box projects\\test_stuff\\code\\obj\\",
+      "outputPath": "c:\\users\\loser\\documents\\s&box projects\\test_stuff\\code\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Users\\loser\\AppData\\Roaming\\Godot\\mono\\GodotNuGetFallbackFolder"
+      ],
       "configFilePaths": [
         "C:\\Users\\loser\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\loser\\AppData\\Roaming\\NuGet\\config\\Godot.Offline.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
-        "net6.0"
+        "net7.0"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net6.0": {
-          "targetAlias": "net6.0",
+        "net7.0": {
+          "targetAlias": "net7.0",
           "projectReferences": {
-            "A:\\SteamLibrary\\steamapps\\common\\sbox\\addons\\base\\code\\base.csproj": {
-              "projectPath": "A:\\SteamLibrary\\steamapps\\common\\sbox\\addons\\base\\code\\base.csproj"
+            "A:\\SteamLibrary\\steamapps\\common\\sbox\\addons\\base\\code\\Base Library.csproj": {
+              "projectPath": "A:\\SteamLibrary\\steamapps\\common\\sbox\\addons\\base\\code\\Base Library.csproj"
             }
           }
         }
@@ -66,8 +71,8 @@
       }
     },
     "frameworks": {
-      "net6.0": {
-        "targetAlias": "net6.0",
+      "net7.0": {
+        "targetAlias": "net7.0",
         "imports": [
           "net461",
           "net462",
@@ -79,12 +84,7 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "frameworkReferences": {
-          "Microsoft.NETCore.App": {
-            "privateAssets": "all"
-          }
-        },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.401\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.406\\RuntimeIdentifierGraph.json"
       }
     }
   }
